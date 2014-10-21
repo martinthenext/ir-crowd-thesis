@@ -21,7 +21,7 @@ class JudgementRecord(object):
     self.topic_id = topic_id
     self.doc_id = doc_id
     if not relevance=='na':
-      self.is_relevant = bool(float(relevance))
+      self.is_relevant = (float(relevance) >= 0.5) 
     else:
       self.is_relevant = None
     
@@ -38,8 +38,6 @@ for judgement in judgements:
 
 # For every topic get: list of document texts, list of their mean relevances
 topic_text_relevance_tuples = []
-
-judgements_per_doc_counts = []
 
 for topic_id, judgements in judgements_by_topic_id.iteritems():
   # Grouping judgements by document inside a topic
@@ -62,11 +60,22 @@ for topic_id, judgements in judgements_by_topic_id.iteritems():
 
   # For every document compute the relevance
   mean_relevances = np.zeros(len(judgements_by_doc_id))
-  for index, doc_id in enumerate(judgements_by_doc_id.keys()):
-    judgements_per_doc_counts.append(len(judgements_by_doc_id[doc_id]))
-    mean_relevances[index] = np.mean([j.is_relevant for j in judgements_by_doc_id[doc_id]])
+  var_relevances = np.zeros(len(judgements_by_doc_id))
+  count_relevances = np.zeros(len(judgements_by_doc_id))
 
-  topic_text_relevance_tuples.append( (topic_id, document_texts, mean_relevances) )
+
+  for index, doc_id in enumerate(judgements_by_doc_id.keys()):
+    doc_relevances = [j.is_relevant for j in judgements_by_doc_id[doc_id]]
+    mean_relevances[index] = np.mean(doc_relevances)
+    var_relevances[index] = np.var(doc_relevances)
+    count_relevances[index] = len(judgements_by_doc_id[doc_id])
+
+  # Computing pooled variance
+  weigted_sum = sum([(n - 1) * s for n, s in izip(count_relevances, var_relevances)])
+  denominator = sum(count_relevances) - len(count_relevances)
+  pooled_variance = float(weigted_sum) / float(denominator)
+
+  topic_text_relevance_tuples.append( (topic_id, document_texts, mean_relevances, pooled_variance) )
 
 # Get a list of all texts
 all_texts_iter = imap(operator.itemgetter(1), topic_text_relevance_tuples)
@@ -77,7 +86,7 @@ vectorizer = TfidfVectorizer()
 vectorizer.fit(all_texts_iter)
 
 # Separate relevant documents from irrelevant
-for topic_id, texts, relevances in topic_text_relevance_tuples:
+for topic_id, texts, relevances, pooled_variance in topic_text_relevance_tuples:
   relevant_texts = []
   irrelevant_texts = []
   for text, relevance in izip(texts, relevances):
@@ -94,7 +103,7 @@ for topic_id, texts, relevances in topic_text_relevance_tuples:
 
   t_test_p_value = ttest_ind(inner_similarity.flatten(), outer_similarity.flatten(), equal_var=False)[1]
 
-  print "%s|%0.2f|%0.2f|%0.2f|%0.2f|%s|%0.e" % (
+  print "%s|%0.2f|%0.2f|%0.2f|%0.2f|%s|%0.e|%0.3f|" % (
     topic_id,
     np.mean(inner_similarity.flatten()),
     np.mean(outer_similarity.flatten()),
@@ -102,6 +111,5 @@ for topic_id, texts, relevances in topic_text_relevance_tuples:
     np.std(outer_similarity.flatten()),
     len(texts),
     t_test_p_value,
+    pooled_variance,
   )
-
-print 'Judgements per doc: %s' % np.mean(judgements_per_doc_counts)

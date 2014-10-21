@@ -9,6 +9,7 @@ Q: In trec_judgements in team 6 there are judgements with ranked jusgements (0.5
 TF-IDF cosine similarities between relevant documents (inner similarities) are compared to distances between relevant documents and irrelevant (outer similarities). Two-sample Welch t-test was used on the similarities.
 
 topic|inner mean similarity|outer mean similarity|inner sd|outer sd|total texts in topic|p-value|judgement relevance|comment
+-----|----|----|----|----|---|-----|-----|
 20932|0.43|0.37|0.23|0.21|115|1e-42|0.195|
 20488|0.50|0.35|0.21|0.22|110|2e-157|0.158|
 20910|0.32|0.19|0.23|0.17|115|1e-187|0.160|

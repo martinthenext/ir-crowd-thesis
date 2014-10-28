@@ -41,7 +41,6 @@ topic|inner mean similarity|outer mean similarity|inner sd|outer sd|total texts 
 20584|0.44|0.26|0.24|0.20|105|5e-241|0.165|
 20996|0.22|0.08|0.24|0.09|110|1e-25|0.164|
 
-
 Judgements per doc: 14.4746875
 
 Weird topic (inner similarity smaller than outer):
@@ -55,3 +54,42 @@ Weird topic (inner similarity smaller than outer):
     </row>
 
 Computed the [pooled variance](http://en.wikipedia.org/wiki/Pooled_variance) for judgemens on every topic: for every document variance of relevance judgements was computed, then these variances were pooled (weighed with sample sizes) for every topic.
+
+### Ground truth
+
+We have 395 "ground truth" relevance assessments. For documents which had "ground truth" available differences between average worker assessment and "ground truth" have been studied. See means of the differences and t-test results in the table below.
+
+topic|mean difference between avg. vote and truth|p-value
+-----|-----|------
+20932|-0.15|2e-01
+20488|0.19|3e-02
+20910|0.36|1e-05 *
+20958|0.13|2e-01
+20714|0.09|2e-01
+20636|0.14|2e-01
+20956|0.05|6e-01
+20424|0.28|6e-02
+20916|-0.03|8e-01
+20542|0.07|4e-01
+20778|0.22|2e-02
+20690|0.12|7e-02
+20696|0.18|3e-01
+20694|0.14|1e-02
+20832|0.21|8e-03 *
+20962|0.14|4e-01
+20812|0.34|2e-05 *
+20814|0.13|8e-02
+20704|0.25|1e-02
+20922|0.55|1e-03 *
+20780|0.00|1e+00
+20766|0.12|7e-02
+20644|0.33|1e-01
+20764|0.14|3e-02
+20642|0.02|8e-01
+20686|0.19|4e-02
+20976|0.36|5e-03 *
+20972|-0.00|1e+00
+20584|0.13|2e-02
+20996|-0.16|2e-01
+
+Stars designate p-values less than `0.01`: mean difference between average worker vote and "ground truth" on topic documents is signifantly different from 0.

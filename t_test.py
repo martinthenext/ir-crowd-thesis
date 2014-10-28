@@ -20,7 +20,9 @@ for topic_id, texts, relevances, pooled_variance, truths in topic_texts_relevanc
   inner_similarity = cosine_similarity(relevant_vectorized)
   outer_similarity = cosine_similarity(relevant_vectorized, irrelevant_vectorized)
 
-  t_test_p_value = ttest_ind(inner_similarity.flatten(), outer_similarity.flatten(), equal_var=False)[1]
+  t_test_p_value = ttest_ind(
+    inner_similarity.flatten(), outer_similarity.flatten(), 
+    equal_var=False)[1]
 
   print "%s|%0.2f|%0.2f|%0.2f|%0.2f|%s|%0.e|%0.3f|" % (
     topic_id,

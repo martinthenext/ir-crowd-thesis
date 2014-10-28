@@ -1,4 +1,4 @@
-from load import topic_texts_relevances_variances, vectorizer
+from data import topic_texts_relevances_variances, vectorizer
 from itertools import izip
 from sklearn.metrics.pairwise import cosine_similarity
 from scipy.stats import ttest_ind

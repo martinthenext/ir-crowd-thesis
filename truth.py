@@ -22,6 +22,9 @@ significance_indicator = lambda p: "*" if p < 0.01 else " "
 
 for topic_id, _, relevances, _, truths in topic_texts_relevances_variances_truths:
   diff = get_differences(relevances, truths)
+  truth_count = sum(1 for t in truths if t is not None)
+  relevances_count = len(relevances)
   # Test for H0: expectation of difference is zero
   _, pval = ttest_1samp(diff, 0)
-  print '%s|%0.2f|%0.e %s' % (topic_id, np.mean(diff), pval, significance_indicator(pval))
+  print '%s|%s/%s|%0.2f|%0.e %s' % \
+    (topic_id, truth_count, relevances_count, np.mean(diff), pval, significance_indicator(pval))

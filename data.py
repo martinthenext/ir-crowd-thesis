@@ -28,9 +28,6 @@ class JudgementRecord(object):
 # First read off ground truth so we can look it up afterwards
 truth_by_topic_id_and_doc_id = {}
 
-no_label_counter = 0
-label_counter = 0
-
 with io.open(GROUND_TRUTH_FILE, 'r', encoding='utf-8') as f:
   headers = f.readline()
   for line in f:
@@ -40,9 +37,6 @@ with io.open(GROUND_TRUTH_FILE, 'r', encoding='utf-8') as f:
     truth = float(cols[3]) / 2
     if truth < 0:
       truth = None
-      no_label_counter += 1
-    else:
-      label_counter += 1
     truth_by_topic_id_and_doc_id[(topic_id, doc_id)] = truth
 
 print 'No ground truth:%s\nGround truth:%s\n' % (no_label_counter, label_counter)

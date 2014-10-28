@@ -59,37 +59,37 @@ Computed the [pooled variance](http://en.wikipedia.org/wiki/Pooled_variance) for
 
 We have 395 "ground truth" relevance assessments. For documents which had "ground truth" available differences between average worker assessment and "ground truth" have been studied. See means of the differences and t-test results in the table below.
 
-topic|mean difference between avg. vote and truth|p-value
------|-----|------
-20932|-0.15|2e-01
-20488|0.19|3e-02
-20910|0.36|1e-05 *
-20958|0.13|2e-01
-20714|0.09|2e-01
-20636|0.14|2e-01
-20956|0.05|6e-01
-20424|0.28|6e-02
-20916|-0.03|8e-01
-20542|0.07|4e-01
-20778|0.22|2e-02
-20690|0.12|7e-02
-20696|0.18|3e-01
-20694|0.14|1e-02
-20832|0.21|8e-03 *
-20962|0.14|4e-01
-20812|0.34|2e-05 *
-20814|0.13|8e-02
-20704|0.25|1e-02
-20922|0.55|1e-03 *
-20780|0.00|1e+00
-20766|0.12|7e-02
-20644|0.33|1e-01
-20764|0.14|3e-02
-20642|0.02|8e-01
-20686|0.19|4e-02
-20976|0.36|5e-03 *
-20972|-0.00|1e+00
-20584|0.13|2e-02
-20996|-0.16|2e-01
+topic|truth known / #documents|mean difference between avg. vote and truth|p-value
+-----|------|------|-----
+20932|15/115|-0.15|2e-01
+20488|10/110|0.19|3e-02
+20910|15/115|0.36|1e-05 *
+20958|10/100|0.13|2e-01
+20714|10/110|0.09|2e-01
+20636|10/100|0.14|2e-01
+20956|10/110|0.05|6e-01
+20424|10/100|0.28|6e-02
+20916|10/110|-0.03|8e-01
+20542|15/115|0.07|4e-01
+20778|10/110|0.22|2e-02
+20690|25/125|0.12|7e-02
+20696|10/110|0.18|3e-01
+20694|20/100|0.14|1e-02
+20832|10/100|0.21|8e-03 *
+20962|10/110|0.14|4e-01
+20812|15/115|0.34|2e-05 *
+20814|10/100|0.13|8e-02
+20704|10/90|0.25|1e-02
+20922|10/100|0.55|1e-03 *
+20780|15/115|0.00|1e+00
+20766|10/110|0.12|7e-02
+20644|15/105|0.33|1e-01
+20764|10/100|0.14|3e-02
+20642|15/115|0.02|8e-01
+20686|15/115|0.19|4e-02
+20976|10/90|0.36|5e-03 *
+20972|15/90|-0.00|1e+00
+20584|35/105|0.13|2e-02
+20996|10/110|-0.16|2e-01
 
 Stars designate p-values less than `0.01`: mean difference between average worker vote and "ground truth" on topic documents is signifantly different from 0.

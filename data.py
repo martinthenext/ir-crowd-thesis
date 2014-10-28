@@ -8,6 +8,7 @@ from sklearn.externals import joblib
 
 JUDGEMENT_FILE = '/local/martin/data/all_judgements.txt'
 FULLTEXT_FOLDER = '/local/martin/data/url-header-html-txt'
+GROUND_TRUTH_FILE = '/local/martin/data/task1_unlabeled_g_truth_cons_public.csv'
 
 class JudgementRecord(object):
   def __init__(self, table_row):
@@ -23,7 +24,22 @@ class JudgementRecord(object):
     else:
       self.is_relevant = None
     
-      
+
+# First read off ground truth so we can look it up afterwards
+truth_by_topic_id_and_doc_id = {}
+
+with io.open(GROUND_TRUTH_FILE, 'r', encoding='utf-8') as f:
+  headers = f.readline()
+  for line in f:
+    cols = line[:-1].split("\t")
+    topic_id = cols[1]
+    doc_id = cols[2]
+    truth = float(cols[3]) / 2
+    if truth < 0:
+      truth = None
+    truth_by_topic_id_and_doc_id[(topic_id, doc_id)] = truth
+
+
 with io.open(JUDGEMENT_FILE, 'r', encoding='utf-8') as f:
   judgement_records = [JudgementRecord(line[:-1]) for line in f]
   is_useful = lambda j: (j.label_type == 0) and (j.is_relevant is not None)
@@ -34,8 +50,9 @@ judgements_by_topic_id = defaultdict(list)
 for judgement in judgements:
   judgements_by_topic_id[judgement.topic_id].append(judgement)
 
+
 # For every topic get: list of document texts, list of their mean relevances
-topic_texts_relevances_variances = []
+topic_texts_relevances_variances_truths = []
 
 for topic_id, judgements in judgements_by_topic_id.iteritems():
   # Grouping judgements by document inside a topic
@@ -55,7 +72,6 @@ for topic_id, judgements in judgements_by_topic_id.iteritems():
     with io.open(filename, 'r', encoding='utf-8') as f:
       document_texts.append(f.read())
 
-
   # For every document compute the relevance
   mean_relevances = np.zeros(len(judgements_by_doc_id))
   var_relevances = np.zeros(len(judgements_by_doc_id))
@@ -73,10 +89,17 @@ for topic_id, judgements in judgements_by_topic_id.iteritems():
   denominator = sum(count_relevances) - len(count_relevances)
   pooled_variance = float(weigted_sum) / float(denominator)
 
-  topic_texts_relevances_variances.append( (topic_id, document_texts, mean_relevances, pooled_variance) )
+  # Gettings ground truth for all the documents
+  truths = np.array([truth_by_topic_id_and_doc_id[(topic_id, doc_id)] \
+    for doc_id in judgements_by_doc_id.keys()])
+
+  # DATA
+  topic_texts_relevances_variances_truths.append(
+   (topic_id, document_texts, mean_relevances, pooled_variance, truths) 
+  )
 
 # Get a list of all texts
-all_texts_iter = imap(operator.itemgetter(1), topic_texts_relevances_variances)
+all_texts_iter = imap(operator.itemgetter(1), topic_texts_relevances_variances_truths)
 all_texts_iter = chain.from_iterable(all_texts_iter)
 
 # Get a TF-IDF dictionary from all the documents across different topics

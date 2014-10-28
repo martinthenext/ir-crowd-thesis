@@ -1,11 +1,11 @@
-from data import topic_texts_relevances_variances, vectorizer
+from data import topic_texts_relevances_variances_truths, vectorizer
 from itertools import izip
 from sklearn.metrics.pairwise import cosine_similarity
 from scipy.stats import ttest_ind
 import numpy as np
 
 # Separate relevant documents from irrelevant
-for topic_id, texts, relevances, pooled_variance in topic_texts_relevances_variances:
+for topic_id, texts, relevances, pooled_variance, truths in topic_texts_relevances_variances_truths:
   relevant_texts = []
   irrelevant_texts = []
   for text, relevance in izip(texts, relevances):

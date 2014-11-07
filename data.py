@@ -39,8 +39,6 @@ with io.open(GROUND_TRUTH_FILE, 'r', encoding='utf-8') as f:
       truth = None
     truth_by_topic_id_and_doc_id[(topic_id, doc_id)] = truth
 
-print 'No ground truth:%s\nGround truth:%s\n' % (no_label_counter, label_counter)
-
 
 with io.open(JUDGEMENT_FILE, 'r', encoding='utf-8') as f:
   judgement_records = [JudgementRecord(line[:-1]) for line in f]
@@ -55,6 +53,7 @@ for judgement in judgements:
 
 # For every topic get: list of document texts, list of their mean relevances
 topic_texts_relevances_variances_truths = []
+min_judgements_per_document = []
 
 for topic_id, judgements in judgements_by_topic_id.iteritems():
   # Grouping judgements by document inside a topic
@@ -91,6 +90,9 @@ for topic_id, judgements in judgements_by_topic_id.iteritems():
   denominator = sum(count_relevances) - len(count_relevances)
   pooled_variance = float(weigted_sum) / float(denominator)
 
+  # Computing minimum amount of relevance judgements per document
+  min_judgements_per_document.append(min(count_relevances))
+
   # Gettings ground truth for all the documents
   truths = np.array([truth_by_topic_id_and_doc_id[(topic_id, doc_id)] \
     for doc_id in judgements_by_doc_id.keys()])
@@ -107,3 +109,10 @@ all_texts_iter = chain.from_iterable(all_texts_iter)
 # Get a TF-IDF dictionary from all the documents across different topics
 vectorizer = TfidfVectorizer()
 vectorizer.fit(all_texts_iter)
+
+# Printing the min judgements per document statistic
+print "topic|min judgements per document"
+print "-----|------"
+for topic_id_count_pair in izip(judgements_by_topic_id.keys(), min_judgements_per_document):
+  print "%s|%s" % topic_id_count_pair
+print "global|%s" % min(min_judgements_per_document)

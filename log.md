@@ -93,3 +93,41 @@ topic|truth known / #documents|mean difference between avg. vote and truth|p-val
 20996|10/110|-0.16|2e-01
 
 Stars designate p-values less than `0.01`: mean difference between average worker vote and "ground truth" on topic documents is signifantly different from 0.
+
+### Minimum amount of judgements per document
+
+topic|min judgements per document
+-----|------
+20932|15.0
+20488|11.0
+20910|16.0
+20958|7.0
+20714|1.0
+20636|15.0
+20956|15.0
+20424|3.0
+20916|3.0
+20542|14.0
+20778|14.0
+20690|17.0
+20696|2.0
+20694|14.0
+20832|5.0
+20962|8.0
+20812|16.0
+20814|5.0
+20704|4.0
+20922|1.0
+20780|14.0
+20766|6.0
+20644|1.0
+20764|10.0
+20642|16.0
+20686|15.0
+20976|6.0
+20972|14.0
+20584|16.0
+20996|14.0
+global|1.0
+
+There are documents in the dataset which only have 1 judgement attached to them. If we implement the active learning setting assuming we can query additional judgements for any document, those should be removed or topic only restricted to the ones with high values in this table.

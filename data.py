@@ -37,6 +37,8 @@ with io.open(GROUND_TRUTH_FILE, 'r', encoding='utf-8') as f:
     truth = float(cols[3]) / 2
     if truth < 0:
       truth = None
+    else:
+      truth = bool(truth)
     truth_by_topic_id_and_doc_id[(topic_id, doc_id)] = truth
 
 
@@ -50,10 +52,7 @@ judgements_by_topic_id = defaultdict(list)
 for judgement in judgements:
   judgements_by_topic_id[judgement.topic_id].append(judgement)
 
-
-# For every topic get: list of document texts, list of their mean relevances
-topic_texts_relevances_variances_truths = []
-min_judgements_per_document = []
+texts_vote_lists_truths_by_topic_id = {}
 
 for topic_id, judgements in judgements_by_topic_id.iteritems():
   # Grouping judgements by document inside a topic
@@ -73,46 +72,11 @@ for topic_id, judgements in judgements_by_topic_id.iteritems():
     with io.open(filename, 'r', encoding='utf-8') as f:
       document_texts.append(f.read())
 
-  # For every document compute the relevance
-  mean_relevances = np.zeros(len(judgements_by_doc_id))
-  var_relevances = np.zeros(len(judgements_by_doc_id))
-  count_relevances = np.zeros(len(judgements_by_doc_id))
-
-
-  for index, doc_id in enumerate(judgements_by_doc_id.keys()):
-    doc_relevances = [j.is_relevant for j in judgements_by_doc_id[doc_id]]
-    mean_relevances[index] = np.mean(doc_relevances)
-    var_relevances[index] = np.var(doc_relevances)
-    count_relevances[index] = len(judgements_by_doc_id[doc_id])
-
-  # Computing pooled variance
-  weigted_sum = sum([(n - 1) * s for n, s in izip(count_relevances, var_relevances)])
-  denominator = sum(count_relevances) - len(count_relevances)
-  pooled_variance = float(weigted_sum) / float(denominator)
-
-  # Computing minimum amount of relevance judgements per document
-  min_judgements_per_document.append(min(count_relevances))
+  vote_lists = [ [j.is_relevant for j in judgements_by_doc_id[doc_id]]
+    for doc_id in judgements_by_doc_id.keys() ]
 
   # Gettings ground truth for all the documents
-  truths = np.array([truth_by_topic_id_and_doc_id[(topic_id, doc_id)] \
-    for doc_id in judgements_by_doc_id.keys()])
+  truths = [truth_by_topic_id_and_doc_id[(topic_id, doc_id)] \
+    for doc_id in judgements_by_doc_id.keys()]
 
-  # DATA
-  topic_texts_relevances_variances_truths.append(
-   (topic_id, document_texts, mean_relevances, pooled_variance, truths) 
-  )
-
-# Get a list of all texts
-all_texts_iter = imap(operator.itemgetter(1), topic_texts_relevances_variances_truths)
-all_texts_iter = chain.from_iterable(all_texts_iter)
-
-# Get a TF-IDF dictionary from all the documents across different topics
-vectorizer = TfidfVectorizer()
-vectorizer.fit(all_texts_iter)
-
-# Printing the min judgements per document statistic
-print "topic|min judgements per document"
-print "-----|------"
-for topic_id_count_pair in izip(judgements_by_topic_id.keys(), min_judgements_per_document):
-  print "%s|%s" % topic_id_count_pair
-print "global|%s" % min(min_judgements_per_document)
+  texts_vote_lists_truths_by_topic_id[topic_id] = (document_texts, vote_lists, truths)

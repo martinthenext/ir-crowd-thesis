@@ -42,7 +42,7 @@ def copy_and_shuffle_sublists(list_of_lists):
   return result
 
 
-def get_accuracy_sequence(n_votes_to_sample, vote_lists, truths):
+def get_accuracy_sequence(n_votes_to_sample, vote_lists, truths, n_strict=True):
   """ Randomly sample votes and re-calculate estimates
   """
   unknown_votes = copy_and_shuffle_sublists(vote_lists)
@@ -57,7 +57,10 @@ def get_accuracy_sequence(n_votes_to_sample, vote_lists, truths):
     updated_doc_idx = random.randrange(len(vote_lists))
     if not unknown_votes[updated_doc_idx]:
       # We ran out of votes for this document, stop sequencing
-      continue
+      if n_strict:
+        return None
+      else:
+        continue
     vote = unknown_votes[updated_doc_idx].pop()
     known_votes[updated_doc_idx].append(vote)
     # Recalculate the estimate on the affected document
@@ -79,15 +82,19 @@ estimates = [get_majority_vote(vote_list) for vote_list in vote_lists]
 print get_accuracy(estimates, truths)
 
 
-n_iterations = 10000
+n_iterations = 4
 # 1..10 votes per document
 start_idx, stop_idx = 1 * n_documents, 10 * n_documents
 
-results = np.zeros((n_iterations, (10 - 1) * n_documents))
+sequences = []
 
-for i in xrange(n_iterations):
-  results[i] = np.array(get_accuracy_sequence(stop_idx, vote_lists, truths)[start_idx:])
+for _ in xrange(n_iterations):
+  sequence = get_accuracy_sequence(stop_idx, vote_lists, truths)
+  if sequence:
+    sequences.append(np.array(sequence[start_idx:]))
+
+results = np.vstack(sequences)
 
 plt.plot(np.mean(results, axis=0))
-plt.savefig('sequence-avg10000.png')
+plt.savefig('sequence-avg4.png')
 plt.close()

@@ -3,9 +3,7 @@ import numpy as np
 from itertools import izip, ifilter
 from copy import deepcopy
 import random
-import matplotlib as mpl
-mpl.use('Agg')
-import matplotlib.pyplot as plt
+from plots import plot_to_file
 
 def get_accuracy(estimates, truths):
   """ 
@@ -67,7 +65,7 @@ def get_accuracy_sequence(n_votes_to_sample, vote_lists, truths, n_strict=True):
     known_votes[updated_doc_idx].append(vote)
     # Recalculate the estimate on the affected document
     estimates[updated_doc_idx] = get_majority_vote(known_votes[updated_doc_idx])
-    # Calucate the accuracy
+    # Calucate the accuracy_sequence
     accuracy_sequence[index] = get_accuracy(estimates, truths)
 
   return accuracy_sequence
@@ -83,6 +81,7 @@ n_documents = len(texts)
 estimates = [get_majority_vote(vote_list) for vote_list in vote_lists]
 print get_accuracy(estimates, truths)
 
+#TODO: take care of cases when the beginning of sequence is Nones
 
 n_runs = 10000
 min_votes_per_doc = 1
@@ -101,6 +100,5 @@ results = np.vstack(sequences)
 
 x = votes_per_document
 y = np.mean(results, axis=0)
-plt.plot(x, y)
-plt.savefig('sequence-avg10000-axis.png')
-plt.close()
+
+plot_to_file('Learning curve, 10000 runs', x, y, 'Votes per document', 'Accuracy')

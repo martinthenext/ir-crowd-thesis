@@ -3,6 +3,8 @@ import numpy as np
 from itertools import izip, ifilter
 from copy import deepcopy
 import random
+import matplotlib as mpl
+mpl.use('Agg')
 import matplotlib.pyplot as plt
 
 def get_accuracy(estimates, truths):
@@ -82,19 +84,23 @@ estimates = [get_majority_vote(vote_list) for vote_list in vote_lists]
 print get_accuracy(estimates, truths)
 
 
-n_iterations = 4
-# 1..10 votes per document
-start_idx, stop_idx = 1 * n_documents, 10 * n_documents
+n_runs = 10000
+min_votes_per_doc = 1
+max_votes_per_doc = 10
 
+start_idx, stop_idx = min_votes_per_doc * n_documents, max_votes_per_doc * n_documents
+votes_per_document = np.arange(float(start_idx), float(stop_idx)) / n_documents
 sequences = []
 
-for _ in xrange(n_iterations):
+for _ in xrange(n_runs):
   sequence = get_accuracy_sequence(stop_idx, vote_lists, truths)
   if sequence:
     sequences.append(np.array(sequence[start_idx:]))
 
 results = np.vstack(sequences)
 
-plt.plot(np.mean(results, axis=0))
-plt.savefig('sequence-avg4.png')
+x = votes_per_document
+y = np.mean(results, axis=0)
+plt.plot(x, y)
+plt.savefig('sequence-avg10000-axis.png')
 plt.close()

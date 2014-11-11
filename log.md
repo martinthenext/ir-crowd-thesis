@@ -131,3 +131,21 @@ topic|min judgements per document
 global|1.0
 
 There are documents in the dataset which only have 1 judgement attached to them. If we implement the active learning setting assuming we can query additional judgements for any document, those should be removed or topic only restricted to the ones with high values in this table.
+
+## Majority voting
+
+### Learning curves
+
+To get a baseline result of using majority voting for estimating relevances document relevances for a particular topic (`20690`) this [has been done](https://github.com/martinthenext/ir-crowd-thesis/blob/3a184ffff8ac92426c4b964cb51132a1ff29e16e/experiments.py) 10000 times:
+
+1. Relevance judgements (votes) were randomly drawn one by one
+2. For every new judgement estimates of relevances were updates using majority voting
+3. Accuracy of the estimate was measured using the ground truth
+
+Resulting 10000 accuracy sequences were averaged and shown on the below graph. The vertical axis shows **amount of votes per document**. 
+
+![sequence-avg10000-axis](https://cloud.githubusercontent.com/assets/810383/5001323/018bfac4-69f5-11e4-846f-e7219387e28e.png)
+
+*Sidenote* If during the run a vote was requested for a document that ran out of votes the accuracy sequence was discarded. Below you can see the graph in which the sequence was still considered. At the end of the curve you can see visible disruptions caused by the fact that for the end of sequences (around 10 votes per document) the probability of running out of votes for a document was higher.
+
+![sequence-avg10000](https://cloud.githubusercontent.com/assets/810383/5001638/33869a22-69f8-11e4-8270-48fd49dd3fdf.png)

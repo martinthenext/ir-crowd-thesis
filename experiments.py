@@ -3,6 +3,7 @@ import numpy as np
 from itertools import izip, ifilter
 from copy import deepcopy
 import random
+import matplotlib.pyplot as plt
 
 TOPIC_ID = '20690'
 
@@ -40,13 +41,6 @@ def copy_and_shuffle_sublists(list_of_lists):
 
   return result
 
-texts, vote_lists, truths = texts_vote_lists_truths_by_topic_id[TOPIC_ID]
-
-# Firthermore we only work with votes and truths, sampling votes, updating 
-# majority vote estimates and measuring therir accuracy w.r.t. truths
-
-estimates = [get_majority_vote(vote_list) for vote_list in vote_lists]
-print get_accuracy(estimates, truths)
 
 def get_accuracy_sequence(n_votes_to_sample, vote_lists, truths):
   """ Randomly sample votes and re-calculate estimates
@@ -73,4 +67,24 @@ def get_accuracy_sequence(n_votes_to_sample, vote_lists, truths):
 
   return accuracy_sequence
 
-print get_accuracy_sequence(100, vote_lists, truths)
+texts, vote_lists, truths = texts_vote_lists_truths_by_topic_id[TOPIC_ID]
+n_documents = len(texts)
+
+# Firthermore we only work with votes and truths, sampling votes, updating 
+# majority vote estimates and measuring therir accuracy w.r.t. truths
+
+estimates = [get_majority_vote(vote_list) for vote_list in vote_lists]
+print get_accuracy(estimates, truths)
+
+
+n_iterations = 4
+# 1..10 votes per document
+start_idx, stop_idx = 1 * n_documents, 10 * n_documents
+
+results = np.zeros((n_iterations, (10 - 1) * n_documents))
+
+for i in xrange(n_iterations):
+  results[i] = np.array(get_accuracy_sequence(stop_idx, vote_lists, truths)[start_idx:])
+
+plt.plot(np.mean(results, axis=0))
+plt.show()

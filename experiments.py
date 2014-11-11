@@ -5,8 +5,6 @@ from copy import deepcopy
 import random
 import matplotlib.pyplot as plt
 
-TOPIC_ID = '20690'
-
 def get_accuracy(estimates, truths):
   """ 
   This gets boolean lists of estimates and truths with corresponding
@@ -22,12 +20,14 @@ def get_accuracy(estimates, truths):
   else:
     return np.mean(matching)
 
+
 def get_majority_vote(vote_list):
   """ 
   Get a boolean relevance estimate for a document given 
   a list of votes with majority voting
   """
   return np.mean(vote_list) > 0.5
+
 
 def copy_and_shuffle_sublists(list_of_lists):
   """ Get a copy with all lists shuffled
@@ -67,6 +67,8 @@ def get_accuracy_sequence(n_votes_to_sample, vote_lists, truths):
 
   return accuracy_sequence
 
+TOPIC_ID = '20690'
+
 texts, vote_lists, truths = texts_vote_lists_truths_by_topic_id[TOPIC_ID]
 n_documents = len(texts)
 
@@ -77,7 +79,7 @@ estimates = [get_majority_vote(vote_list) for vote_list in vote_lists]
 print get_accuracy(estimates, truths)
 
 
-n_iterations = 4
+n_iterations = 10000
 # 1..10 votes per document
 start_idx, stop_idx = 1 * n_documents, 10 * n_documents
 
@@ -87,4 +89,5 @@ for i in xrange(n_iterations):
   results[i] = np.array(get_accuracy_sequence(stop_idx, vote_lists, truths)[start_idx:])
 
 plt.plot(np.mean(results, axis=0))
-plt.show()
+plt.savefig('sequence-avg10000.png')
+plt.close()

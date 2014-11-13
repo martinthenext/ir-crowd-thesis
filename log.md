@@ -151,3 +151,5 @@ The accuracy of the majority vote using all the available data is `0.92`.
 *Sidenote* If during the run a vote was requested for a document that ran out of votes the accuracy sequence was discarded. Below you can see the graph in which the sequence was still considered. At the end of the curve you can see visible disruptions caused by the fact that for the end of sequences (around 10 votes per document) the probability of running out of votes for a document was higher.
 
 ![sequence-avg10000](https://cloud.githubusercontent.com/assets/810383/5001638/33869a22-69f8-11e4-8270-48fd49dd3fdf.png)
+
+There is a substantial amount of `None`s in the beginning of the sequences as well (due to lack of votes for any ground truth), they are just not visible given the amount of simulations.

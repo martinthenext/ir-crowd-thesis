@@ -157,3 +157,7 @@ There is a substantial amount of `None`s in the beginning of the sequences as we
 **UPDATE** New graph with the best estimate (made using all information) marked with a grey line.
 
 ![learning-curve-for-majority-voting-topic-20690-10000-runs- 1](https://cloud.githubusercontent.com/assets/810383/5049220/3a1a0274-6c24-11e4-9a39-19bb98940131.png)
+
+**UPDATE** For a topic `20932` learning curve looks strange.
+
+![learning-curve-for-majority-voting-topic-20932-10000-runs- 93](https://cloud.githubusercontent.com/assets/810383/5049769/81a93d4a-6c28-11e4-8d7e-98a44f389223.png)

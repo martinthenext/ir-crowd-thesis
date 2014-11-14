@@ -175,3 +175,7 @@ For topic `20910` the convergence is also strange:
 ![learning-curve-for-majority-voting-topic-20910-10000-runs- 5](https://cloud.githubusercontent.com/assets/810383/5052713/4ab1da84-6c43-11e4-8c5a-adaec8e76b68.png)
 
 This is suspicious, code review is required.
+
+Some other topics are ok though:
+
+![learning-curve-for-majority-voting-topic-20812-10000-runs- 69](https://cloud.githubusercontent.com/assets/810383/5054741/de0f1386-6c58-11e4-8595-48b40839db94.png)

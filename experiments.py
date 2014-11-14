@@ -4,6 +4,7 @@ from itertools import izip, ifilter
 from copy import deepcopy
 import random
 from plots import plot_learning_curve
+from scipy.stats import nanmean
 
 def get_accuracy(estimates, truths):
   """ 
@@ -84,16 +85,18 @@ def plot_learning_curve_for_topic(topic_id, n_runs, votes_per_doc=(1,10)):
   sequences = []
 
   for _ in xrange(n_runs):
-    sequence = get_accuracy_sequence(stop_idx, vote_lists, truths)
+    sequence = get_accuracy_sequence(stop_idx, vote_lists, truths, n_strict=False)
     if sequence:
       sequences.append(np.array(sequence[start_idx:]))
 
   results = np.vstack(sequences)
 
   x = votes_per_document
-  y = np.mean(results, axis=0)
+  y = nanmean(results, axis=0)
 
-  plot_learning_curve('Learning curve for majority voting, topic %s, %s runs' % (topic_id, n_runs), 
+  plot_learning_curve('Learning curve for majority voting, topic %s, %s runs, Nones allowed' % (topic_id, n_runs), 
     x, y, 'Votes per document', 'Accuracy', baseline=max_accuracy)
+
+# TODO votes per doc can only be int
 
 plot_learning_curve_for_topic('20690', 10000, votes_per_doc=(1, 10))

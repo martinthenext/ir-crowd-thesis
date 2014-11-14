@@ -169,3 +169,9 @@ As we exclude the sequences in which votes for a document run out, increasing th
 For 12 votes per document the plot is smoother:
 
 ![learning-curve-for-majority-voting-topic-20932-10000-runs- 39](https://cloud.githubusercontent.com/assets/810383/5051944/4d4f47ba-6c3c-11e4-9c7e-20fc91fc0aa5.png)
+
+For topic `20910` the convergence is also strange:
+
+![learning-curve-for-majority-voting-topic-20910-10000-runs- 5](https://cloud.githubusercontent.com/assets/810383/5052713/4ab1da84-6c43-11e4-8c5a-adaec8e76b68.png)
+
+This is suspicious, code review is required.

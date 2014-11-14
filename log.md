@@ -161,3 +161,11 @@ There is a substantial amount of `None`s in the beginning of the sequences as we
 **UPDATE** For a topic `20932` learning curve looks strange.
 
 ![learning-curve-for-majority-voting-topic-20932-10000-runs- 93](https://cloud.githubusercontent.com/assets/810383/5049769/81a93d4a-6c28-11e4-8d7e-98a44f389223.png)
+
+As we exclude the sequences in which votes for a document run out, increasing the maximum number of votes per document in an experiment decreases the number of sequences and makes a plot "random". In topic `20932` minimal amount of votes per document is 15, so making an experiment from 1 to 14 results in this:
+
+![learning-curve-for-majority-voting-topic-20932-10000-runs- 90](https://cloud.githubusercontent.com/assets/810383/5051937/3f6c1e34-6c3c-11e4-8f67-3a6505fedf27.png)
+
+For 12 votes per document the plot is smoother:
+
+![learning-curve-for-majority-voting-topic-20932-10000-runs- 39](https://cloud.githubusercontent.com/assets/810383/5051944/4d4f47ba-6c3c-11e4-9c7e-20fc91fc0aa5.png)

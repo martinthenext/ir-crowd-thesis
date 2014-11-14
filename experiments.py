@@ -3,7 +3,7 @@ import numpy as np
 from itertools import izip, ifilter
 from copy import deepcopy
 import random
-from plots import plot_to_file
+from plots import plot_learning_curve
 
 def get_accuracy(estimates, truths):
   """ 
@@ -70,35 +70,30 @@ def get_accuracy_sequence(n_votes_to_sample, vote_lists, truths, n_strict=True):
 
   return accuracy_sequence
 
-TOPIC_ID = '20690'
+def plot_learning_curve_for_topic(topic_id, n_runs, votes_per_doc=(1,10)):
+  texts, vote_lists, truths = texts_vote_lists_truths_by_topic_id[topic_id]
+  n_documents = len(texts)
 
-texts, vote_lists, truths = texts_vote_lists_truths_by_topic_id[TOPIC_ID]
-n_documents = len(texts)
+  estimates = [get_majority_vote(vote_list) for vote_list in vote_lists]
+  max_accuracy = get_accuracy(estimates, truths)
 
-# Firthermore we only work with votes and truths, sampling votes, updating 
-# majority vote estimates and measuring therir accuracy w.r.t. truths
+  min_votes_per_doc, max_votes_per_doc = votes_per_doc
 
-estimates = [get_majority_vote(vote_list) for vote_list in vote_lists]
-print get_accuracy(estimates, truths)
+  start_idx, stop_idx = min_votes_per_doc * n_documents, max_votes_per_doc * n_documents
+  votes_per_document = np.arange(float(start_idx), float(stop_idx)) / n_documents
+  sequences = []
 
-#TODO: take care of cases when the beginning of sequence is Nones
+  for _ in xrange(n_runs):
+    sequence = get_accuracy_sequence(stop_idx, vote_lists, truths)
+    if sequence:
+      sequences.append(np.array(sequence[start_idx:]))
 
-n_runs = 10000
-min_votes_per_doc = 1
-max_votes_per_doc = 10
+  results = np.vstack(sequences)
 
-start_idx, stop_idx = min_votes_per_doc * n_documents, max_votes_per_doc * n_documents
-votes_per_document = np.arange(float(start_idx), float(stop_idx)) / n_documents
-sequences = []
+  x = votes_per_document
+  y = np.mean(results, axis=0)
 
-for _ in xrange(n_runs):
-  sequence = get_accuracy_sequence(stop_idx, vote_lists, truths)
-  if sequence:
-    sequences.append(np.array(sequence[start_idx:]))
+  plot_learning_curve('Learning curve for majority voting, topic %s, %s runs' % (topic_id, n_runs), 
+    x, y, 'Votes per document', 'Accuracy', baseline=max_accuracy)
 
-results = np.vstack(sequences)
-
-x = votes_per_document
-y = np.mean(results, axis=0)
-
-plot_to_file('Learning curve, 10000 runs', x, y, 'Votes per document', 'Accuracy')
+plot_learning_curve_for_topic('20690', 10000, votes_per_doc=(1, 10))

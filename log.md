@@ -153,3 +153,7 @@ The accuracy of the majority vote using all the available data is `0.92`.
 ![sequence-avg10000](https://cloud.githubusercontent.com/assets/810383/5001638/33869a22-69f8-11e4-8270-48fd49dd3fdf.png)
 
 There is a substantial amount of `None`s in the beginning of the sequences as well (due to lack of votes for any ground truth), they are just not visible given the amount of simulations.
+
+**UPDATE** New graph with the best estimate (made using all information) marked with a grey line.
+
+![learning-curve-for-majority-voting-topic-20690-10000-runs- 1](https://cloud.githubusercontent.com/assets/810383/5049220/3a1a0274-6c24-11e4-9a39-19bb98940131.png)

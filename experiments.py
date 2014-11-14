@@ -43,7 +43,7 @@ def copy_and_shuffle_sublists(list_of_lists):
   return result
 
 
-def get_accuracy_sequence(n_votes_to_sample, vote_lists, truths, n_strict=True):
+def get_accuracy_sequence(n_votes_to_sample, vote_lists, truths):
   """ Randomly sample votes and re-calculate estimates
   """
   unknown_votes = copy_and_shuffle_sublists(vote_lists)
@@ -57,11 +57,8 @@ def get_accuracy_sequence(n_votes_to_sample, vote_lists, truths, n_strict=True):
     # Draw one vote for a random document
     updated_doc_idx = random.randrange(len(vote_lists))
     if not unknown_votes[updated_doc_idx]:
-      # We ran out of votes for this document, stop sequencing
-      if n_strict:
-        return None
-      else:
-        continue
+      # We ran out of votes for this document, diregard this sequence
+      return None
     vote = unknown_votes[updated_doc_idx].pop()
     known_votes[updated_doc_idx].append(vote)
     # Recalculate the estimate on the affected document
@@ -70,6 +67,7 @@ def get_accuracy_sequence(n_votes_to_sample, vote_lists, truths, n_strict=True):
     accuracy_sequence[index] = get_accuracy(estimates, truths)
 
   return accuracy_sequence
+
 
 def plot_learning_curve_for_topic(topic_id, n_runs, votes_per_doc=(1,10)):
   texts, vote_lists, truths = texts_vote_lists_truths_by_topic_id[topic_id]
@@ -94,9 +92,9 @@ def plot_learning_curve_for_topic(topic_id, n_runs, votes_per_doc=(1,10)):
   x = votes_per_document
   y = nanmean(results, axis=0)
 
-  plot_learning_curve('Learning curve for majority voting, topic %s, %s runs, Nones allowed' % (topic_id, n_runs), 
+  plot_learning_curve('Learning curve for majority voting, topic %s, %s runs' % (topic_id, n_runs), 
     x, y, 'Votes per document', 'Accuracy', baseline=max_accuracy)
 
 # TODO votes per doc can only be int
 
-plot_learning_curve_for_topic('20690', 10000, votes_per_doc=(1, 10))
+plot_learning_curve_for_topic('20812', 10000, votes_per_doc=(1, 10))

@@ -1,6 +1,6 @@
 from data import texts_vote_lists_truths_by_topic_id
 import numpy as np
-from itertools import izip, ifilter
+from itertools import izip, ifilter, chain
 from copy import deepcopy
 import random
 from plots import plot_learning_curve
@@ -76,6 +76,22 @@ def get_accuracy_sequence(estimator, n_votes_to_sample, texts, vote_lists, truth
 
   return accuracy_sequence
 
+def index_sublist_items(list_of_lists):
+  """
+  >>> a = [[1, 2], [65, 66], [12, 13, 14]]
+  >>> list(index_sublist_items(a))
+  [[1, 2], [65, 66], [12, 13, 14]]
+  """
+  indexed_items = [ [ (idx, list_el) for list_el in l ]
+    for idx, l in enumerate(list_of_lists) ]
+  return chain(*indexed_items)
+
+def get_accuracy_sequence_sample_votes(estimator, n_votes_to_sample,
+  texts, vote_lists, truths):
+  """ Sample random (vote, document) pairs instead of getting votes 
+      for random document
+  """
+  pass
 
 def plot_learning_curve_for_topic(topic_id, n_runs, votes_per_doc=(1,10)):
   data = texts_vote_lists_truths_by_topic_id[topic_id]

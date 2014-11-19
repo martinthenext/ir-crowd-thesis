@@ -6,6 +6,8 @@ import random
 from plots import plot_learning_curve
 from scipy.stats import nanmean
 
+RANDOM_SEED = 731
+
 def get_accuracy(estimates, truths):
   """ 
   This gets boolean lists of estimates and truths with corresponding
@@ -61,6 +63,7 @@ def get_accuracy_sequence(estimator, n_votes_to_sample, texts, vote_lists, truth
 
   for index in xrange(n_votes_to_sample):
     # Draw one vote for a random document
+    random.seed(RANDOM_SEED)
     updated_doc_idx = random.randrange(len(vote_lists))
     if not unknown_votes[updated_doc_idx]:
       # We ran out of votes for this document, diregard this sequence
@@ -120,9 +123,10 @@ def plot_learning_curve_for_topic(topic_id, n_runs, votes_per_doc=(1,10)):
   x = votes_per_document
   y = nanmean(results, axis=0)
 
-  plot_learning_curve('Learning curve for topic %s, %s runs' % (topic_id, n_runs), 
-    x, {'majority voting' : y }, 'Votes per document', 'Accuracy', baseline=max_accuracy)
+  plot_learning_curve('Learning curve for topic %s, %s runs, seed %s' % 
+    (topic_id, n_runs, RANDOM_SEED), x, {'majority voting' : y }, 
+    'Votes per document', 'Accuracy', baseline=max_accuracy)
 
 # TODO votes per doc can only be int
 
-plot_learning_curve_for_topic('20642', 10000, votes_per_doc=(1, 10))
+plot_learning_curve_for_topic('20932', 10000, votes_per_doc=(1, 10))

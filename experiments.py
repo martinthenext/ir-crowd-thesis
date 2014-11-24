@@ -15,6 +15,8 @@ def get_accuracy(estimates, truths):
   positions and returns a fraction of matching items
 
   If any of the pair (estimate, truth) is None, it is disregarded
+
+  Symmetric w.r.t. argument order
   """
   pairs = izip(estimates, truths)
   pairs_without_Nones = ifilter(lambda x: None not in x, pairs)
@@ -82,6 +84,7 @@ def get_accuracy_sequence(estimator, n_votes_to_sample, texts, vote_lists, truth
 
   return accuracy_sequence
 
+
 def index_sublist_items(list_of_lists):
   """
   >>> a = [[1, 2], [65, 66], [12, 13, 14]]
@@ -92,12 +95,14 @@ def index_sublist_items(list_of_lists):
     for idx, l in enumerate(list_of_lists) ]
   return chain(*indexed_items)
 
+
 def get_accuracy_sequence_sample_votes(estimator, n_votes_to_sample,
   texts, vote_lists, truths):
   """ Sample random (vote, document) pairs instead of getting votes 
       for random document
   """
   pass
+
 
 def plot_learning_curve_for_topic(topic_id, n_runs, votes_per_doc=(1,10)):
   data = texts_vote_lists_truths_by_topic_id[topic_id]
@@ -109,7 +114,7 @@ def plot_learning_curve_for_topic(topic_id, n_runs, votes_per_doc=(1,10)):
   estimates = estimator(texts, vote_lists)
   print estimates
   print truths
-  max_accuracy = get_accuracy(estimates, estimates)
+  max_accuracy = get_accuracy(estimates, truths)
   print 'max accuracy %s' % max_accuracy
 
   min_votes_per_doc, max_votes_per_doc = votes_per_doc
@@ -119,11 +124,9 @@ def plot_learning_curve_for_topic(topic_id, n_runs, votes_per_doc=(1,10)):
   
   sequences = []
 
-  # Validate against the global majority vote
-
   for _ in xrange(n_runs):
     sequence = get_accuracy_sequence(estimator, stop_idx, texts, 
-      vote_lists, estimates)
+      vote_lists, truths)
     if sequence:
       sequences.append(np.array(sequence[start_idx:]))
 
@@ -133,16 +136,38 @@ def plot_learning_curve_for_topic(topic_id, n_runs, votes_per_doc=(1,10)):
   x = votes_per_document
   y = nanmean(results, axis=0)
 
+  print 'last iteration accuracy %s' % y[-1]
+
   plot_learning_curve('Learning curve for topic %s, %s runs, seed %s' % 
     (topic_id, n_runs, RANDOM_SEED), x, {'majority voting' : y }, 
     'Votes per document', 'Accuracy', baseline=max_accuracy)
 
-plot_learning_curve_for_topic('20932', 100, votes_per_doc=(1, 12))
 
-'''
+# Building stuff from scratch, to then substitue with known functions and debug
+# Sample 1 vote per every document, then 2 votes,...
+
 texts, vote_lists, truths = texts_vote_lists_truths_by_topic_id['20932']
-required_len = 10 * len(texts)
-print 'reqiured len %s' % required_len
 
-print get_accuracy_sequence(est_majority_vote, required_len, texts, vote_lists, truths)
-'''
+estimates = [None] * len(texts)
+unknown_votes = copy_and_shuffle_sublists(vote_lists)
+known_votes = [ [] for _ in unknown_votes ]
+
+all_data_estimate = est_majority_vote(texts, unknown_votes)
+print 'all data estimate accuracy: %s' % get_accuracy(all_data_estimate, truths)
+
+
+# minimum votes per document in this topic
+min_votes_per_doc = min([len(votes) for votes in vote_lists])
+
+for votes_per_doc in xrange(1, min_votes_per_doc + 1):
+  # draw one more vote for every document
+  for doc_idx, _ in enumerate(texts):
+    known_votes[doc_idx].append(unknown_votes[doc_idx].pop())
+  # debug
+  print known_votes[:2]
+  # calculate accuracy
+  estimate = est_majority_vote(texts, known_votes)
+  accuracy = get_accuracy(estimate, truths)
+  print accuracy
+
+# TODO something wrong: every run yields the same sequence of votes

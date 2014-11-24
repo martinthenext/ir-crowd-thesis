@@ -179,3 +179,7 @@ This is suspicious, code review is required.
 Some other topics are ok though:
 
 ![learning-curve-for-majority-voting-topic-20812-10000-runs- 69](https://cloud.githubusercontent.com/assets/810383/5054741/de0f1386-6c58-11e4-8595-48b40839db94.png)
+
+This lurning curve has been plotted with accuracy being measured not against the ground truth, but against the estimates obtained with all the information available. This way the maximum accuracy is 1.
+
+![learning-curve-for-topic-20932-100-runs-seed-731- 14](https://cloud.githubusercontent.com/assets/810383/5169317/77cef2ca-7406-11e4-85cb-ba1516a28683.png)

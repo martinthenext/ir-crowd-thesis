@@ -29,7 +29,7 @@ def get_majority_vote(vote_list):
   Get a boolean relevance estimate for a document given 
   a list of votes with majority voting
   """
-  return np.mean(vote_list) > 0.5
+  return np.mean(vote_list) > 0.5 if vote_list else None
 
 
 def est_majority_vote(texts, vote_lists):
@@ -54,6 +54,8 @@ def copy_and_shuffle_sublists(list_of_lists):
 def get_accuracy_sequence(estimator, n_votes_to_sample, texts, vote_lists, truths):
   """ Randomly sample votes and re-calculate estimates
   """
+  random.seed(RANDOM_SEED)
+
   unknown_votes = copy_and_shuffle_sublists(vote_lists)
   known_votes = [ [] for _ in unknown_votes ]
 
@@ -63,7 +65,6 @@ def get_accuracy_sequence(estimator, n_votes_to_sample, texts, vote_lists, truth
 
   for index in xrange(n_votes_to_sample):
     # Draw one vote for a random document
-    random.seed(RANDOM_SEED)
     updated_doc_idx = random.randrange(len(vote_lists))
     if not unknown_votes[updated_doc_idx]:
       # We ran out of votes for this document, diregard this sequence
@@ -83,8 +84,9 @@ def index_sublist_items(list_of_lists):
   """
   >>> a = [[1, 2], [65, 66], [12, 13, 14]]
   >>> list(index_sublist_items(a))
-  [[1, 2], [65, 66], [12, 13, 14]]
+  [(0, 1), (0, 2), (1, 65), (1, 66), (2, 12), (2, 13), (2, 14)]
   """
+  # TODO change the docstring
   indexed_items = [ [ (idx, list_el) for list_el in l ]
     for idx, l in enumerate(list_of_lists) ]
   return chain(*indexed_items)
@@ -127,6 +129,12 @@ def plot_learning_curve_for_topic(topic_id, n_runs, votes_per_doc=(1,10)):
     (topic_id, n_runs, RANDOM_SEED), x, {'majority voting' : y }, 
     'Votes per document', 'Accuracy', baseline=max_accuracy)
 
-# TODO votes per doc can only be int
+plot_learning_curve_for_topic('20932', 1000, votes_per_doc=(1, 10))
 
-plot_learning_curve_for_topic('20932', 10000, votes_per_doc=(1, 10))
+'''
+texts, vote_lists, truths = texts_vote_lists_truths_by_topic_id['20932']
+required_len = 10 * len(texts)
+print 'reqiured len %s' % required_len
+
+print get_accuracy_sequence(est_majority_vote, required_len, texts, vote_lists, truths)
+'''

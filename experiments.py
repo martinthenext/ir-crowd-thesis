@@ -1,7 +1,6 @@
 from data import texts_vote_lists_truths_by_topic_id
 import numpy as np
 from itertools import izip, ifilter, chain
-from copy import deepcopy
 import random
 from plots import plot_learning_curve
 from scipy.stats import nanmean
@@ -48,13 +47,7 @@ def copy_and_shuffle_sublists(list_of_lists):
   """ Get a copy with all lists shuffled
   Use this to draw 'random' votes with .pop()
   """
-  result = []
-  for l in list_of_lists:
-    new_list = deepcopy(l)
-    random.shuffle(new_list)
-    result.append(new_list)
-
-  return result
+  return [sorted(l, key=lambda x: random.random()) for l in list_of_lists]
 
 
 def get_accuracy_sequence(estimator, n_votes_to_sample, texts, vote_lists, truths):

@@ -183,3 +183,10 @@ Some other topics are ok though:
 This lurning curve has been plotted with accuracy being measured not against the ground truth, but against the estimates obtained with all the information available. This way the maximum accuracy is 1.
 
 ![learning-curve-for-topic-20932-100-runs-seed-731- 14](https://cloud.githubusercontent.com/assets/810383/5169317/77cef2ca-7406-11e4-85cb-ba1516a28683.png)
+
+### Discrete accuracy measuments
+
+For every iteration, we sample one more vote for every document and measure accruacy with regards to the ground truth.
+
+![accuracies-across-10000-runs-adding-1-vote-per-document-at-a-time- 10](https://cloud.githubusercontent.com/assets/810383/5183122/3bd70ece-74ab-11e4-9e71-f77d43ef0b90.png)
+

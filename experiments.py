@@ -2,7 +2,7 @@ from data import texts_vote_lists_truths_by_topic_id
 import numpy as np
 from itertools import izip, ifilter, chain
 import random
-from plots import plot_learning_curve
+from plots import plot_learning_curve, plot_lines
 from scipy.stats import nanmean
 
 RANDOM_SEED = 731
@@ -141,26 +141,35 @@ def plot_learning_curve_for_topic(topic_id, n_runs, votes_per_doc=(1,10)):
 
 texts, vote_lists, truths = texts_vote_lists_truths_by_topic_id['20932']
 
-estimates = [None] * len(texts)
-unknown_votes = copy_and_shuffle_sublists(vote_lists)
-known_votes = [ [] for _ in unknown_votes ]
-
-all_data_estimate = est_majority_vote(texts, unknown_votes)
-print 'all data estimate accuracy: %s' % get_accuracy(all_data_estimate, truths)
-
+all_data_estimate = est_majority_vote(texts, vote_lists)
+all_data_estimate_accuracy = get_accuracy(all_data_estimate, truths)
+print 'all data estimate accuracy: %s' % all_data_estimate_accuracy
 
 # minimum votes per document in this topic
 min_votes_per_doc = min([len(votes) for votes in vote_lists])
+votes_per_doc_seq = range(1, min_votes_per_doc + 1)
 
-accuracies = []
-for votes_per_doc in xrange(1, min_votes_per_doc + 1):
-  # draw one more vote for every document
-  for doc_idx, _ in enumerate(texts):
-    known_votes[doc_idx].append(unknown_votes[doc_idx].pop())
-  # debug
-  # print known_votes[:2]
-  # calculate accuracy
-  estimate = est_majority_vote(texts, known_votes)
-  accuracies.append( get_accuracy(estimate, truths) )
+N_RUNS = 10000
+accuracies_accross_runs = np.zeros( (N_RUNS, min_votes_per_doc) )
+for i in xrange(N_RUNS):
+  estimates = [None] * len(texts)
+  unknown_votes = copy_and_shuffle_sublists(vote_lists)
+  known_votes = [ [] for _ in unknown_votes ]
 
-print accuracies
+  accuracies = []
+  for votes_per_doc in votes_per_doc_seq:
+    # draw one more vote for every document
+    for doc_idx, _ in enumerate(texts):
+      known_votes[doc_idx].append(unknown_votes[doc_idx].pop())
+    # debug
+    # print known_votes[:2]
+    # calculate accuracy
+    estimate = est_majority_vote(texts, known_votes)
+    accuracies.append( get_accuracy(estimate, truths) )
+
+  accuracies_accross_runs[i, :] = accuracies
+
+mean_accuracies = np.mean(accuracies_accross_runs, axis=0)
+plot_lines('Accuracies across %s runs adding 1 vote per document at a time' % N_RUNS,
+ votes_per_doc_seq, mean_accuracies, 'Votes per document', 'Mean accuracy',
+ baseline=all_data_estimate_accuracy)

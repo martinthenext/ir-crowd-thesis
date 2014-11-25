@@ -200,7 +200,7 @@ For the 'nice' topic:
 
 In case of even vote distribution for 'relevant' and 'irrelevant' let us take a random vote instead.
 
-```
+```python
 def get_majority_vote(vote_list):
   """ 
   Get a boolean relevance estimate for a document given 

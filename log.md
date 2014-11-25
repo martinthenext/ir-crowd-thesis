@@ -219,3 +219,25 @@ def get_majority_vote(vote_list):
 This yields this version of the discrete accuracy measument plot:
 
 ![topic-20932 -accuracies-at-k-votes-per-doc-10000-runs- 88](https://cloud.githubusercontent.com/assets/810383/5185334/f9a37bb4-74be-11e4-84ef-0a705e9e016d.png)
+
+If we exclude the cases of undecisive votes from consideration when calculating accuracy:
+
+```python
+def get_majority_vote(vote_list):
+  """ 
+  Get a boolean relevance estimate for a document given 
+  a list of votes with majority voting
+  """
+  if vote_list:
+    relevance = np.mean(vote_list)
+    if relevance == 0.5:
+      return None
+    else:
+      return (relevance > 0.5)
+  else:
+    return None
+```
+
+This is how it changes the picture:
+
+![topic-20932 -accuracies-at-k-votes-per-doc-10000-runs- 29](https://cloud.githubusercontent.com/assets/810383/5187427/5f5b1b20-74cd-11e4-9c27-1072416d27b9.png)

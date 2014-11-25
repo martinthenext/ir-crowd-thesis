@@ -34,7 +34,7 @@ def get_majority_vote(vote_list):
   if vote_list:
     relevance = np.mean(vote_list)
     if relevance == 0.5:
-      return random.choice([True, False])
+      return None
     else:
       return (relevance > 0.5)
   else:
@@ -188,4 +188,3 @@ def plot_discrete_accuracies(topic_id, n_runs):
    baseline=np.mean(final_accuracies))
 
 plot_discrete_accuracies('20932', 10000)
-

@@ -6,7 +6,7 @@ from plots import plot_learning_curve
 from scipy.stats import nanmean
 
 RANDOM_SEED = 731
-random.seed(RANDOM_SEED)
+#random.seed(RANDOM_SEED)
 
 def get_accuracy(estimates, truths):
   """ 
@@ -152,15 +152,15 @@ print 'all data estimate accuracy: %s' % get_accuracy(all_data_estimate, truths)
 # minimum votes per document in this topic
 min_votes_per_doc = min([len(votes) for votes in vote_lists])
 
+accuracies = []
 for votes_per_doc in xrange(1, min_votes_per_doc + 1):
   # draw one more vote for every document
   for doc_idx, _ in enumerate(texts):
     known_votes[doc_idx].append(unknown_votes[doc_idx].pop())
   # debug
-  print known_votes[:2]
+  # print known_votes[:2]
   # calculate accuracy
   estimate = est_majority_vote(texts, known_votes)
-  accuracy = get_accuracy(estimate, truths)
-  print accuracy
+  accuracies.append( get_accuracy(estimate, truths) )
 
-# TODO something wrong: every run yields the same sequence of votes
+print accuracies

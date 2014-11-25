@@ -151,6 +151,7 @@ votes_per_doc_seq = range(1, min_votes_per_doc + 1)
 
 N_RUNS = 10000
 accuracies_accross_runs = np.zeros( (N_RUNS, min_votes_per_doc) )
+final_accuracies = np.zeros(N_RUNS)
 for i in xrange(N_RUNS):
   estimates = [None] * len(texts)
   unknown_votes = copy_and_shuffle_sublists(vote_lists)
@@ -169,7 +170,17 @@ for i in xrange(N_RUNS):
 
   accuracies_accross_runs[i, :] = accuracies
 
+  # draw all the residual votes
+  for doc_idx, _ in enumerate(texts):
+    known_votes[doc_idx] += unknown_votes[doc_idx]
+
+  # calculate final accuracy
+  estimate = est_majority_vote(texts, known_votes)
+  final_accuracies[i] = get_accuracy(estimate, truths)
+
+print final_accuracies
+
 mean_accuracies = np.mean(accuracies_accross_runs, axis=0)
 plot_lines('Accuracies across %s runs adding 1 vote per document at a time' % N_RUNS,
  votes_per_doc_seq, mean_accuracies, 'Votes per document', 'Mean accuracy',
- baseline=all_data_estimate_accuracy)
+ baseline=np.mean(final_accuracies))

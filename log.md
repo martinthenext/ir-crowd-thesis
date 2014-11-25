@@ -190,3 +190,6 @@ For every iteration, we sample one more vote for every document and measure accr
 
 ![accuracies-across-10000-runs-adding-1-vote-per-document-at-a-time- 10](https://cloud.githubusercontent.com/assets/810383/5183122/3bd70ece-74ab-11e4-9e71-f77d43ef0b90.png)
 
+The grey line representing accuracy of the majority vote estimate on all the available data is retrieved at every run by sampling all the residual votes (to make sure the vote sampling process works properly).
+
+![accuracies-across-10000-runs-adding-1-vote-per-document-at-a-time- 82](https://cloud.githubusercontent.com/assets/810383/5184221/db073ed8-74b5-11e4-9f09-e751dfe3723a.png)

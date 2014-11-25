@@ -195,3 +195,27 @@ The grey line representing accuracy of the majority vote estimate on all the ava
 For the 'nice' topic:
 
 ![topic-20812 -accuracies-at-k-votes-per-doc-10000-runs- 79](https://cloud.githubusercontent.com/assets/810383/5184747/21a1256c-74ba-11e4-98d3-79941efc6f2b.png)
+
+### Random majorty vote
+
+In case of even vote distribution for 'relevant' and 'irrelevant' let us take a random vote instead.
+
+```
+def get_majority_vote(vote_list):
+  """ 
+  Get a boolean relevance estimate for a document given 
+  a list of votes with majority voting
+  """
+  if vote_list:
+    relevance = np.mean(vote_list)
+    if relevance == 0.5:
+      return random.choice([True, False])
+    else:
+      return (relevance > 0.5)
+  else:
+    return None
+```
+
+This yields this version of the discrete accuracy measument plot:
+
+![topic-20932 -accuracies-at-k-votes-per-doc-10000-runs- 88](https://cloud.githubusercontent.com/assets/810383/5185334/f9a37bb4-74be-11e4-84ef-0a705e9e016d.png)

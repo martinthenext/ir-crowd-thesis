@@ -188,8 +188,10 @@ This lurning curve has been plotted with accuracy being measured not against the
 
 For every iteration, we sample one more vote for every document and measure accruacy with regards to the ground truth.
 
-![accuracies-across-10000-runs-adding-1-vote-per-document-at-a-time- 10](https://cloud.githubusercontent.com/assets/810383/5183122/3bd70ece-74ab-11e4-9e71-f77d43ef0b90.png)
+![topic-20932 -accuracies-at-k-votes-per-doc-10000-runs- 69](https://cloud.githubusercontent.com/assets/810383/5184708/04479c58-74ba-11e4-9122-fa8ff802cb01.png)
 
 The grey line representing accuracy of the majority vote estimate on all the available data is retrieved at every run by sampling all the residual votes (to make sure the vote sampling process works properly).
 
-![accuracies-across-10000-runs-adding-1-vote-per-document-at-a-time- 82](https://cloud.githubusercontent.com/assets/810383/5184221/db073ed8-74b5-11e4-9f09-e751dfe3723a.png)
+For the 'nice' topic:
+
+![topic-20812 -accuracies-at-k-votes-per-doc-10000-runs- 79](https://cloud.githubusercontent.com/assets/810383/5184747/21a1256c-74ba-11e4-98d3-79941efc6f2b.png)

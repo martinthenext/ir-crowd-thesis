@@ -139,7 +139,8 @@ def plot_learning_curve_for_topic(topic_id, n_runs, votes_per_doc=(1,10)):
 # Building stuff from scratch, to then substitue with known functions and debug
 # Sample 1 vote per every document, then 2 votes,...
 
-texts, vote_lists, truths = texts_vote_lists_truths_by_topic_id['20932']
+topic_id = '20932'
+texts, vote_lists, truths = texts_vote_lists_truths_by_topic_id[topic_id]
 
 all_data_estimate = est_majority_vote(texts, vote_lists)
 all_data_estimate_accuracy = get_accuracy(all_data_estimate, truths)
@@ -162,8 +163,7 @@ for i in xrange(N_RUNS):
     # draw one more vote for every document
     for doc_idx, _ in enumerate(texts):
       known_votes[doc_idx].append(unknown_votes[doc_idx].pop())
-    # debug
-    # print known_votes[:2]
+
     # calculate accuracy
     estimate = est_majority_vote(texts, known_votes)
     accuracies.append( get_accuracy(estimate, truths) )
@@ -181,6 +181,6 @@ for i in xrange(N_RUNS):
 print final_accuracies
 
 mean_accuracies = np.mean(accuracies_accross_runs, axis=0)
-plot_lines('Accuracies across %s runs adding 1 vote per document at a time' % N_RUNS,
+plot_lines('Topic %s: accuracies at k votes per doc, %s runs' % (topic_id, N_RUNS),
  votes_per_doc_seq, mean_accuracies, 'Votes per document', 'Mean accuracy',
  baseline=np.mean(final_accuracies))

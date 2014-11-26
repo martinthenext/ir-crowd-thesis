@@ -156,7 +156,6 @@ def plot_discrete_accuracies(topic_id, n_runs):
   min_votes_per_doc = min([len(votes) for votes in vote_lists])
   votes_per_doc_seq = range(1, min_votes_per_doc + 1)
 
-  n_runs = 10000
   accuracies_accross_runs = np.zeros( (n_runs, min_votes_per_doc) )
   final_accuracies = np.zeros(n_runs)
   for i in xrange(n_runs):
@@ -189,4 +188,4 @@ def plot_discrete_accuracies(topic_id, n_runs):
    votes_per_doc_seq, mean_accuracies, 'Votes per document', 'Mean accuracy',
    baseline=np.mean(final_accuracies))
 
-plot_learning_curve_for_topic('20932', 10000, (1,12))
+plot_learning_curve_for_topic('20932', 5000, (1,12))

@@ -220,6 +220,10 @@ This yields this version of the discrete accuracy measument plot:
 
 ![topic-20932 -accuracies-at-k-votes-per-doc-10000-runs- 88](https://cloud.githubusercontent.com/assets/810383/5185334/f9a37bb4-74be-11e4-84ef-0a705e9e016d.png)
 
+And this version of the above shown learning curve.
+
+![learning-curve-for-topic-20932-10000-runs-seed-731- 52](https://cloud.githubusercontent.com/assets/810383/5200174/4bfd54d0-7563-11e4-8744-f09c834ef403.png)
+
 If we exclude the cases of undecisive votes from consideration when calculating accuracy:
 
 ```python
@@ -238,6 +242,10 @@ def get_majority_vote(vote_list):
     return None
 ```
 
-This is how it changes the picture:
+This is how it changes the picture of discrete accuracy plot:
 
 ![topic-20932 -accuracies-at-k-votes-per-doc-10000-runs- 29](https://cloud.githubusercontent.com/assets/810383/5187427/5f5b1b20-74cd-11e4-9c27-1072416d27b9.png)
+
+And learning curve:
+
+![learning-curve-for-topic-20932-10000-runs-seed-731- 50](https://cloud.githubusercontent.com/assets/810383/5200204/82f0c60c-7563-11e4-9924-350c0142146b.png)

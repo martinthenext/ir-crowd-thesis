@@ -42,7 +42,7 @@ def get_majority_vote(vote_list):
   if vote_list:
     relevance = np.mean(vote_list)
     if relevance == 0.5:
-      return random.choice([True, False])
+      return None
     else:
       return (relevance > 0.5)
   else:
@@ -108,6 +108,12 @@ def get_accuracy_sequence_sample_votes(estimator, n_votes_to_sample,
   doc_vote_pairs = index_sublist_items(vote_lists)
 
 
+def get_good_accuracy_sequence(estimator, stop_idx, texts, vote_lists, truths):
+  sequence = get_accuracy_sequence(estimator, stop_idx, texts, 
+      vote_lists, truths)
+
+
+
 def plot_learning_curve_for_topic(topic_id, n_runs, votes_per_doc=(1,10)):
   data = texts_vote_lists_truths_by_topic_id[topic_id]
   estimator = est_majority_vote
@@ -139,6 +145,8 @@ def plot_learning_curve_for_topic(topic_id, n_runs, votes_per_doc=(1,10)):
       if None not in slice_to_plot:
         sequences.append(np.array(slice_to_plot))
         print 'good sequence'
+      else:
+        print 'bad sequence'
 
   results = np.vstack(sequences)
 

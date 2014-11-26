@@ -5,8 +5,16 @@ import random
 from plots import plot_learning_curve, plot_lines
 from scipy.stats import nanmean
 
-RANDOM_SEED = 731
-#random.seed(RANDOM_SEED)
+class PrintCounter(object):
+  def __init__(self, count_to):
+    self.count_to = count_to
+    self.count = 0
+
+  def __call__(self):
+    self.count += 1
+    if self.count <= self.count_to:
+      print '%s / %s' % (self.count, self.count_to)
+
 
 def get_accuracy(estimates, truths):
   """ 
@@ -34,7 +42,7 @@ def get_majority_vote(vote_list):
   if vote_list:
     relevance = np.mean(vote_list)
     if relevance == 0.5:
-      return None
+      return random.choice([True, False])
     else:
       return (relevance > 0.5)
   else:
@@ -52,7 +60,6 @@ def copy_and_shuffle_sublists(list_of_lists):
   Use this to draw 'random' votes with .pop()
   """
   return [sorted(l, key=lambda x: random.random()) for l in list_of_lists]
-
 
 def get_accuracy_sequence(estimator, n_votes_to_sample, texts, vote_lists, truths):
   """ Randomly sample votes and re-calculate estimates
@@ -101,7 +108,6 @@ def get_accuracy_sequence_sample_votes(estimator, n_votes_to_sample,
   doc_vote_pairs = index_sublist_items(vote_lists)
 
 
-
 def plot_learning_curve_for_topic(topic_id, n_runs, votes_per_doc=(1,10)):
   data = texts_vote_lists_truths_by_topic_id[topic_id]
   estimator = est_majority_vote
@@ -110,8 +116,7 @@ def plot_learning_curve_for_topic(topic_id, n_runs, votes_per_doc=(1,10)):
   n_documents = len(texts)
 
   estimates = estimator(texts, vote_lists)
-  print estimates
-  print truths
+
   max_accuracy = get_accuracy(estimates, truths)
   print 'max accuracy %s' % max_accuracy
 
@@ -122,22 +127,28 @@ def plot_learning_curve_for_topic(topic_id, n_runs, votes_per_doc=(1,10)):
   
   sequences = []
 
+  count = PrintCounter(n_runs)
+
   for _ in xrange(n_runs):
     sequence = get_accuracy_sequence(estimator, stop_idx, texts, 
       vote_lists, truths)
+    count()
     if sequence:
-      sequences.append(np.array(sequence[start_idx:]))
+      slice_to_plot = sequence[start_idx:]
+      # No None's in the plotted sequences!
+      if None not in slice_to_plot:
+        sequences.append(np.array(slice_to_plot))
+        print 'good sequence'
 
   results = np.vstack(sequences)
-  print 'max measured %s' % np.nanmax(results, axis=0)
 
   x = votes_per_document
-  y = nanmean(results, axis=0)
+  y = np.mean(results, axis=0)
 
   print 'last iteration accuracy %s' % y[-1]
 
-  plot_learning_curve('Learning curve for topic %s, %s runs, seed %s' % 
-    (topic_id, n_runs, RANDOM_SEED), x, {'majority voting' : y }, 
+  plot_learning_curve('Learning curve for topic %s, %s runs' % 
+    (topic_id, n_runs), x, {'majority voting' : y }, 
     'Votes per document', 'Accuracy', baseline=max_accuracy)
 
 
@@ -187,4 +198,4 @@ def plot_discrete_accuracies(topic_id, n_runs):
    votes_per_doc_seq, mean_accuracies, 'Votes per document', 'Mean accuracy',
    baseline=np.mean(final_accuracies))
 
-plot_discrete_accuracies('20932', 10000)
+plot_learning_curve_for_topic('20932', 1000, (1,12))

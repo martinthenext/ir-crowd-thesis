@@ -108,12 +108,6 @@ def get_accuracy_sequence_sample_votes(estimator, n_votes_to_sample,
   doc_vote_pairs = index_sublist_items(vote_lists)
 
 
-def get_good_accuracy_sequence(estimator, stop_idx, texts, vote_lists, truths):
-  sequence = get_accuracy_sequence(estimator, stop_idx, texts, 
-      vote_lists, truths)
-
-
-
 def plot_learning_curve_for_topic(topic_id, n_runs, votes_per_doc=(1,10)):
   data = texts_vote_lists_truths_by_topic_id[topic_id]
   estimator = est_majority_vote
@@ -127,30 +121,16 @@ def plot_learning_curve_for_topic(topic_id, n_runs, votes_per_doc=(1,10)):
   print 'max accuracy %s' % max_accuracy
 
   min_votes_per_doc, max_votes_per_doc = votes_per_doc
-
   start_idx, stop_idx = min_votes_per_doc * n_documents, max_votes_per_doc * n_documents
-  votes_per_document = np.arange(float(start_idx), float(stop_idx)) / n_documents
-  
-  sequences = []
 
-  count = PrintCounter(n_runs)
+  # TODO Parallelize this!
+  sequences = [get_accuracy_sequence(estimator, stop_idx, texts, 
+      vote_lists, truths) for _ in xrange(n_runs)]
 
-  for _ in xrange(n_runs):
-    sequence = get_accuracy_sequence(estimator, stop_idx, texts, 
-      vote_lists, truths)
-    count()
-    if sequence:
-      slice_to_plot = sequence[start_idx:]
-      # No None's in the plotted sequences!
-      if None not in slice_to_plot:
-        sequences.append(np.array(slice_to_plot))
-        print 'good sequence'
-      else:
-        print 'bad sequence'
+  good_slices = [ s[start_idx:] for s in sequences if s is not None ]
+  results = np.vstack(good_slices)
 
-  results = np.vstack(sequences)
-
-  x = votes_per_document
+  x = np.arange(float(start_idx), float(stop_idx)) / n_documents
   y = np.mean(results, axis=0)
 
   print 'last iteration accuracy %s' % y[-1]
@@ -206,4 +186,4 @@ def plot_discrete_accuracies(topic_id, n_runs):
    votes_per_doc_seq, mean_accuracies, 'Votes per document', 'Mean accuracy',
    baseline=np.mean(final_accuracies))
 
-plot_learning_curve_for_topic('20932', 1000, (1,12))
+plot_learning_curve_for_topic('20932', 100, (1,12))

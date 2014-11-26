@@ -4,6 +4,7 @@ from itertools import izip, ifilter, chain
 import random
 from plots import plot_learning_curve, plot_lines
 from scipy.stats import nanmean
+from sklearn.externals.joblib import Parallel, delayed
 
 class PrintCounter(object):
   def __init__(self, count_to):
@@ -61,9 +62,12 @@ def copy_and_shuffle_sublists(list_of_lists):
   """
   return [sorted(l, key=lambda x: random.random()) for l in list_of_lists]
 
-def get_accuracy_sequence(estimator, n_votes_to_sample, texts, vote_lists, truths):
+def get_accuracy_sequence(estimator, n_votes_to_sample, texts, vote_lists, truths, idx=None):
   """ Randomly sample votes and re-calculate estimates
   """
+  if idx:
+    print idx
+
   unknown_votes = copy_and_shuffle_sublists(vote_lists)
   known_votes = [ [] for _ in unknown_votes ]
 
@@ -123,9 +127,8 @@ def plot_learning_curve_for_topic(topic_id, n_runs, votes_per_doc=(1,10)):
   min_votes_per_doc, max_votes_per_doc = votes_per_doc
   start_idx, stop_idx = min_votes_per_doc * n_documents, max_votes_per_doc * n_documents
 
-  # TODO Parallelize this!
-  sequences = [get_accuracy_sequence(estimator, stop_idx, texts, 
-      vote_lists, truths) for _ in xrange(n_runs)]
+  sequences = Parallel(n_jobs=4)( delayed(get_accuracy_sequence)(estimator, stop_idx, texts, 
+      vote_lists, truths, idx) for idx in xrange(n_runs) )
 
   good_slices = [ s[start_idx:] for s in sequences if s is not None ]
   results = np.vstack(good_slices)
@@ -186,4 +189,4 @@ def plot_discrete_accuracies(topic_id, n_runs):
    votes_per_doc_seq, mean_accuracies, 'Votes per document', 'Mean accuracy',
    baseline=np.mean(final_accuracies))
 
-plot_learning_curve_for_topic('20932', 100, (1,12))
+plot_learning_curve_for_topic('20932', 10000, (1,12))

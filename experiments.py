@@ -110,6 +110,7 @@ def get_accuracy_sequence_sample_votes(estimator, n_votes_to_sample,
       for random document
   """
   doc_vote_pairs = index_sublist_items(vote_lists)
+  pass
 
 
 def plot_learning_curve_for_topic(topic_id, n_runs, votes_per_doc=(1,10)):
@@ -188,4 +189,27 @@ def plot_discrete_accuracies(topic_id, n_runs):
    votes_per_doc_seq, mean_accuracies, 'Votes per document', 'Mean accuracy',
    baseline=np.mean(final_accuracies))
 
-plot_learning_curve_for_topic('20932', 5000, (1,12))
+def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, esimators_dict):
+  texts, vote_lists, truths = texts_vote_lists_truths_by_topic_id[topic_id]
+  n_documents = len(texts)
+
+  min_votes_per_doc, max_votes_per_doc = votes_per_doc
+  start_idx, stop_idx = min_votes_per_doc * n_documents, max_votes_per_doc * n_documents
+  x = np.arange(float(start_idx), float(stop_idx)) / n_documents
+
+  estimator_y = {}
+
+  for estimator_name, estimator in esimators_dict.iteritems():
+    sequences = Parallel(n_jobs=4)( delayed(get_accuracy_sequence)(estimator, stop_idx, texts, 
+        vote_lists, truths, idx) for idx in xrange(n_runs) )
+
+    good_slices = [ s[start_idx:] for s in sequences if s is not None ]
+    results = np.vstack(good_slices)
+
+    estimator_y[estimator_name] = np.mean(results, axis=0)
+
+  plot_learning_curve('Learning curve for topic %s, %s runs' % 
+    (topic_id, n_runs), x, estimator_y, 
+    'Votes per document', 'Accuracy')
+
+plot_learning_curves_for_topic('20932', 100, (1,12), { 'Majority vote' : est_majority_vote })

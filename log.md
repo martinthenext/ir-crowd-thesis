@@ -250,7 +250,3 @@ Zigzag behaviour might be explained by that now that we disregard the equilibriu
 
 ![learning-curve-for-topic-20932-10000-runs-seed-731- 50](https://cloud.githubusercontent.com/assets/810383/5200204/82f0c60c-7563-11e4-9924-350c0142146b.png)
 
-This is what happens if you exclude all the sequences with `None`s in them - the ones that still did
-
-![learning-curve-for-topic-20932-1000-runs- 27](https://cloud.githubusercontent.com/assets/810383/5202285/d09af8f0-757c-11e4-9425-74a22ad351ed.png)
-

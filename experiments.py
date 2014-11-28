@@ -35,6 +35,10 @@ def get_accuracy(estimates, truths):
     return np.mean(matching)
 
 
+def unit_to_bool_indecisive(x):
+  return None if x == 0.5 else x > 0.5
+
+
 def get_majority_vote(vote_list):
   """ 
   Get a boolean relevance estimate for a document given 
@@ -42,10 +46,7 @@ def get_majority_vote(vote_list):
   """
   if vote_list:
     relevance = np.mean(vote_list)
-    if relevance == 0.5:
-      return None
-    else:
-      return (relevance > 0.5)
+    return unit_to_bool_indecisive(relevance)
   else:
     return None
 
@@ -211,5 +212,13 @@ def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, esimators_di
   plot_learning_curve('Learning curve for topic %s, %s runs' % 
     (topic_id, n_runs), x, estimator_y, 
     'Votes per document', 'Accuracy')
+
+def func_linear_combination(estimator1, estimator2, propotion=0.5):
+  def result(*args, **kwargs):
+    return unit_to_bool_indecisive(
+      proportion * estimator1(*args, **kwargs) + (1 - proportion) * estimator2(*args, **kwargs)
+    )
+
+  return result
 
 plot_learning_curves_for_topic('20932', 100, (1,12), { 'Majority vote' : est_majority_vote })

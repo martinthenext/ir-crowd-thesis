@@ -1,6 +1,6 @@
 from data import texts_vote_lists_truths_by_topic_id
 import numpy as np
-from itertools import izip, ifilter, chain
+from itertools import izip, ifilter, chain, imap
 import random
 from plots import plot_learning_curve, plot_lines
 from scipy.stats import nanmean
@@ -35,26 +35,23 @@ def get_accuracy(estimates, truths):
     return np.mean(matching)
 
 
-def unit_to_bool_indecisive(x):
-  return None if x == 0.5 else x > 0.5
+unit_to_bool_indecisive = lambda x: None if x == 0.5 else (x > 0.5)
 
 
-def get_majority_vote(vote_list):
-  """ 
-  Get a boolean relevance estimate for a document given 
-  a list of votes with majority voting
+get_mean_vote = lambda vote_list: np.mean(vote_list) if vote_list else None
+
+
+def conf_majority_vote(texts, vote_lists):
+  """ This is how all confidence functions should look like
+      Return value in [0, 1] means certainty in document's relevance
   """
-  if vote_list:
-    relevance = np.mean(vote_list)
-    return unit_to_bool_indecisive(relevance)
-  else:
-    return None
+  return imap(get_mean_vote, vote_lists)
 
 
 def est_majority_vote(texts, vote_lists):
   """ This is how all estimator functions should look like
   """
-  return [get_majority_vote(vote_list) for vote_list in vote_lists]
+  return ( unit_to_bool_indecisive(conf) for conf in conf_majority_vote(texts, vote_lists) )
 
 
 def copy_and_shuffle_sublists(list_of_lists):

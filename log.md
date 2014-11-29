@@ -250,3 +250,6 @@ Zigzag behaviour might be explained by that now that we disregard the equilibriu
 
 ![learning-curve-for-topic-20932-10000-runs-seed-731- 50](https://cloud.githubusercontent.com/assets/810383/5200204/82f0c60c-7563-11e4-9924-350c0142146b.png)
 
+# Combining two estimators
+
+Combining boolean (relevant/irrelevant) results of two estimator functions doesn't make sense. If you prioritize between them you will always pick answers of the estimator with the highest priority because there is no way to 'combine' boolean judgements. Hence, we need to combine the estimated confidence levels in [0, 1]. For example, mean judgement of a document (`mean(1,0,0,1,1,1)`) can be perceived as a confidence that the document is relevant.

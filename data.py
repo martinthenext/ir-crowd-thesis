@@ -3,7 +3,6 @@ from collections import defaultdict
 import operator
 import numpy as np
 import io
-from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.externals import joblib
 
 JUDGEMENT_FILE = '/local/martin/data/all_judgements.txt'

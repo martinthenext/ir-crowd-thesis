@@ -41,7 +41,7 @@ unit_to_bool_indecisive = lambda x: None if x == 0.5 else (x > 0.5)
 get_mean_vote = lambda vote_list: np.mean(vote_list) if vote_list else None
 
 
-def conf_majority_vote(texts, vote_lists):
+def p_majority_vote(texts, vote_lists):
   """ This is how all confidence functions should look like
       Return value in [0, 1] means certainty in document's relevance
   """
@@ -51,7 +51,7 @@ def conf_majority_vote(texts, vote_lists):
 def est_majority_vote(texts, vote_lists):
   """ This is how all estimator functions should look like
   """
-  return ( unit_to_bool_indecisive(conf) for conf in conf_majority_vote(texts, vote_lists) )
+  return ( unit_to_bool_indecisive(conf) for conf in p_majority_vote(texts, vote_lists) )
 
 
 def copy_and_shuffle_sublists(list_of_lists):
@@ -59,6 +59,7 @@ def copy_and_shuffle_sublists(list_of_lists):
   Use this to draw 'random' votes with .pop()
   """
   return [sorted(l, key=lambda x: random.random()) for l in list_of_lists]
+
 
 def get_accuracy_sequence(estimator, n_votes_to_sample, texts, vote_lists, truths, idx=None):
   """ Randomly sample votes and re-calculate estimates
@@ -187,6 +188,7 @@ def plot_discrete_accuracies(topic_id, n_runs):
    votes_per_doc_seq, mean_accuracies, 'Votes per document', 'Mean accuracy',
    baseline=np.mean(final_accuracies))
 
+
 def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, esimators_dict):
   texts, vote_lists, truths = texts_vote_lists_truths_by_topic_id[topic_id]
   n_documents = len(texts)
@@ -210,6 +212,7 @@ def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, esimators_di
     (topic_id, n_runs), x, estimator_y, 
     'Votes per document', 'Accuracy')
 
+
 def func_linear_combination(estimator1, estimator2, propotion=0.5):
   def result(*args, **kwargs):
     return unit_to_bool_indecisive(
@@ -217,5 +220,28 @@ def func_linear_combination(estimator1, estimator2, propotion=0.5):
     )
 
   return result
+
+
+def get_p_and_var(vote_list):
+  if not vote_list:
+    return None, None
+
+  p = get_mean_vote(vote_list)
+  n = len(vote_list)
+
+  # Variance is None if there is only one vote
+  var = p * (1 - p) / n if n > 1 else None
+  return p, var
+
+
+vote_list=[True, True, False, False, False]
+get_p_and_var(vote_list)
+
+
+def p_majority_vote_or_nn(texts, vote_lists, sufficient_similarity=0.5):
+  """ If the nearest neighbor's similarity to you is bigger than sufficient_similarity
+      and variance smaller than yours, take neighbor's conf instead of yours
+  """
+
 
 plot_learning_curves_for_topic('20932', 100, (1,12), { 'Majority vote' : est_majority_vote })

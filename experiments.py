@@ -234,14 +234,30 @@ def get_p_and_var(vote_list):
   return p, var
 
 
-vote_list=[True, True, False, False, False]
-get_p_and_var(vote_list)
+def var_lr(doc_var, neighbor_var):
+  """ Returns True if the document variance is less than leighbor variance
+  """
+  if neighbor_var is None:
+    return True
+  else:
+    if doc_var is None:
+      return False
+    else:
+      return (doc_var < neighbor_var)
 
 
 def p_majority_vote_or_nn(texts, vote_lists, sufficient_similarity=0.5):
   """ If the nearest neighbor's similarity to you is bigger than sufficient_similarity
       and variance smaller than yours, take neighbor's conf instead of yours
   """
+  vectorizer = TfidfVectorizer()
+  tfidf = vectorizer.fit_transform(texts)
+  similarity = cosine_similarity(tfidf)
+  nn_search_structure = KDTree(similarity)
 
+  result_p = []
+  for doc_index, vote_list in enumerate(vote_lists):
+    p_doc, var_doc = get_p_and_var(vote_list)
+    # TODO Find out nearest neighbor
 
 plot_learning_curves_for_topic('20932', 100, (1,12), { 'Majority vote' : est_majority_vote })

@@ -253,3 +253,18 @@ Zigzag behaviour might be explained by that now that we disregard the equilibriu
 # Combining two estimators
 
 Combining boolean (relevant/irrelevant) results of two estimator functions doesn't make sense. If you prioritize between them you will always pick answers of the estimator with the highest priority because there is no way to 'combine' boolean judgements. Hence, we need to combine the estimated confidence levels in [0, 1]. For example, mean judgement of a document (`mean(1,0,0,1,1,1)`) can be perceived as a confidence that the document is relevant.
+
+# Majority vote vs Nearest Neighbor
+
+The simple strategy to use distance information to improve over the majority vote estimate is to look at the nearest neighbor. For the first experiment votes have been sampled for randomly chosen documents one by one and on every iteration:
+
+1. Probability of relevance `p` has been estimated for all the documents as mean of votes
+2. Variance of this estimate was calculated as `p * (1 - p) / n`, there `n` is a number of votes for a particular document (Binomial distribution). As variance was intended to be used as a measure of uncertainty, the fact that a variance of a one-point estimate is always 0 was problematic. So instead the variance of one point was assumed to be infinity.
+3. If the nearest neighbor was closer than `0.5` (out of 1) and had a smaller variance, the point estimate for `p` was taken from the neighbor.
+
+This is the resulting graph:
+
+![learning-curve-for-topic-20932-100-runs- 73](https://cloud.githubusercontent.com/assets/810383/5269032/4177175c-7a5f-11e4-8c51-eb0754ab6dfb.png)
+
+As expected, the nearest neighbor approach works better on a small amount of votes per document. The fact that it gets dominated by the majority voting could be possibly fixed with a nicer use of `n` in uncertainty estimation.
+

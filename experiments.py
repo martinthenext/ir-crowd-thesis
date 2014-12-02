@@ -5,6 +5,9 @@ import random
 from plots import plot_learning_curve, plot_lines
 from scipy.stats import nanmean
 from sklearn.externals.joblib import Parallel, delayed
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import datetime
 
 class PrintCounter(object):
   def __init__(self, count_to):
@@ -189,7 +192,7 @@ def plot_discrete_accuracies(topic_id, n_runs):
    baseline=np.mean(final_accuracies))
 
 
-def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, esimators_dict):
+def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, estimators_dict):
   texts, vote_lists, truths = texts_vote_lists_truths_by_topic_id[topic_id]
   n_documents = len(texts)
 
@@ -199,7 +202,8 @@ def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, esimators_di
 
   estimator_y = {}
 
-  for estimator_name, estimator in esimators_dict.iteritems():
+  for estimator_name, estimator in estimators_dict.iteritems():
+    print 'Calculating for %s' % estimator_name
     sequences = Parallel(n_jobs=4)( delayed(get_accuracy_sequence)(estimator, stop_idx, texts, 
         vote_lists, truths, idx) for idx in xrange(n_runs) )
 
@@ -213,20 +217,13 @@ def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, esimators_di
     'Votes per document', 'Accuracy')
 
 
-def func_linear_combination(estimator1, estimator2, propotion=0.5):
-  def result(*args, **kwargs):
-    return unit_to_bool_indecisive(
-      proportion * estimator1(*args, **kwargs) + (1 - proportion) * estimator2(*args, **kwargs)
-    )
-
-  return result
-
-
 def get_p_and_var(vote_list):
   if not vote_list:
     return None, None
 
   p = get_mean_vote(vote_list)
+  if p is None:
+    return None, None
   n = len(vote_list)
 
   # Variance is None if there is only one vote
@@ -234,7 +231,7 @@ def get_p_and_var(vote_list):
   return p, var
 
 
-def var_lr(doc_var, neighbor_var):
+def is_doc_variance_better(doc_var, neighbor_var):
   """ Returns True if the document variance is less than leighbor variance
   """
   if neighbor_var is None:
@@ -253,11 +250,34 @@ def p_majority_vote_or_nn(texts, vote_lists, sufficient_similarity=0.5):
   vectorizer = TfidfVectorizer()
   tfidf = vectorizer.fit_transform(texts)
   similarity = cosine_similarity(tfidf)
-  nn_search_structure = KDTree(similarity)
 
   result_p = []
   for doc_index, vote_list in enumerate(vote_lists):
-    p_doc, var_doc = get_p_and_var(vote_list)
-    # TODO Find out nearest neighbor
+    doc_p, doc_var = get_p_and_var(vote_list)
+    similarities = similarity[:, doc_index]
+    similarities[doc_index] = 0
+    nn_similarity = similarities.max()
 
-plot_learning_curves_for_topic('20932', 100, (1,12), { 'Majority vote' : est_majority_vote })
+    if nn_similarity > sufficient_similarity:
+      nn_index = similarities.argmax()
+      nn_p, nn_var = get_p_and_var(vote_lists[nn_index])
+      p = doc_p if is_doc_variance_better(doc_var, nn_var) else nn_p
+    else:
+      p = doc_p
+    result_p.append(p)
+
+  return result_p
+
+
+def est_majority_vote_or_nn(texts, vote_lists):
+  """ This is how all estimator functions should look like
+  """
+  return ( unit_to_bool_indecisive(conf) for conf in p_majority_vote_or_nn(texts, vote_lists, 0.5) )
+
+print "plotting curves from 1 to 7 votes per doc"
+print "started job at %s" % datetime.datetime.now()
+plot_learning_curves_for_topic('20690', 1000, (1,5), { 
+  'Majority vote' : est_majority_vote,
+  'Majority vote or NN' : est_majority_vote_or_nn,
+})
+print "finished job at %s" % datetime.datetime.now()

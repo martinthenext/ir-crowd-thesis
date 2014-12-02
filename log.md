@@ -268,3 +268,10 @@ This is the resulting graph:
 
 As expected, the nearest neighbor approach works better on a small amount of votes per document. The fact that it gets dominated by the majority voting could be possibly fixed with a nicer use of `n` in uncertainty estimation.
 
+*UPDATE* This is not true, variance of 1 is actually is the maximum variance you can get. So just variance is a good enough relative measure of uncertainty.
+
+Another topic and more simulations:
+
+![learning-curve-for-topic-20690-1000-runs- 23](https://cloud.githubusercontent.com/assets/810383/5270294/13849576-7a6a-11e4-80dd-33676ff6428f.png)
+
+Simulation has been running for 9 hours, using 4 cores. Functional-style code recalculates distance matrix every time, need to reconsider.

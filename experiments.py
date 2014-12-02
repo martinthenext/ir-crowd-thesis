@@ -64,7 +64,8 @@ def copy_and_shuffle_sublists(list_of_lists):
   return [sorted(l, key=lambda x: random.random()) for l in list_of_lists]
 
 
-def get_accuracy_sequence(estimator, n_votes_to_sample, texts, vote_lists, truths, idx=None):
+def get_accuracy_sequence(estimator, n_votes_to_sample, texts, 
+  vote_lists, truths, idx=None, *args):
   """ Randomly sample votes and re-calculate estimates
   """
   if idx:
@@ -87,7 +88,7 @@ def get_accuracy_sequence(estimator, n_votes_to_sample, texts, vote_lists, truth
     known_votes[updated_doc_idx].append(vote)
     
     # Recalculate all the estimates for the sake of consistency
-    estimates = estimator(texts, known_votes)
+    estimates = estimator(texts, known_votes, *args)
 
     # Calucate the accuracy_sequence
     accuracy_sequence[index] = get_accuracy(estimates, truths)
@@ -113,37 +114,6 @@ def get_accuracy_sequence_sample_votes(estimator, n_votes_to_sample,
   """
   doc_vote_pairs = index_sublist_items(vote_lists)
   pass
-
-
-def plot_learning_curve_for_topic(topic_id, n_runs, votes_per_doc=(1,10)):
-  data = texts_vote_lists_truths_by_topic_id[topic_id]
-  estimator = est_majority_vote
-
-  texts, vote_lists, truths = data
-  n_documents = len(texts)
-
-  estimates = estimator(texts, vote_lists)
-
-  max_accuracy = get_accuracy(estimates, truths)
-  print 'max accuracy %s' % max_accuracy
-
-  min_votes_per_doc, max_votes_per_doc = votes_per_doc
-  start_idx, stop_idx = min_votes_per_doc * n_documents, max_votes_per_doc * n_documents
-
-  sequences = Parallel(n_jobs=4)( delayed(get_accuracy_sequence)(estimator, stop_idx, texts, 
-      vote_lists, truths, idx) for idx in xrange(n_runs) )
-
-  good_slices = [ s[start_idx:] for s in sequences if s is not None ]
-  results = np.vstack(good_slices)
-
-  x = np.arange(float(start_idx), float(stop_idx)) / n_documents
-  y = np.mean(results, axis=0)
-
-  print 'last iteration accuracy %s' % y[-1]
-
-  plot_learning_curve('Learning curve for topic %s, %s runs' % 
-    (topic_id, n_runs), x, {'majority voting' : y }, 
-    'Votes per document', 'Accuracy', baseline=max_accuracy)
 
 
 def plot_discrete_accuracies(topic_id, n_runs):
@@ -192,7 +162,7 @@ def plot_discrete_accuracies(topic_id, n_runs):
    baseline=np.mean(final_accuracies))
 
 
-def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, estimators_dict):
+def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, estimators_dict, comment=None):
   texts, vote_lists, truths = texts_vote_lists_truths_by_topic_id[topic_id]
   n_documents = len(texts)
 
@@ -202,19 +172,22 @@ def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, estimators_d
 
   estimator_y = {}
 
-  for estimator_name, estimator in estimators_dict.iteritems():
+  for estimator_name, estimator_and_args in estimators_dict.iteritems():
     print 'Calculating for %s' % estimator_name
+    estimator, args = estimator_and_args
     sequences = Parallel(n_jobs=4)( delayed(get_accuracy_sequence)(estimator, stop_idx, texts, 
-        vote_lists, truths, idx) for idx in xrange(n_runs) )
+        vote_lists, truths, idx, *args) for idx in xrange(n_runs) )
 
     good_slices = [ s[start_idx:] for s in sequences if s is not None ]
     results = np.vstack(good_slices)
 
     estimator_y[estimator_name] = np.mean(results, axis=0)
 
-  plot_learning_curve('Learning curve for topic %s, %s runs' % 
-    (topic_id, n_runs), x, estimator_y, 
-    'Votes per document', 'Accuracy')
+  if comment:
+    title = 'Topic %s, %s runs, %s' % (topic_id, n_runs, comment)
+  else:
+    title = 'Topic %s, %s runs' % (topic_id, n_runs)
+  plot_learning_curve(title, x, estimator_y, 'Votes per document', 'Accuracy')
 
 
 def get_p_and_var(vote_list):
@@ -269,15 +242,16 @@ def p_majority_vote_or_nn(texts, vote_lists, sufficient_similarity=0.5):
   return result_p
 
 
-def est_majority_vote_or_nn(texts, vote_lists):
-  """ This is how all estimator functions should look like
-  """
-  return ( unit_to_bool_indecisive(conf) for conf in p_majority_vote_or_nn(texts, vote_lists, 0.5) )
+def est_majority_vote_or_nn(texts, vote_lists, sufficient_similarity=0.5):
+  return ( unit_to_bool_indecisive(conf) for conf
+   in p_majority_vote_or_nn(texts, vote_lists, sufficient_similarity) )
+
 
 print "plotting curves from 1 to 7 votes per doc"
 print "started job at %s" % datetime.datetime.now()
-plot_learning_curves_for_topic('20690', 1000, (1,5), { 
-  'Majority vote' : est_majority_vote,
-  'Majority vote or NN' : est_majority_vote_or_nn,
+plot_learning_curves_for_topic('20690', 10, (1,5), { 
+#  'Majority vote' : est_majority_vote,
+  'Majority vote or NN, suff.sim. 0.2': (est_majority_vote_or_nn, [ 0.2 ]),
+  'Majority vote or NN, suff.sim. 0.5': (est_majority_vote_or_nn, [ 0.5 ]),
 })
 print "finished job at %s" % datetime.datetime.now()

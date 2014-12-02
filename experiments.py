@@ -51,7 +51,7 @@ def p_majority_vote(texts, vote_lists):
   return imap(get_mean_vote, vote_lists)
 
 
-def est_majority_vote(texts, vote_lists):
+def est_majority_vote(texts, vote_lists, text_similarity):
   """ This is how all estimator functions should look like
   """
   return ( unit_to_bool_indecisive(conf) for conf in p_majority_vote(texts, vote_lists) )
@@ -65,7 +65,7 @@ def copy_and_shuffle_sublists(list_of_lists):
 
 
 def get_accuracy_sequence(estimator, n_votes_to_sample, texts, 
-  vote_lists, truths, idx=None, *args):
+  vote_lists, truths, text_similarity, idx=None, *args):
   """ Randomly sample votes and re-calculate estimates
   """
   if idx:
@@ -88,7 +88,7 @@ def get_accuracy_sequence(estimator, n_votes_to_sample, texts,
     known_votes[updated_doc_idx].append(vote)
     
     # Recalculate all the estimates for the sake of consistency
-    estimates = estimator(texts, known_votes, *args)
+    estimates = estimator(texts, known_votes, text_similarity, *args)
 
     # Calucate the accuracy_sequence
     accuracy_sequence[index] = get_accuracy(estimates, truths)
@@ -116,55 +116,13 @@ def get_accuracy_sequence_sample_votes(estimator, n_votes_to_sample,
   pass
 
 
-def plot_discrete_accuracies(topic_id, n_runs):
-  # Building stuff from scratch, to then substitue with known functions and debug
-  # Sample 1 vote per every document, then 2 votes,...
-  texts, vote_lists, truths = texts_vote_lists_truths_by_topic_id[topic_id]
-
-  all_data_estimate = est_majority_vote(texts, vote_lists)
-  all_data_estimate_accuracy = get_accuracy(all_data_estimate, truths)
-  print 'all data estimate accuracy: %s' % all_data_estimate_accuracy
-
-  # minimum votes per document in this topic
-  min_votes_per_doc = min([len(votes) for votes in vote_lists])
-  votes_per_doc_seq = range(1, min_votes_per_doc + 1)
-
-  accuracies_accross_runs = np.zeros( (n_runs, min_votes_per_doc) )
-  final_accuracies = np.zeros(n_runs)
-  for i in xrange(n_runs):
-    estimates = [None] * len(texts)
-    unknown_votes = copy_and_shuffle_sublists(vote_lists)
-    known_votes = [ [] for _ in unknown_votes ]
-
-    accuracies = []
-    for votes_per_doc in votes_per_doc_seq:
-      # draw one more vote for every document
-      for doc_idx, _ in enumerate(texts):
-        known_votes[doc_idx].append(unknown_votes[doc_idx].pop())
-
-      # calculate accuracy
-      estimate = est_majority_vote(texts, known_votes)
-      accuracies.append( get_accuracy(estimate, truths) )
-
-    accuracies_accross_runs[i, :] = accuracies
-
-    # draw all the residual votes
-    for doc_idx, _ in enumerate(texts):
-      known_votes[doc_idx] += unknown_votes[doc_idx]
-
-    # calculate final accuracy
-    estimate = est_majority_vote(texts, known_votes)
-    final_accuracies[i] = get_accuracy(estimate, truths)
-
-  mean_accuracies = np.mean(accuracies_accross_runs, axis=0)
-  plot_lines('Topic %s: accuracies at k votes per doc, %s runs' % (topic_id, n_runs),
-   votes_per_doc_seq, mean_accuracies, 'Votes per document', 'Mean accuracy',
-   baseline=np.mean(final_accuracies))
-
-
 def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, estimators_dict, comment=None):
   texts, vote_lists, truths = texts_vote_lists_truths_by_topic_id[topic_id]
   n_documents = len(texts)
+
+  vectorizer = TfidfVectorizer()
+  tfidf = vectorizer.fit_transform(texts)
+  text_similarity = cosine_similarity(tfidf)
 
   min_votes_per_doc, max_votes_per_doc = votes_per_doc
   start_idx, stop_idx = min_votes_per_doc * n_documents, max_votes_per_doc * n_documents
@@ -176,7 +134,7 @@ def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, estimators_d
     print 'Calculating for %s' % estimator_name
     estimator, args = estimator_and_args
     sequences = Parallel(n_jobs=4)( delayed(get_accuracy_sequence)(estimator, stop_idx, texts, 
-        vote_lists, truths, idx, *args) for idx in xrange(n_runs) )
+        vote_lists, truths, text_similarity, idx, *args) for idx in xrange(n_runs) )
 
     good_slices = [ s[start_idx:] for s in sequences if s is not None ]
     results = np.vstack(good_slices)
@@ -216,18 +174,14 @@ def is_doc_variance_better(doc_var, neighbor_var):
       return (doc_var < neighbor_var)
 
 
-def p_majority_vote_or_nn(texts, vote_lists, sufficient_similarity=0.5):
+def p_majority_vote_or_nn(texts, vote_lists, text_similarity, sufficient_similarity):
   """ If the nearest neighbor's similarity to you is bigger than sufficient_similarity
       and variance smaller than yours, take neighbor's conf instead of yours
   """
-  vectorizer = TfidfVectorizer()
-  tfidf = vectorizer.fit_transform(texts)
-  similarity = cosine_similarity(tfidf)
-
   result_p = []
   for doc_index, vote_list in enumerate(vote_lists):
     doc_p, doc_var = get_p_and_var(vote_list)
-    similarities = similarity[:, doc_index]
+    similarities = text_similarity[:, doc_index]
     similarities[doc_index] = 0
     nn_similarity = similarities.max()
 
@@ -242,16 +196,18 @@ def p_majority_vote_or_nn(texts, vote_lists, sufficient_similarity=0.5):
   return result_p
 
 
-def est_majority_vote_or_nn(texts, vote_lists, sufficient_similarity=0.5):
+def est_majority_vote_or_nn(texts, vote_lists, text_similarity, sufficient_similarity):
   return ( unit_to_bool_indecisive(conf) for conf
-   in p_majority_vote_or_nn(texts, vote_lists, sufficient_similarity) )
+   in p_majority_vote_or_nn(texts, vote_lists, text_similarity, sufficient_similarity) )
 
 
 print "plotting curves from 1 to 7 votes per doc"
 print "started job at %s" % datetime.datetime.now()
-plot_learning_curves_for_topic('20690', 10, (1,5), { 
-#  'Majority vote' : est_majority_vote,
-  'Majority vote or NN, suff.sim. 0.2': (est_majority_vote_or_nn, [ 0.2 ]),
+plot_learning_curves_for_topic('20690', 1000, (1,5), { 
+  'Majority vote' : est_majority_vote,
+  'Majority vote or NN, suff.sim. 0.2': (est_majority_vote_or_nn, [ 0.1 ]),
+  'Majority vote or NN, suff.sim. 0.5': (est_majority_vote_or_nn, [ 0.2 ]),
   'Majority vote or NN, suff.sim. 0.5': (est_majority_vote_or_nn, [ 0.5 ]),
-})
+  'Majority vote or NN, suff.sim. 0.5': (est_majority_vote_or_nn, [ 0.7 ]),
+}, comment="for different sufficient similarity levels")
 print "finished job at %s" % datetime.datetime.now()

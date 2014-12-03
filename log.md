@@ -282,4 +282,7 @@ In the algorithm described below the nearest neighbor's estimate is considered i
 
 ![topic-20690-1000-runs-for-different-sufficient-similarity-levels- 54](https://cloud.githubusercontent.com/assets/810383/5279200/5a60c9ba-7ae2-11e4-9de6-3700f89e77a7.png)
 
-As expected, lower values yield slightly better results.
+As expected, lower values yield slightly better results. For another topic Majorty votes gets betten than NN almost instantly:
+
+![topic-20910-1000-runs-for-different-sufficient-similarity-levels- 45](https://cloud.githubusercontent.com/assets/810383/5280673/7c0fe6d8-7af4-11e4-99fe-d0067ed652ca.png)
+

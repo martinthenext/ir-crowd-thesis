@@ -204,10 +204,10 @@ def est_majority_vote_or_nn(texts, vote_lists, text_similarity, sufficient_simil
 print "plotting curves from 1 to 7 votes per doc"
 print "started job at %s" % datetime.datetime.now()
 plot_learning_curves_for_topic('20690', 1000, (1,5), { 
-  'Majority vote' : est_majority_vote,
-  'Majority vote or NN, suff.sim. 0.2': (est_majority_vote_or_nn, [ 0.1 ]),
-  'Majority vote or NN, suff.sim. 0.5': (est_majority_vote_or_nn, [ 0.2 ]),
+  'Majority vote' : (est_majority_vote, []),
+  'Majority vote or NN, suff.sim. 0.1': (est_majority_vote_or_nn, [ 0.1 ]),
+  'Majority vote or NN, suff.sim. 0.2': (est_majority_vote_or_nn, [ 0.2 ]),
   'Majority vote or NN, suff.sim. 0.5': (est_majority_vote_or_nn, [ 0.5 ]),
-  'Majority vote or NN, suff.sim. 0.5': (est_majority_vote_or_nn, [ 0.7 ]),
+  'Majority vote or NN, suff.sim. 0.7': (est_majority_vote_or_nn, [ 0.7 ]),
 }, comment="for different sufficient similarity levels")
 print "finished job at %s" % datetime.datetime.now()

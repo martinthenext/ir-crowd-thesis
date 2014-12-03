@@ -275,3 +275,11 @@ Another topic and more simulations:
 ![learning-curve-for-topic-20690-1000-runs- 23](https://cloud.githubusercontent.com/assets/810383/5270294/13849576-7a6a-11e4-80dd-33676ff6428f.png)
 
 Simulation has been running for 9 hours, using 4 cores. Functional-style code recalculates distance matrix every time, need to reconsider.
+
+*UPDATE* Similarity is now only calculated once. 
+
+In the algorithm described below the nearest neighbor's estimate is considered if it's similar enough. This is the comparison of different sufficient similarity measures:
+
+![topic-20690-1000-runs-for-different-sufficient-similarity-levels- 54](https://cloud.githubusercontent.com/assets/810383/5279200/5a60c9ba-7ae2-11e4-9de6-3700f89e77a7.png)
+
+As expected, lower values yield slightly better results.

@@ -286,3 +286,6 @@ As expected, lower values yield slightly better results. For another topic Major
 
 ![topic-20910-1000-runs-for-different-sufficient-similarity-levels- 45](https://cloud.githubusercontent.com/assets/810383/5280673/7c0fe6d8-7af4-11e4-99fe-d0067ed652ca.png)
 
+Another topic and more levels:
+
+![topic-20812-1000-runs-for-different-sufficient-similarity-levels- 43](https://cloud.githubusercontent.com/assets/810383/5290688/6fe2c54c-7b49-11e4-90ae-22d4067f85dd.png)

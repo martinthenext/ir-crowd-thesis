@@ -289,3 +289,7 @@ As expected, lower values yield slightly better results. For another topic Major
 Another topic and more levels:
 
 ![topic-20812-1000-runs-for-different-sufficient-similarity-levels- 43](https://cloud.githubusercontent.com/assets/810383/5290688/6fe2c54c-7b49-11e4-90ae-22d4067f85dd.png)
+
+Sufficient similarity of 1 means that neighbor's estimate never gets used, which is the same as just majority voting:
+
+![topic-20584-10000-runs-for-different-sufficient-similarity-levels- 40](https://cloud.githubusercontent.com/assets/810383/5297468/6305d60a-7baf-11e4-96c2-2f9f32962996.png)

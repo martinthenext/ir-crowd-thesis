@@ -293,3 +293,7 @@ Another topic and more levels:
 Sufficient similarity of 1 means that neighbor's estimate never gets used, which is the same as just majority voting:
 
 ![topic-20584-10000-runs-for-different-sufficient-similarity-levels- 40](https://cloud.githubusercontent.com/assets/810383/5297468/6305d60a-7baf-11e4-96c2-2f9f32962996.png)
+
+Sometimes it works great from the beginning:
+
+![topic-20780-10000-runs-for-different-sufficient-similarity-levels- 86](https://cloud.githubusercontent.com/assets/810383/5308499/a4349432-7c17-11e4-9325-1260bde09fd2.png)

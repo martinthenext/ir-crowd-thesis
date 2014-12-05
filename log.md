@@ -297,3 +297,18 @@ Sufficient similarity of 1 means that neighbor's estimate never gets used, which
 Sometimes it works great from the beginning:
 
 ![topic-20780-10000-runs-for-different-sufficient-similarity-levels- 86](https://cloud.githubusercontent.com/assets/810383/5308499/a4349432-7c17-11e4-9325-1260bde09fd2.png)
+
+## Adaptive sufficient similarity
+
+We can adjust sufficient similarity to increase from 0.5 to 1 as the amount of votes for a particular document increases. That means that if the document has only 1 vote it will take the estimate from any other document closer to it than 0.5 with smaller variance. But if it has more than 10 votes the document would need to be almost identical to influence the estimate:
+
+```
+
+def get_sufficient_similarity(n):
+  return 1 - 1 / float(n - 1) if n > 1 else 0
+
+```
+
+To compare with the plot above for topic `20584` we just add the new adaptive estimate:
+
+![topic-20584-10000-runs-for-different-sufficient-similarity-levels- 78](https://cloud.githubusercontent.com/assets/810383/5317109/f089329e-7c93-11e4-8e06-d3a112b90a8f.png)

@@ -174,9 +174,15 @@ def is_doc_variance_better(doc_var, neighbor_var):
       return (doc_var < neighbor_var)
 
 
+def get_sufficient_similarity(n):
+  return 1 - 1 / float(n - 1) if n > 1 else 0
+
+
 def p_majority_vote_or_nn(texts, vote_lists, text_similarity, sufficient_similarity):
   """ If the nearest neighbor's similarity to you is bigger than sufficient_similarity
       and variance smaller than yours, take neighbor's conf instead of yours
+
+      if sufficient_similarity is None it's selected by number of votes 
   """
   result_p = []
   for doc_index, vote_list in enumerate(vote_lists):
@@ -184,6 +190,10 @@ def p_majority_vote_or_nn(texts, vote_lists, text_similarity, sufficient_similar
     similarities = text_similarity[:, doc_index]
     similarities[doc_index] = 0
     nn_similarity = similarities.max()
+
+    if sufficient_similarity is None:
+      # Select similarity threshold depending on amount of votes
+      sufficient_similarity = get_sufficient_similarity(len(vote_list))
 
     if nn_similarity > sufficient_similarity:
       nn_index = similarities.argmax()
@@ -201,13 +211,15 @@ def est_majority_vote_or_nn(texts, vote_lists, text_similarity, sufficient_simil
    in p_majority_vote_or_nn(texts, vote_lists, text_similarity, sufficient_similarity) )
 
 
+def est_majority_vote_or_nn_adaptive(texts, vote_lists, text_similarity):
+    # Select similarity threshold depending on amount of votes
+    sufficient_similarity = get_sufficient_similarity(len(vote_list))
+
 print "plotting curves from 1 to 7 votes per doc"
 print "started job at %s" % datetime.datetime.now()
-plot_learning_curves_for_topic('20690', 1000, (1,5), { 
-  'Majority vote' : (est_majority_vote, []),
-  'Majority vote or NN, suff.sim. 0.1': (est_majority_vote_or_nn, [ 0.1 ]),
-  'Majority vote or NN, suff.sim. 0.2': (est_majority_vote_or_nn, [ 0.2 ]),
+plot_learning_curves_for_topic('20812', 10000, (1,5), { 
+  'Majority vote' : (est_majority_vote, []) ,
   'Majority vote or NN, suff.sim. 0.5': (est_majority_vote_or_nn, [ 0.5 ]),
-  'Majority vote or NN, suff.sim. 0.7': (est_majority_vote_or_nn, [ 0.7 ]),
+  'Majority vote or NN, adaptive': (est_majority_vote_or_nn, [ None ]),
 }, comment="for different sufficient similarity levels")
 print "finished job at %s" % datetime.datetime.now()

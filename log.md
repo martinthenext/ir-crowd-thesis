@@ -315,7 +315,7 @@ To compare with the plot above for topic `20584` we just add the new adaptive es
 
 ## Accuracy T-test
 
-To quantify the way distance-aware estimator can be better than majority voting, estimator accuracy has been measured against the baseline of majority voting with the average of 3 votes per document. A 1000 runs of simulations were performed identical to the ones yielding the above graphs.
+To quantify the way distance-aware estimator can be better than majority voting, estimator accuracy has been measured against the baseline of majority voting with the average of 3 votes per document. A 1000 runs of simulations were performed identical to the ones yielding the above graphs. For topic `20780`:
 
 Votes per doc for NN estimator|Majority vote, 10 votes per doc|NN,ss=0.1|NN,ss=0.3|NN,ss=0.5|NN,ss=0.7|NN,ss=0.9
 ------------------------------|-------------|---------|---------|---------|---------|---------

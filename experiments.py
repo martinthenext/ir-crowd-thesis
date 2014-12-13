@@ -252,7 +252,7 @@ def est_majority_vote_or_nn(texts, vote_lists, text_similarity, sufficient_simil
 print "Votes per doc for NN estimator|Majority vote, 10 votes per doc|NN,ss=0.1|NN,ss=0.3|NN,ss=0.5|NN,ss=0.7|NN,ss=0.9"
 print "------------------------------|-------------|---------|---------|---------|---------|---------"
 for votes_per_doc_for_nn in range(3, 10):
-  print "%s |" % votes_per_doc_for_nn + t_test_accuracy('20780', 1000, [
+  print "%s |" % votes_per_doc_for_nn + t_test_accuracy('20812', 1000, [
     (est_majority_vote, [], 10),
     (est_majority_vote_or_nn, [0.1], votes_per_doc_for_nn), 
     (est_majority_vote_or_nn, [0.3], votes_per_doc_for_nn), 

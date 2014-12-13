@@ -9,6 +9,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import datetime
 
+
 class PrintCounter(object):
   def __init__(self, count_to):
     self.count_to = count_to
@@ -65,7 +66,7 @@ def copy_and_shuffle_sublists(list_of_lists):
 
 
 def get_accuracy_sequence(estimator, n_votes_to_sample, texts, 
-  vote_lists, truths, text_similarity, idx=None, *args):
+  vote_lists, truths, text_similarity, idx=None, return_final=False, *args):
   """ Randomly sample votes and re-calculate estimates
   """
   if idx:
@@ -87,13 +88,21 @@ def get_accuracy_sequence(estimator, n_votes_to_sample, texts,
     vote = unknown_votes[updated_doc_idx].pop()
     known_votes[updated_doc_idx].append(vote)
     
-    # Recalculate all the estimates for the sake of consistency
+    if not return_final:
+      # Recalculate all the estimates for the sake of consistency
+      estimates = estimator(texts, known_votes, text_similarity, *args)
+
+      # Calucate the accuracy_sequence
+      accuracy_sequence[index] = get_accuracy(estimates, truths)
+
+  if return_final:
+
     estimates = estimator(texts, known_votes, text_similarity, *args)
-
-    # Calucate the accuracy_sequence
-    accuracy_sequence[index] = get_accuracy(estimates, truths)
-
-  return accuracy_sequence
+    final_accuracy = get_accuracy(esimates, truths)
+    return final_accuracy
+  
+  else:
+    return accuracy_sequence
 
 
 def index_sublist_items(list_of_lists):
@@ -134,7 +143,7 @@ def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, estimators_d
     print 'Calculating for %s' % estimator_name
     estimator, args = estimator_and_args
     sequences = Parallel(n_jobs=4)( delayed(get_accuracy_sequence)(estimator, stop_idx, texts, 
-        vote_lists, truths, text_similarity, idx, *args) for idx in xrange(n_runs) )
+        vote_lists, truths, text_similarity, idx, False, *args) for idx in xrange(n_runs) )
 
     good_slices = [ s[start_idx:] for s in sequences if s is not None ]
     results = np.vstack(good_slices)
@@ -146,6 +155,16 @@ def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, estimators_d
   else:
     title = 'Topic %s, %s runs' % (topic_id, n_runs)
   plot_learning_curve(title, x, estimator_y, 'Votes per document', 'Accuracy')
+
+
+def t_test_accuracy(topic_id, n_runs, estimator_params_votes_per_doc_tuples):
+  texts, vote_lists, truths = texts_vote_lists_truths_by_topic_id[topic_id]
+  vectorizer = TfidfVectorizer()
+  text_similarity = cosine_similarity(vectorizer.fit_transform(texts))
+
+  for estimator, params, votes_per_doc in estimator_params_votes_per_doc_tuples:
+    stop_idx = max_votes_per_doc * len(texts)
+    # TODO
 
 
 def get_p_and_var(vote_list):
@@ -215,11 +234,12 @@ def est_majority_vote_or_nn_adaptive(texts, vote_lists, text_similarity):
     # Select similarity threshold depending on amount of votes
     sufficient_similarity = get_sufficient_similarity(len(vote_list))
 
+
 print "plotting curves from 1 to 7 votes per doc"
 print "started job at %s" % datetime.datetime.now()
-plot_learning_curves_for_topic('20812', 10000, (1,5), { 
+plot_learning_curves_for_topic('20812', 1000, (1,5), { 
   'Majority vote' : (est_majority_vote, []) ,
-  'Majority vote or NN, suff.sim. 0.5': (est_majority_vote_or_nn, [ 0.5 ]),
-  'Majority vote or NN, adaptive': (est_majority_vote_or_nn, [ None ]),
+  'Majority vote or NN, suff.sim. 0.3': (est_majority_vote_or_nn, [ 0.5 ]),
 }, comment="for different sufficient similarity levels")
 print "finished job at %s" % datetime.datetime.now()
+

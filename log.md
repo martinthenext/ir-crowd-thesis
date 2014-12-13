@@ -312,3 +312,19 @@ def get_sufficient_similarity(n):
 To compare with the plot above for topic `20584` we just add the new adaptive estimate:
 
 ![topic-20584-10000-runs-for-different-sufficient-similarity-levels- 78](https://cloud.githubusercontent.com/assets/810383/5317109/f089329e-7c93-11e4-8e06-d3a112b90a8f.png)
+
+## Accuracy T-test
+
+To quantify the way distance-aware estimator can be better than majority voting, estimator accuracy has been measured against the baseline of majority voting with the average of 3 votes per document. A 1000 runs of simulations were performed identical to the ones yielding the above graphs.
+
+Votes per doc for NN estimator|Majority vote, 10 votes per doc|NN,ss=0.1|NN,ss=0.3|NN,ss=0.5|NN,ss=0.7|NN,ss=0.9
+------------------------------|-------------|---------|---------|---------|---------|---------
+3 |0.86|0.88 *|0.88 *|0.87  |0.84 *|0.83 *
+4 |0.86|0.90 *|0.90 *|0.89 *|0.86  |0.84 *
+5 |0.87|0.92 *|0.91 *|0.91 *|0.87  |0.85 *
+6 |0.86|0.92 *|0.93 *|0.91 *|0.88 *|0.86  
+7 |0.86|0.93 *|0.93 *|0.93 *|0.88 *|0.86  
+8 |0.86|0.93 *|0.94 *|0.93 *|0.89 *|0.87  
+9 |0.86|0.94 *|0.94 *|0.93 *|0.90 *|0.87  
+
+A star shows significance at `0.01` level.

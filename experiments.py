@@ -8,6 +8,8 @@ from sklearn.externals.joblib import Parallel, delayed
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import datetime
+from scipy.stats import ttest_ind
+import sys
 
 
 class PrintCounter(object):
@@ -67,10 +69,10 @@ def copy_and_shuffle_sublists(list_of_lists):
 
 def get_accuracy_sequence(estimator, n_votes_to_sample, texts, 
   vote_lists, truths, text_similarity, idx=None, return_final=False, *args):
-  """ Randomly sample votes and re-calculate estimates
+  """ Randomly sample votes and re-calculate estimates.
   """
   if idx:
-    print idx
+    sys.stderr.write("%s\n" % idx)
 
   unknown_votes = copy_and_shuffle_sublists(vote_lists)
   known_votes = [ [] for _ in unknown_votes ]
@@ -98,7 +100,7 @@ def get_accuracy_sequence(estimator, n_votes_to_sample, texts,
   if return_final:
 
     estimates = estimator(texts, known_votes, text_similarity, *args)
-    final_accuracy = get_accuracy(esimates, truths)
+    final_accuracy = get_accuracy(estimates, truths)
     return final_accuracy
   
   else:
@@ -158,13 +160,31 @@ def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, estimators_d
 
 
 def t_test_accuracy(topic_id, n_runs, estimator_params_votes_per_doc_tuples):
+  """ Test if accuracy for estimators with given parameters is
+      significantly better than that of the first estimator in the tuple
+  """
   texts, vote_lists, truths = texts_vote_lists_truths_by_topic_id[topic_id]
   vectorizer = TfidfVectorizer()
   text_similarity = cosine_similarity(vectorizer.fit_transform(texts))
 
-  for estimator, params, votes_per_doc in estimator_params_votes_per_doc_tuples:
-    stop_idx = max_votes_per_doc * len(texts)
-    # TODO
+  accuracy_arrays = []
+  for estimator, args, votes_per_doc in estimator_params_votes_per_doc_tuples:
+    stop_idx = votes_per_doc * len(texts)
+    # Now get n_runs accuracies and put then into numpy arrays
+    accuracies = Parallel(n_jobs=4)( delayed(get_accuracy_sequence)(estimator, stop_idx, texts, 
+        vote_lists, truths, text_similarity, idx, True, *args) for idx in xrange(n_runs) )
+    accuracy_arrays.append( np.array( filter(lambda x: x is not None, accuracies) ) )
+
+  # Baseline
+  result_row = []
+  result_row.append( "%0.2f" % np.mean(accuracy_arrays[0]) )
+  # T-tests
+  for accuracy_array in accuracy_arrays[1:]:
+    _, pval = ttest_ind(accuracy_array, accuracy_arrays[0], equal_var=False)
+    significance_indicator = lambda p: "*" if p < 0.01 else " "
+    result_row.append( "%0.2f %s" % (np.mean(accuracy_array), significance_indicator(pval)))
+
+  return "|".join(result_row)
 
 
 def get_p_and_var(vote_list):
@@ -229,17 +249,14 @@ def est_majority_vote_or_nn(texts, vote_lists, text_similarity, sufficient_simil
   return ( unit_to_bool_indecisive(conf) for conf
    in p_majority_vote_or_nn(texts, vote_lists, text_similarity, sufficient_similarity) )
 
-
-def est_majority_vote_or_nn_adaptive(texts, vote_lists, text_similarity):
-    # Select similarity threshold depending on amount of votes
-    sufficient_similarity = get_sufficient_similarity(len(vote_list))
-
-
-print "plotting curves from 1 to 7 votes per doc"
-print "started job at %s" % datetime.datetime.now()
-plot_learning_curves_for_topic('20812', 1000, (1,5), { 
-  'Majority vote' : (est_majority_vote, []) ,
-  'Majority vote or NN, suff.sim. 0.3': (est_majority_vote_or_nn, [ 0.5 ]),
-}, comment="for different sufficient similarity levels")
-print "finished job at %s" % datetime.datetime.now()
-
+print "Votes per doc for NN estimator|Majority vote, 10 votes per doc|NN,ss=0.1|NN,ss=0.3|NN,ss=0.5|NN,ss=0.7|NN,ss=0.9"
+print "------------------------------|-------------|---------|---------|---------|---------|---------"
+for votes_per_doc_for_nn in range(3, 10):
+  print "%s |" % votes_per_doc_for_nn + t_test_accuracy('20780', 1000, [
+    (est_majority_vote, [], 10),
+    (est_majority_vote_or_nn, [0.1], votes_per_doc_for_nn), 
+    (est_majority_vote_or_nn, [0.3], votes_per_doc_for_nn), 
+    (est_majority_vote_or_nn, [0.5], votes_per_doc_for_nn), 
+    (est_majority_vote_or_nn, [0.7], votes_per_doc_for_nn), 
+    (est_majority_vote_or_nn, [0.9], votes_per_doc_for_nn), 
+  ] )

@@ -328,3 +328,15 @@ Votes per doc for NN estimator|Majority vote, 10 votes per doc|NN,ss=0.1|NN,ss=0
 9 |0.86|0.94 *|0.94 *|0.93 *|0.90 *|0.87  
 
 A star shows significance at `0.01` level.
+
+For topic `20812`, all accuracies are signifantly lower than that of majority voting:
+
+Votes per doc for NN estimator|Majority vote, 10 votes per doc|NN,ss=0.1|NN,ss=0.3|NN,ss=0.5|NN,ss=0.7|NN,ss=0.9
+------------------------------|-------------|---------|---------|---------|---------|---------
+3 |0.91|0.77 *|0.76 *|0.82 *|0.82 *|0.81 *
+4 |0.90|0.78 *|0.77 *|0.84 *|0.83 *|0.83 *
+5 |0.91|0.79 *|0.78 *|0.85 *|0.84 *|0.84 *
+6 |0.91|0.79 *|0.79 *|0.85 *|0.85 *|0.86 *
+7 |0.90|0.80 *|0.79 *|0.86 *|0.86 *|0.86 *
+8 |0.90|0.80 *|0.80 *|0.86 *|0.86 *|0.86 *
+9 |0.90|0.80 *|0.80 *|0.86 *|0.86 *|0.87 *

@@ -182,7 +182,8 @@ def t_test_accuracy(topic_id, n_runs, estimator_params_votes_per_doc_tuples):
   for accuracy_array in accuracy_arrays[1:]:
     _, pval = ttest_ind(accuracy_array, accuracy_arrays[0], equal_var=False)
     significance_indicator = lambda p: "*" if p < 0.01 else " "
-    result_row.append( "%0.2f %s" % (np.mean(accuracy_array), significance_indicator(pval)))
+    is_better = "$" if np.mean(accuracy_array) > np.mean(accuracy_arrays[0]) else " "
+    result_row.append( "%0.2f %s %s" % (np.mean(accuracy_array), significance_indicator(pval), is_better))
 
   return "|".join(result_row)
 
@@ -249,14 +250,17 @@ def est_majority_vote_or_nn(texts, vote_lists, text_similarity, sufficient_simil
   return ( unit_to_bool_indecisive(conf) for conf
    in p_majority_vote_or_nn(texts, vote_lists, text_similarity, sufficient_similarity) )
 
-print "Votes per doc for NN estimator|Majority vote, 10 votes per doc|NN,ss=0.1|NN,ss=0.3|NN,ss=0.5|NN,ss=0.7|NN,ss=0.9"
-print "------------------------------|-------------|---------|---------|---------|---------|---------"
-for votes_per_doc_for_nn in range(3, 10):
-  print "%s |" % votes_per_doc_for_nn + t_test_accuracy('20812', 1000, [
-    (est_majority_vote, [], 10),
-    (est_majority_vote_or_nn, [0.1], votes_per_doc_for_nn), 
-    (est_majority_vote_or_nn, [0.3], votes_per_doc_for_nn), 
-    (est_majority_vote_or_nn, [0.5], votes_per_doc_for_nn), 
-    (est_majority_vote_or_nn, [0.7], votes_per_doc_for_nn), 
-    (est_majority_vote_or_nn, [0.9], votes_per_doc_for_nn), 
-  ] )
+
+print "Topic|Votes per doc for NN estimator|Majority vote, 10 votes per doc|NN,ss=0.1|NN,ss=0.3|NN,ss=0.5|NN,ss=0.7|NN,ss=0.9"
+print "-----|------------------------------|-------------|---------|---------|---------|---------|---------"
+
+for topic_id in texts_vote_lists_truths_by_topic_id.keys():
+  for votes_per_doc_for_nn in range(3, 10):
+    print "%s | %s |" % (topic_id, votes_per_doc_for_nn) + t_test_accuracy(topic_id, 1000, [
+      (est_majority_vote, [], 10),
+      (est_majority_vote_or_nn, [0.1], votes_per_doc_for_nn), 
+      (est_majority_vote_or_nn, [0.3], votes_per_doc_for_nn), 
+      (est_majority_vote_or_nn, [0.5], votes_per_doc_for_nn), 
+      (est_majority_vote_or_nn, [0.7], votes_per_doc_for_nn), 
+      (est_majority_vote_or_nn, [0.9], votes_per_doc_for_nn), 
+    ] )

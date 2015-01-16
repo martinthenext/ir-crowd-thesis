@@ -247,20 +247,40 @@ def p_majority_vote_or_nn(texts, vote_lists, text_similarity, sufficient_similar
 
 
 def est_majority_vote_or_nn(texts, vote_lists, text_similarity, sufficient_similarity):
-  return ( unit_to_bool_indecisive(conf) for conf
+  return ( unit_to_bool_indecisive(p) for p
    in p_majority_vote_or_nn(texts, vote_lists, text_similarity, sufficient_similarity) )
 
 
-print "Topic|Votes per doc for NN estimator|Majority vote, 10 votes per doc|NN,ss=0.1|NN,ss=0.3|NN,ss=0.5|NN,ss=0.7|NN,ss=0.9"
-print "-----|------------------------------|-------------|---------|---------|---------|---------|---------"
+def p_majority_vote_with_nn(texts, vote_lists, text_similarity, sufficient_similarity):
+  result_p = []
+  for doc_index, doc_vote_list in enumerate(vote_lists):
+    similarities = text_similarity[:, doc_index]
+    similarities[doc_index] = 0
+    nn_similarity = similarities.max()
 
-for topic_id in texts_vote_lists_truths_by_topic_id.keys():
-  for votes_per_doc_for_nn in range(3, 10):
-    print "%s | %s |" % (topic_id, votes_per_doc_for_nn) + t_test_accuracy(topic_id, 1000, [
-      (est_majority_vote, [], 10),
-      (est_majority_vote_or_nn, [0.1], votes_per_doc_for_nn), 
-      (est_majority_vote_or_nn, [0.3], votes_per_doc_for_nn), 
-      (est_majority_vote_or_nn, [0.5], votes_per_doc_for_nn), 
-      (est_majority_vote_or_nn, [0.7], votes_per_doc_for_nn), 
-      (est_majority_vote_or_nn, [0.9], votes_per_doc_for_nn), 
-    ] )
+    if nn_similarity > sufficient_similarity:
+      # Join their votes
+      nn_vote_list = vote_lists[ similarities.argmax() ]
+      joint_vote_list = doc_vote_list + nn_vote_list
+      p, var = get_p_and_var(joint_vote_list)
+    else:
+      p, var = get_p_and_var(doc_vote_list)
+
+    result_p.append(p)
+
+  return result_p
+
+
+def est_majority_vote_with_nn(texts, vote_lists, text_similarity, sufficient_similarity):
+  return ( unit_to_bool_indecisive(p) for p
+   in p_majority_vote_with_nn(texts, vote_lists, text_similarity, sufficient_similarity) )
+
+
+print "plotting curves from 1 to 7 votes per doc"
+print "started job at %s" % datetime.datetime.now()
+plot_learning_curves_for_topic('20690', 10000, (1,5), { 
+  'Majority vote' : (est_majority_vote, []),
+  'Majority vote or NN, suff.sim. 0.5': (est_majority_vote_or_nn, [ 0.5 ]),
+  'Majority vote with NN, suff.sim. 0.5': (est_majority_vote_with_nn, [ 0.5 ]),
+}, comment="for different sufficient similarity levels")
+print "finished job at %s" % datetime.datetime.now()

@@ -340,3 +340,11 @@ Votes per doc for NN estimator|Majority vote, 10 votes per doc|NN,ss=0.1|NN,ss=0
 7 |0.90|0.80 *|0.79 *|0.86 *|0.86 *|0.86 *
 8 |0.90|0.80 *|0.80 *|0.86 *|0.86 *|0.86 *
 9 |0.90|0.80 *|0.80 *|0.86 *|0.86 *|0.87 *
+
+## Joining votes with nearest neighbor
+
+Instead of using the nearest neighbor's vote like before it makes sense to join votes with them. Below is the learning curve of such an estimator (named 'Majority vote with NN').
+
+![topic-20690-10000-runs-for-different-sufficient-similarity-levels- 71](https://cloud.githubusercontent.com/assets/810383/5777764/d32e0cb0-9d95-11e4-951b-8d9709ec0608.png)
+
+Behavior of this estimator with different sufficient similarity levels should be investigated.

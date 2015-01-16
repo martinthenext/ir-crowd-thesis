@@ -276,11 +276,46 @@ def est_majority_vote_with_nn(texts, vote_lists, text_similarity, sufficient_sim
    in p_majority_vote_with_nn(texts, vote_lists, text_similarity, sufficient_similarity) )
 
 
-print "plotting curves from 1 to 7 votes per doc"
+def p_merge_enough_votes(texts, vote_lists, text_similarity, votes_required):
+  """ Merge votes from nearest neighbors until a sufficient amount of votes 
+      is reached
+  """
+  result_p = []
+  for doc_index, doc_vote_list in enumerate(vote_lists):
+    if len(doc_vote_list) >= votes_required:
+      p, var = get_p_and_var(doc_vote_list)
+    else:
+      # Gather votes around from neighbors
+      similarities = text_similarity[:, doc_index]
+      similarities[doc_index] = 0
+
+      decreasing_order_idx = np.argsort(similarities)[::-1]
+      # Fill the vote list until it's big enough
+      vote_list = doc_vote_list[:]
+      for neighbor_idx in decreasing_order_idx:
+        vote_list += vote_lists[neighbor_idx]
+        if len(vote_list) >= votes_required:
+          break
+      # Derive estimate from that vote list
+      p, var = get_p_and_var(vote_list)
+
+    result_p.append(p)
+
+  return result_p
+
+
+def est_merge_enough_votes(texts, vote_lists, text_similarity, votes_required):
+  return ( unit_to_bool_indecisive(p) for p
+   in p_merge_enough_votes(texts, vote_lists, text_similarity, votes_required) )
+
+
+print "plotting curves from 1 to 5 votes per doc"
 print "started job at %s" % datetime.datetime.now()
 plot_learning_curves_for_topic('20690', 10000, (1,5), { 
   'Majority vote' : (est_majority_vote, []),
-  'Majority vote or NN, suff.sim. 0.5': (est_majority_vote_or_nn, [ 0.5 ]),
   'Majority vote with NN, suff.sim. 0.5': (est_majority_vote_with_nn, [ 0.5 ]),
+  'Merge enough votes, required 5': (est_merge_enough_votes, [ 5 ]),
+  'Merge enough votes, required 1': (est_merge_enough_votes, [ 1 ]),
+  'Merge enough votes, required 3': (est_merge_enough_votes, [ 3 ]),
 }, comment="for different sufficient similarity levels")
 print "finished job at %s" % datetime.datetime.now()

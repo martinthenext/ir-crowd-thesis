@@ -348,3 +348,9 @@ Instead of using the nearest neighbor's vote like before it makes sense to join 
 ![topic-20690-10000-runs-for-different-sufficient-similarity-levels- 71](https://cloud.githubusercontent.com/assets/810383/5777764/d32e0cb0-9d95-11e4-951b-8d9709ec0608.png)
 
 Behavior of this estimator with different sufficient similarity levels should be investigated.
+
+## Joining votes until a required number is received
+
+Another strategy would be to require a certain number of votes, and in case a document doesn't have this number consecutevely join votes with the nearest neighbor until the required number is reached. This strategy proves to be even more effective:
+
+![topic-20690-10000-runs-for-different-sufficient-similarity-levels- 2](https://cloud.githubusercontent.com/assets/810383/5789186/ae4dcfae-9e60-11e4-9c00-4608051cf7da.png)

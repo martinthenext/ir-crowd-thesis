@@ -354,3 +354,7 @@ Behavior of this estimator with different sufficient similarity levels should be
 Another strategy would be to require a certain number of votes, and in case a document doesn't have this number consecutevely join votes with the nearest neighbor until the required number is reached. This strategy proves to be even more effective:
 
 ![topic-20690-10000-runs-for-different-sufficient-similarity-levels- 2](https://cloud.githubusercontent.com/assets/810383/5789186/ae4dcfae-9e60-11e4-9c00-4608051cf7da.png)
+
+Results for some other topic, where previous results were pretty bad:
+
+![topic-20910-10000-runs-for-different-sufficient-similarity-levels- 58](https://cloud.githubusercontent.com/assets/810383/5801071/318f8696-9fe7-11e4-8647-abb97a12483c.png)

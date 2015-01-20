@@ -358,3 +358,7 @@ Another strategy would be to require a certain number of votes, and in case a do
 Results for some other topic, where previous results were pretty bad:
 
 ![topic-20910-10000-runs-for-different-sufficient-similarity-levels- 58](https://cloud.githubusercontent.com/assets/810383/5801071/318f8696-9fe7-11e4-8647-abb97a12483c.png)
+
+Sometimes mejority vote with NN outperforms 'merge enough votes' strategy. Also, optimal parameter for the latter is not always 3 as it seems.
+
+![topic-20780-10000-runs-for-different-sufficient-similarity-levels- 44](https://cloud.githubusercontent.com/assets/810383/5819072/4ac17276-a0bb-11e4-9033-021e16d75c5e.png)

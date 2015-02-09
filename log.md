@@ -362,3 +362,22 @@ Results for some other topic, where previous results were pretty bad:
 Sometimes mejority vote with NN outperforms 'merge enough votes' strategy. Also, optimal parameter for the latter is not always 3 as it seems.
 
 ![topic-20780-10000-runs-for-different-sufficient-similarity-levels- 44](https://cloud.githubusercontent.com/assets/810383/5819072/4ac17276-a0bb-11e4-9033-021e16d75c5e.png)
+
+## Using GP package from Scikit-Learn
+
+For the task of "predicting" relevance probabilities from the given TF-IDF document vectors we try using Gaussian Processes regression `tf-idf vector` -> `relevance probability`. With a simple code like that:
+
+```python
+MY_FAVOURITE_NUMBER = 2900
+vectorizer = TfidfVectorizer()
+X = vectorizer.fit_transform(texts).toarray()
+y = np.array(list(p_majority_vote(texts, vote_lists)))
+gp = gaussian_process.GaussianProcess(nugget=MY_FAVOURITE_NUMBER)
+print gp.fit(X, y)
+```
+
+We get an exception:
+
+> Exception: Multiple input features cannot have the same target value.
+
+As we supply the `nugget` that should be possible, but it's not. Author [suggests](https://github.com/scikit-learn/scikit-learn/issues/642#issuecomment-67366214) this is an implementation problem.

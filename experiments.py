@@ -10,7 +10,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import datetime
 from scipy.stats import ttest_ind
 import sys
-
+from sklearn import gaussian_process
 
 class PrintCounter(object):
   def __init__(self, count_to):
@@ -309,13 +309,16 @@ def est_merge_enough_votes(texts, vote_lists, text_similarity, votes_required):
    in p_merge_enough_votes(texts, vote_lists, text_similarity, votes_required) )
 
 
-print "plotting curves from 1 to 5 votes per doc"
-print "started job at %s" % datetime.datetime.now()
-plot_learning_curves_for_topic('20780', 10000, (1,5), { 
-  'Majority vote' : (est_majority_vote, []),
-  'Majority vote with NN, suff.sim. 0.5': (est_majority_vote_with_nn, [ 0.5 ]),
-  'Merge enough votes, required 5': (est_merge_enough_votes, [ 5 ]),
-  'Merge enough votes, required 1': (est_merge_enough_votes, [ 1 ]),
-  'Merge enough votes, required 3': (est_merge_enough_votes, [ 3 ]),
-}, comment="for different sufficient similarity levels")
-print "finished job at %s" % datetime.datetime.now()
+TOPIC_ID = '20780'
+texts, vote_lists, truths = texts_vote_lists_truths_by_topic_id[TOPIC_ID]
+# Estimated relevance probabilities for all documents
+y = np.array(list(p_majority_vote(texts, vote_lists)))
+
+MY_FAVOURITE_NUMBER = 2900
+
+vectorizer = TfidfVectorizer()
+X = vectorizer.fit_transform(texts).toarray()
+
+gp = gaussian_process.GaussianProcess(nugget=MY_FAVOURITE_NUMBER)
+print gp.fit(X, y)
+# >> Multiple input features cannot have the same target value

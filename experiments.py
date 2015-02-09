@@ -12,6 +12,7 @@ from scipy.stats import ttest_ind
 import sys
 from sklearn import gaussian_process
 
+
 class PrintCounter(object):
   def __init__(self, count_to):
     self.count_to = count_to
@@ -314,11 +315,16 @@ texts, vote_lists, truths = texts_vote_lists_truths_by_topic_id[TOPIC_ID]
 # Estimated relevance probabilities for all documents
 y = np.array(list(p_majority_vote(texts, vote_lists)))
 
-MY_FAVOURITE_NUMBER = 2900
+MY_FAVOURITE_NUMBER = 10
 
 vectorizer = TfidfVectorizer()
 X = vectorizer.fit_transform(texts).toarray()
 
 gp = gaussian_process.GaussianProcess(nugget=MY_FAVOURITE_NUMBER)
 print gp.fit(X, y)
-# >> Multiple input features cannot have the same target value
+
+yhat = gp.predict(X)
+print y
+print yhat
+
+print np.mean(yhat - y)

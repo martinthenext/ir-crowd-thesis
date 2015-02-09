@@ -381,3 +381,5 @@ We get an exception:
 > Exception: Multiple input features cannot have the same target value.
 
 As we supply the `nugget` that should be possible, but it's not. Author [suggests](https://github.com/scikit-learn/scikit-learn/issues/642#issuecomment-67366214) this is an implementation problem.
+
+The exception could be quickly "fixed" by [monkey patching](http://en.wikipedia.org/wiki/Monkey_patch) the `sklearn` locally and allowing GP to run. The predicted values yielded by GP are slightly different (mean difference is 5e-18 but noticable), which is a serirable behaviour because we want an algorithm to converge to majority voting results when given plenty of data.

@@ -69,7 +69,7 @@ def copy_and_shuffle_sublists(list_of_lists):
 
 
 def get_accuracy_sequence(estimator, n_votes_to_sample, texts, 
-  vote_lists, truths, text_similarity, idx=None, return_final=False, *args):
+  vote_lists, truths, X, text_similarity, idx=None, return_final=False, *args):
   """ Randomly sample votes and re-calculate estimates.
   """
   if idx:
@@ -93,7 +93,7 @@ def get_accuracy_sequence(estimator, n_votes_to_sample, texts,
     
     if not return_final:
       # Recalculate all the estimates for the sake of consistency
-      estimates = estimator(texts, known_votes, text_similarity, *args)
+      estimates = estimator(texts, known_votes, X, text_similarity, *args)
 
       # Calucate the accuracy_sequence
       accuracy_sequence[index] = get_accuracy(estimates, truths)
@@ -133,8 +133,8 @@ def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, estimators_d
   n_documents = len(texts)
 
   vectorizer = TfidfVectorizer()
-  tfidf = vectorizer.fit_transform(texts)
-  text_similarity = cosine_similarity(tfidf)
+  X = vectorizer.fit_transform(texts)
+  text_similarity = cosine_similarity(X)
 
   min_votes_per_doc, max_votes_per_doc = votes_per_doc
   start_idx, stop_idx = min_votes_per_doc * n_documents, max_votes_per_doc * n_documents
@@ -146,7 +146,7 @@ def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, estimators_d
     print 'Calculating for %s' % estimator_name
     estimator, args = estimator_and_args
     sequences = Parallel(n_jobs=4)( delayed(get_accuracy_sequence)(estimator, stop_idx, texts, 
-        vote_lists, truths, text_similarity, idx, False, *args) for idx in xrange(n_runs) )
+        vote_lists, truths, X, text_similarity, idx, False, *args) for idx in xrange(n_runs) )
 
     good_slices = [ s[start_idx:] for s in sequences if s is not None ]
     results = np.vstack(good_slices)
@@ -173,7 +173,7 @@ def t_test_accuracy(topic_id, n_runs, estimator_params_votes_per_doc_tuples):
     stop_idx = votes_per_doc * len(texts)
     # Now get n_runs accuracies and put then into numpy arrays
     accuracies = Parallel(n_jobs=4)( delayed(get_accuracy_sequence)(estimator, stop_idx, texts, 
-        vote_lists, truths, text_similarity, idx, True, *args) for idx in xrange(n_runs) )
+        vote_lists, truths, X, text_similarity, idx, True, *args) for idx in xrange(n_runs) )
     accuracy_arrays.append( np.array( filter(lambda x: x is not None, accuracies) ) )
 
   # Baseline
@@ -219,7 +219,7 @@ def get_sufficient_similarity(n):
   return 1 - 1 / float(n - 1) if n > 1 else 0
 
 
-def p_majority_vote_or_nn(texts, vote_lists, text_similarity, sufficient_similarity):
+def p_majority_vote_or_nn(texts, vote_lists, X, text_similarity, sufficient_similarity):
   """ If the nearest neighbor's similarity to you is bigger than sufficient_similarity
       and variance smaller than yours, take neighbor's conf instead of yours
 
@@ -247,12 +247,12 @@ def p_majority_vote_or_nn(texts, vote_lists, text_similarity, sufficient_similar
   return result_p
 
 
-def est_majority_vote_or_nn(texts, vote_lists, text_similarity, sufficient_similarity):
+def est_majority_vote_or_nn(texts, vote_lists, X, text_similarity, sufficient_similarity):
   return ( unit_to_bool_indecisive(p) for p
-   in p_majority_vote_or_nn(texts, vote_lists, text_similarity, sufficient_similarity) )
+   in p_majority_vote_or_nn(texts, vote_lists, X, text_similarity, sufficient_similarity) )
 
 
-def p_majority_vote_with_nn(texts, vote_lists, text_similarity, sufficient_similarity):
+def p_majority_vote_with_nn(texts, vote_lists, X, text_similarity, sufficient_similarity):
   result_p = []
   for doc_index, doc_vote_list in enumerate(vote_lists):
     similarities = text_similarity[:, doc_index]
@@ -272,12 +272,12 @@ def p_majority_vote_with_nn(texts, vote_lists, text_similarity, sufficient_simil
   return result_p
 
 
-def est_majority_vote_with_nn(texts, vote_lists, text_similarity, sufficient_similarity):
+def est_majority_vote_with_nn(texts, vote_lists, X, text_similarity, sufficient_similarity):
   return ( unit_to_bool_indecisive(p) for p
-   in p_majority_vote_with_nn(texts, vote_lists, text_similarity, sufficient_similarity) )
+   in p_majority_vote_with_nn(texts, vote_lists, X, text_similarity, sufficient_similarity) )
 
 
-def p_merge_enough_votes(texts, vote_lists, text_similarity, votes_required):
+def p_merge_enough_votes(texts, vote_lists, X, text_similarity, votes_required):
   """ Merge votes from nearest neighbors until a sufficient amount of votes 
       is reached
   """
@@ -305,22 +305,33 @@ def p_merge_enough_votes(texts, vote_lists, text_similarity, votes_required):
   return result_p
 
 
-def est_merge_enough_votes(texts, vote_lists, text_similarity, votes_required):
+def est_merge_enough_votes(texts, vote_lists, X, text_similarity, votes_required):
   return ( unit_to_bool_indecisive(p) for p
-   in p_merge_enough_votes(texts, vote_lists, text_similarity, votes_required) )
+   in p_merge_enough_votes(texts, vote_lists, X, text_similarity, votes_required) )
 
 
-def p_gp(texts, vote_lists, text_similarity, nugget):
-  # Quite possibly it doesn't work if y includes Nones
-  vectorizer = TfidfVectorizer()
-  X = vectorizer.fit_transform(texts).toarray()
-  y = np.array(list(p_majority_vote(texts, vote_lists)))
-  gp = gaussian_process.GaussianProcess(nugget=nugget)
-  gp.fit(X, y)
-  return gp.predict(X)
+def p_gp(texts, vote_lists, X, text_similarity, nugget):
+  p_mv = list(p_majority_vote(texts, vote_lists))
+  good_idx = [i for i, p in enumerate(p_mv) if p is not None]
+  # It only makes sense to run GPs if there is more than 1 observation
+  if len(good_idx) > 1:
+    y_good = np.array(p_mv)[good_idx]
+    vectorizer = TfidfVectorizer()
+    X_good = X[good_idx, :]
+  
+    gp = gaussian_process.GaussianProcess(nugget=nugget)
+    gp.fit(X_good, y_good)
+    results_for_good_idx = gp.predict(X)
+
+    result_p = [None] * len(texts)
+    for idx_in_new, idx_in_orig in enumerate(good_idx):
+      result_p[idx_in_orig] = results_for_good_idx[idx_in_orig]
+    return result_p
+  else:
+    return p_mv
 
 
-def est_gp(texts, vote_lists, text_similarity, nugget):
+def est_gp(texts, vote_lists, X, text_similarity, nugget):
   return ( unit_to_bool_indecisive(p) for p 
     in p_gp(texts, vote_lists, text_similarity, nugget))
 
@@ -330,6 +341,6 @@ print "started job at %s" % datetime.datetime.now()
 plot_learning_curves_for_topic('20780', 10000, (1,5), { 
   'Majority vote' : (est_majority_vote, []),
   'Majority vote with NN, suff.sim. 0.5': (est_majority_vote_with_nn, [ 0.5 ]),
-  'GPs, nugget 10' : (est_gp, [10])
+#  'GPs, nugget 10' : (est_gp, [10])
 }, comment="for different sufficient similarity levels")
 print "finished job at %s" % datetime.datetime.now()

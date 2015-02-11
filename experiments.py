@@ -325,8 +325,11 @@ def est_gp(texts, vote_lists, text_similarity, nugget):
     in p_gp(texts, vote_lists, text_similarity, nugget))
 
 
-TOPIC_ID = '20780'
-texts, vote_lists, truths = texts_vote_lists_truths_by_topic_id[TOPIC_ID]
-
-MY_FAVOURITE_NUMBER = 10
-print p_gp(texts, vote_lists, None, MY_FAVOURITE_NUMBER)
+print "plotting curves from 1 to 5 votes per doc"
+print "started job at %s" % datetime.datetime.now()
+plot_learning_curves_for_topic('20780', 10000, (1,5), { 
+  'Majority vote' : (est_majority_vote, []),
+  'Majority vote with NN, suff.sim. 0.5': (est_majority_vote_with_nn, [ 0.5 ]),
+  'GPs, nugget 10' : (est_gp, [10])
+}, comment="for different sufficient similarity levels")
+print "finished job at %s" % datetime.datetime.now()

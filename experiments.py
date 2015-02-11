@@ -310,21 +310,23 @@ def est_merge_enough_votes(texts, vote_lists, text_similarity, votes_required):
    in p_merge_enough_votes(texts, vote_lists, text_similarity, votes_required) )
 
 
+def p_gp(texts, vote_lists, text_similarity, nugget):
+  # Quite possibly it doesn't work if y includes Nones
+  vectorizer = TfidfVectorizer()
+  X = vectorizer.fit_transform(texts).toarray()
+  y = np.array(list(p_majority_vote(texts, vote_lists)))
+  gp = gaussian_process.GaussianProcess(nugget=nugget)
+  gp.fit(X, y)
+  return gp.predict(X)
+
+
+def est_gp(texts, vote_lists, text_similarity, nugget):
+  return ( unit_to_bool_indecisive(p) for p 
+    in p_gp(texts, vote_lists, text_similarity, nugget))
+
+
 TOPIC_ID = '20780'
 texts, vote_lists, truths = texts_vote_lists_truths_by_topic_id[TOPIC_ID]
-# Estimated relevance probabilities for all documents
-y = np.array(list(p_majority_vote(texts, vote_lists)))
 
 MY_FAVOURITE_NUMBER = 10
-
-vectorizer = TfidfVectorizer()
-X = vectorizer.fit_transform(texts).toarray()
-
-gp = gaussian_process.GaussianProcess(nugget=MY_FAVOURITE_NUMBER)
-print gp.fit(X, y)
-
-yhat = gp.predict(X)
-print y
-print yhat
-
-print np.mean(yhat - y)
+print p_gp(texts, vote_lists, None, MY_FAVOURITE_NUMBER)

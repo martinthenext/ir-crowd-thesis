@@ -313,19 +313,20 @@ def est_merge_enough_votes(texts, vote_lists, X, text_similarity, votes_required
 def p_gp(texts, vote_lists, X, text_similarity, nugget):
   p_mv = list(p_majority_vote(texts, vote_lists))
   good_idx = [i for i, p in enumerate(p_mv) if p is not None]
+  
   # It only makes sense to run GPs if there is more than 1 observation
   if len(good_idx) > 1:
-    y_good = np.array(p_mv)[good_idx]
-    vectorizer = TfidfVectorizer()
-    X_good = X[good_idx, :]
+    y_good = np.array(p_mv)[good_idx].astype(np.float32)
+    X_good = X.toarray()[good_idx, :].astype(np.float32)
   
     gp = gaussian_process.GaussianProcess(nugget=nugget)
     gp.fit(X_good, y_good)
-    results_for_good_idx = gp.predict(X)
+    results_for_good_idx = gp.predict(X_good)
 
     result_p = [None] * len(texts)
     for idx_in_new, idx_in_orig in enumerate(good_idx):
-      result_p[idx_in_orig] = results_for_good_idx[idx_in_orig]
+      result_p[idx_in_orig] = results_for_good_idx[idx_in_new]
+    
     return result_p
   else:
     return p_mv
@@ -333,14 +334,13 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget):
 
 def est_gp(texts, vote_lists, X, text_similarity, nugget):
   return ( unit_to_bool_indecisive(p) for p 
-    in p_gp(texts, vote_lists, text_similarity, nugget))
+    in p_gp(texts, vote_lists, X, text_similarity, nugget))
 
 
 print "plotting curves from 1 to 5 votes per doc"
 print "started job at %s" % datetime.datetime.now()
 plot_learning_curves_for_topic('20780', 10000, (1,5), { 
   'Majority vote' : (est_majority_vote, []),
-  'Majority vote with NN, suff.sim. 0.5': (est_majority_vote_with_nn, [ 0.5 ]),
-#  'GPs, nugget 10' : (est_gp, [10])
-}, comment="for different sufficient similarity levels")
+  'GPs, nugget 10' : (est_gp, [10])
+}, comment="")
 print "finished job at %s" % datetime.datetime.now()

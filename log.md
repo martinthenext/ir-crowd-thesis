@@ -383,3 +383,17 @@ We get an exception:
 As we supply the `nugget` that should be possible, but it's not. Author [suggests](https://github.com/scikit-learn/scikit-learn/issues/642#issuecomment-67366214) this is an implementation problem.
 
 The exception could be quickly "fixed" by [monkey patching](http://en.wikipedia.org/wiki/Monkey_patch) the `sklearn` locally and allowing GP to run. The predicted values yielded by GP are slightly different (mean difference is 5e-18 but noticable), which is a serirable behaviour because we want an algorithm to converge to majority voting results when given plenty of data.
+
+## First GP results
+
+Here is an example comparison of mean vote estimates for relevance probability vs Gaussian Processes:
+
+```
+Mean vote:
+[0.0, 0.0, None, None, None, None, None, None, 1.0, None, None, 1.0, 0.0, None, None, 0.5, 0.0, 1.0, 0.0, None, 0.0, None, None, 0.0, 0.5, 0.0, None, None, 1.0, 0.0, None, 0.33333333333333331, 0.0, None, None, None, 1.0, 0.0, None, 0.0, None, None, None, 1.0, 1.0, None, None, None, None, None, None, 0.5, None, None, 0.0, 0.0, 0.0, None, 0.0, None, None, 0.0, None, None, None, 1.0, 0.0, None, 0.0, 0.33333333333333331, None, 0.0, 1.0, None, 1.0, None, None, 0.0, 0.0, None, 0.0, None, None, 0.0, 1.0, None, None, None, None, 1.0, None, None, 0.0, None, None, None, 1.0, None, None, None, 0.0, None, None, 1.0, 1.0, 1.0, None, None, None, None, None, None, 0.0, None, None]
+GP:
+[0.34528071444815872, 0.34485360723787234, None, None, None, None, None, None, 0.43618980658985174, None, None, 0.43618980658985174, 0.34528071444815872, None, None, 0.39073526051900526, 0.34528071444815872, 0.43618980658985174, 0.34528071444815872, None, 0.34528071444815872, None, None, 0.34528071444815872, 0.39073526051900526, 0.34528071444815872, None, None, 0.43618980658985174, 0.34528071444815872, None, 0.37558374588689636, 0.34528071444815872, None, None, None, 0.43618980658985174, 0.34528071444815872, None, 0.34528071444815872, None, None, None, 0.43618980658985174, 0.43618980658985174, None, None, None, None, None, None, 0.39076545834754334, None, None, 0.34528071444815872, 0.31631480117959171, 0.34528071444815872, None, 0.34528071444815872, None, None, 0.34528071444815872, None, None, None, 0.43618980658985174, 0.34528071444815872, None, 0.34528071444815872, 0.37558374588689636, None, 0.34528075940607789, 0.43618980658985174, None, 0.43619565728262016, None, None, 0.34528071444815872, 0.34528071444815872, None, 0.34528071444815872, None, None, 0.31631494391527976, 0.43618980658985174, None, None, None, None, 0.43618980658985174, None, None, 0.34528071444815872, None, None, None, 0.43618980658985174, None, None, None, 0.34528071444815872, None, None, 0.43618977905735268, 0.43618980658985174, 0.43618980658985174, None, None, None, None, None, None, 0.34528071444815872, None, None]
+
+
+
+```

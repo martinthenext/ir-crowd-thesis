@@ -11,6 +11,7 @@ import datetime
 from scipy.stats import ttest_ind
 import sys
 from sklearn import gaussian_process
+import gc
 
 
 class PrintCounter(object):
@@ -313,15 +314,24 @@ def est_merge_enough_votes(texts, vote_lists, X, text_similarity, votes_required
 def p_gp(texts, vote_lists, X, text_similarity, nugget):
   p_mv = list(p_majority_vote(texts, vote_lists))
   good_idx = [i for i, p in enumerate(p_mv) if p is not None]
-  
+
   # It only makes sense to run GPs if there is more than 1 observation
   if len(good_idx) > 1:
     y_good = np.array(p_mv)[good_idx].astype(np.float32)
-    X_good = X.toarray()[good_idx, :].astype(np.float32)
+    
+    X_good = X[good_idx, :]
+    X_good_array = X_good.toarray()
+    X_good_typed = X_good_array.astype(np.float32, copy=False)
   
     gp = gaussian_process.GaussianProcess(nugget=nugget)
-    gp.fit(X_good, y_good)
-    results_for_good_idx = gp.predict(X_good)
+    gp.fit(X_good_typed, y_good)
+    results_for_good_idx = gp.predict(X_good_typed)
+
+    del y_good
+    del X_good
+    del X_good_array
+    del X_good_typed
+    gc.collect()
 
     result_p = [None] * len(texts)
     for idx_in_new, idx_in_orig in enumerate(good_idx):
@@ -339,8 +349,10 @@ def est_gp(texts, vote_lists, X, text_similarity, nugget):
 
 print "plotting curves from 1 to 5 votes per doc"
 print "started job at %s" % datetime.datetime.now()
-plot_learning_curves_for_topic('20780', 10000, (1,5), { 
+plot_learning_curves_for_topic('20780', 100, (1,5), { 
   'Majority vote' : (est_majority_vote, []),
-  'GPs, nugget 10' : (est_gp, [10])
+  'Merge enough votes' : (est_merge_enough_votes, [5]),
+  'GPs, nugget 10' : (est_gp, [10]),
+  'GPs, nugget 1' : (est_gp, [1]),
 }, comment="")
 print "finished job at %s" % datetime.datetime.now()

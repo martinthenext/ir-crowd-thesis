@@ -324,8 +324,12 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget):
     
     X_good = X[good_idx, :]
     X_good_array = X_good.toarray()
-    X_good_typed = X_good_array.astype(np.float32, copy=False)
+    X_good_typed = X_good_array.astype(np.float16, copy=False)
   
+    del X_good
+    del X_good_array
+    gc.collect()
+
     gp = gaussian_process.GaussianProcess(nugget=nugget)
     gp.fit(X_good_typed, y_good)
     results_for_good_idx = gp.predict(X_good_typed)
@@ -333,8 +337,6 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget):
     print random.randint(1, 10)
 
     del y_good
-    del X_good
-    del X_good_array
     del X_good_typed
     del gp
     gc.collect()
@@ -353,12 +355,13 @@ def est_gp(texts, vote_lists, X, text_similarity, nugget):
     in p_gp(texts, vote_lists, X, text_similarity, nugget))
 
 
-print "plotting curves from 1 to 5 votes per doc"
-print "started job at %s" % datetime.datetime.now()
-plot_learning_curves_for_topic('20780', 3, (1,5), { 
-  'Majority vote' : (est_majority_vote, []),
-  'Merge enough votes' : (est_merge_enough_votes, [5]),
-  'GPs, nugget 10' : (est_gp, [10]),
-#  'GPs, nugget 1' : (est_gp, [1]),
-}, comment="")
-print "finished job at %s" % datetime.datetime.now()
+if __name__ == "__main__":
+  print "plotting curves from 1 to 5 votes per doc"
+  print "started job at %s" % datetime.datetime.now()
+  plot_learning_curves_for_topic('20780', 100, (1,5), { 
+    'Majority vote' : (est_majority_vote, []),
+    'Merge enough votes' : (est_merge_enough_votes, [5]),
+    'GPs, nugget 10' : (est_gp, [10]),
+  #  'GPs, nugget 1' : (est_gp, [1]),
+  }, comment="")
+  print "finished job at %s" % datetime.datetime.now()

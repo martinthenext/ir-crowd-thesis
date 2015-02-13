@@ -384,6 +384,21 @@ As we supply the `nugget` that should be possible, but it's not. Author [suggest
 
 The exception could be quickly "fixed" by [monkey patching](http://en.wikipedia.org/wiki/Monkey_patch) the `sklearn` locally and allowing GP to run. The predicted values yielded by GP are slightly different (mean difference is 5e-18 but noticable), which is a serirable behaviour because we want an algorithm to converge to majority voting results when given plenty of data.
 
+This is `sklearn/gaussian_process/gaussian_process.py`:
+
+```python
+
+         # Calculate matrix of distances D between samples
+         D, ij = l1_cross_distances(X)
+#        if (np.min(np.sum(D, axis=1)) == 0.
+#                and self.corr != correlation.pure_nugget):
+#            raise Exception("Multiple input features cannot have the same"
+#                            " target value.")
+
+
+```
+
+
 ## First GP results
 
 Here is an example comparison of mean vote estimates for relevance probability vs Gaussian Processes:

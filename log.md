@@ -399,3 +399,5 @@ GP:
 ## Memory problems
 
 Ran into memory problems bacause gigantic dense tf-idf matrices don't get garbage-collected properly. Trying different strategies and going to do profiling. 
+
+Experiments show that memory is not enough to process one [sic] accuracy sequence.

@@ -330,7 +330,7 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget):
     gp.fit(X_good_typed, y_good)
     results_for_good_idx = gp.predict(X_good_typed)
 
-    print "I ran a GP"
+    print random.randint(1, 10)
 
     del y_good
     del X_good
@@ -358,7 +358,7 @@ print "started job at %s" % datetime.datetime.now()
 plot_learning_curves_for_topic('20780', 3, (1,5), { 
   'Majority vote' : (est_majority_vote, []),
   'Merge enough votes' : (est_merge_enough_votes, [5]),
-#  'GPs, nugget 10' : (est_gp, [10]),
+  'GPs, nugget 10' : (est_gp, [10]),
 #  'GPs, nugget 1' : (est_gp, [1]),
 }, comment="")
 print "finished job at %s" % datetime.datetime.now()

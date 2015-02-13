@@ -12,6 +12,7 @@ from scipy.stats import ttest_ind
 import sys
 from sklearn import gaussian_process
 import gc
+from memory_profiler import profile
 
 
 class PrintCounter(object):
@@ -146,8 +147,10 @@ def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, estimators_d
   for estimator_name, estimator_and_args in estimators_dict.iteritems():
     print 'Calculating for %s' % estimator_name
     estimator, args = estimator_and_args
-    sequences = Parallel(n_jobs=4)( delayed(get_accuracy_sequence)(estimator, stop_idx, texts, 
-        vote_lists, truths, X, text_similarity, idx, False, *args) for idx in xrange(n_runs) )
+    #sequences = Parallel(n_jobs=4)( delayed(get_accuracy_sequence)(estimator, stop_idx, texts, 
+    #    vote_lists, truths, X, text_similarity, idx, False, *args) for idx in xrange(n_runs) )
+    sequences = [get_accuracy_sequence(estimator, stop_idx, texts, vote_lists, truths, X, \
+      text_similarity, idx, False, *args) for idx in xrange(n_runs)]
 
     good_slices = [ s[start_idx:] for s in sequences if s is not None ]
     results = np.vstack(good_slices)
@@ -310,7 +313,7 @@ def est_merge_enough_votes(texts, vote_lists, X, text_similarity, votes_required
   return ( unit_to_bool_indecisive(p) for p
    in p_merge_enough_votes(texts, vote_lists, X, text_similarity, votes_required) )
 
-
+@profile
 def p_gp(texts, vote_lists, X, text_similarity, nugget):
   p_mv = list(p_majority_vote(texts, vote_lists))
   good_idx = [i for i, p in enumerate(p_mv) if p is not None]
@@ -331,6 +334,7 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget):
     del X_good
     del X_good_array
     del X_good_typed
+    del gp
     gc.collect()
 
     result_p = [None] * len(texts)

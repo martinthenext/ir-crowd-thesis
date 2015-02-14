@@ -416,3 +416,12 @@ GP:
 Ran into memory problems bacause gigantic dense tf-idf matrices don't get garbage-collected properly. Trying different strategies and going to do profiling. 
 
 Experiments show that memory is not enough to process one [sic] accuracy sequence.
+
+**UPDATE** This got implemented and is now running. Going to have a list of accuracy sequences in an `csv` file and then plot them in Excel.
+
+Now GPs seem to be running, we need to get them to an appropriate quality.
+Results that we're aiming at: way higher accuracy than majority voting at low amount of votes per document. Plan:
+
+1. Reimplement the accuracy measurement to include **all documents into the measurement**. Possibly toss a coin with the empirical probability of success measured from the dataset.
+
+2. Try getting parameters for the GP right. Parameters cannot be found by looking at the final accuracy, there should be some other way.

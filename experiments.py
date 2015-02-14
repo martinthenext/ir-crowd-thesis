@@ -13,7 +13,7 @@ import sys
 from sklearn import gaussian_process
 import gc
 from memory_profiler import profile
-
+import resource
 
 class PrintCounter(object):
   def __init__(self, count_to):
@@ -71,12 +71,9 @@ def copy_and_shuffle_sublists(list_of_lists):
 
 
 def get_accuracy_sequence(estimator, n_votes_to_sample, texts, 
-  vote_lists, truths, X, text_similarity, idx=None, return_final=False, *args):
+  vote_lists, truths, X, text_similarity, *args):
   """ Randomly sample votes and re-calculate estimates.
   """
-  if idx:
-    sys.stderr.write("%s\n" % idx)
-
   unknown_votes = copy_and_shuffle_sublists(vote_lists)
   known_votes = [ [] for _ in unknown_votes ]
 
@@ -93,21 +90,13 @@ def get_accuracy_sequence(estimator, n_votes_to_sample, texts,
     vote = unknown_votes[updated_doc_idx].pop()
     known_votes[updated_doc_idx].append(vote)
     
-    if not return_final:
-      # Recalculate all the estimates for the sake of consistency
-      estimates = estimator(texts, known_votes, X, text_similarity, *args)
+    # Recalculate all the estimates for the sake of consistency
+    estimates = estimator(texts, known_votes, X, text_similarity, *args)
 
-      # Calucate the accuracy_sequence
-      accuracy_sequence[index] = get_accuracy(estimates, truths)
+    # Calucate the accuracy_sequence
+    accuracy_sequence[index] = get_accuracy(estimates, truths)
 
-  if return_final:
-
-    estimates = estimator(texts, known_votes, text_similarity, *args)
-    final_accuracy = get_accuracy(estimates, truths)
-    return final_accuracy
-  
-  else:
-    return accuracy_sequence
+  return accuracy_sequence
 
 
 def index_sublist_items(list_of_lists):
@@ -313,18 +302,17 @@ def est_merge_enough_votes(texts, vote_lists, X, text_similarity, votes_required
   return ( unit_to_bool_indecisive(p) for p
    in p_merge_enough_votes(texts, vote_lists, X, text_similarity, votes_required) )
 
-
 def p_gp(texts, vote_lists, X, text_similarity, nugget):
   p_mv = list(p_majority_vote(texts, vote_lists))
   good_idx = [i for i, p in enumerate(p_mv) if p is not None]
 
   # It only makes sense to run GPs if there is more than 1 observation
   if len(good_idx) > 1:
-    y_good = np.array(p_mv)[good_idx].astype(np.float32)
+    y_good = np.array(p_mv)[good_idx].astype(np.dtype('d'))
     
     X_good = X[good_idx, :]
     X_good_array = X_good.toarray()
-    X_good_typed = X_good_array.astype(np.float16, copy=False)
+    X_good_typed = X_good_array.astype(np.dtype('d'), copy=False)
   
     del X_good
     del X_good_array
@@ -334,7 +322,7 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget):
     gp.fit(X_good_typed, y_good)
     results_for_good_idx = gp.predict(X_good_typed)
 
-    print random.randint(1, 10)
+    #print random.randint(1, 10)
 
     del y_good
     del X_good_typed
@@ -344,7 +332,8 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget):
     result_p = [None] * len(texts)
     for idx_in_new, idx_in_orig in enumerate(good_idx):
       result_p[idx_in_orig] = results_for_good_idx[idx_in_new]
-    
+  
+    #print 'Memory: %s mb' % (int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)/1024)
     return result_p
   else:
     return p_mv
@@ -362,6 +351,5 @@ if __name__ == "__main__":
     'Majority vote' : (est_majority_vote, []),
     'Merge enough votes' : (est_merge_enough_votes, [5]),
     'GPs, nugget 10' : (est_gp, [10]),
-  #  'GPs, nugget 1' : (est_gp, [1]),
   }, comment="")
   print "finished job at %s" % datetime.datetime.now()

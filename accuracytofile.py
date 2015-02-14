@@ -14,7 +14,8 @@ if __name__ == "__main__":
 
   # Parameters
   topic_id = '20780'
-  estimator, args = est_gp, [10]
+  estimator, args = est_gp, [ 1 ]
+#  estimator, args = est_majority_vote, []
   votes_per_doc = (1, 5)
 
 
@@ -31,6 +32,7 @@ if __name__ == "__main__":
   start_idx, stop_idx = min_votes_per_doc * n_documents, max_votes_per_doc * n_documents
 
   sequence = get_accuracy_sequence(estimator, stop_idx, texts, vote_lists, truths,
-    X, text_similarity, None, False, *args)
+    X, text_similarity, *args)
 
-  sys.stdout.write(",".join([str(x) for x in sequence]) + '\n')
+  if sequence:
+    sys.stdout.write(",".join([str(x) for x in sequence]) + '\n')

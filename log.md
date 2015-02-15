@@ -425,3 +425,11 @@ Results that we're aiming at: way higher accuracy than majority voting at low am
 1. Reimplement the accuracy measurement to include **all documents into the measurement**. Possibly toss a coin with the empirical probability of success measured from the dataset.
 
 2. Try getting parameters for the GP right. Parameters cannot be found by looking at the final accuracy, there should be some other way.
+
+## First GP results
+
+Now every accuracy sequence is generated separately and is written to a text file. GP with nugget parameter of `1` was compared to the previous successful baseline result of "Merge Enough Votes" with 3 votes required and Majority Voting.
+
+![default](https://cloud.githubusercontent.com/assets/810383/6204550/e60d9dec-b54f-11e4-85b1-033118ab0391.png)
+
+GP are worse than everything, but this is because we don't know the right parameters yet. 

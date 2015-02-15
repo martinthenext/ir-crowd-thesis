@@ -428,7 +428,7 @@ Results that we're aiming at: way higher accuracy than majority voting at low am
 
 ## First GP results
 
-Now every accuracy sequence is generated separately and is written to a text file. GP with nugget parameter of `1` was compared to the previous successful baseline result of "Merge Enough Votes" with 3 votes required and Majority Voting.
+Now every accuracy sequence is generated separately and is written to a text file. GP with nugget parameter of `1` was compared to the previous successful baseline result of "Merge Enough Votes" with 3 votes required and Majority Voting. For every sequence 100 experiments were run and results from 1 to 5 votes per document are shown.
 
 ![default](https://cloud.githubusercontent.com/assets/810383/6204550/e60d9dec-b54f-11e4-85b1-033118ab0391.png)
 

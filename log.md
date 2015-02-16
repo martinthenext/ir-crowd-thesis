@@ -433,3 +433,7 @@ Now every accuracy sequence is generated separately and is written to a text fil
 ![default](https://cloud.githubusercontent.com/assets/810383/6204550/e60d9dec-b54f-11e4-85b1-033118ab0391.png)
 
 GP are worse than everything, but this is because we don't know the right parameters yet. 
+
+**UPDATE** Nugget `0.1` does obviously better. If nugget parameter means variance, it should be in a range of `0.01`. Results are going to be around soon.
+
+![default](https://cloud.githubusercontent.com/assets/810383/6219777/45aeb1da-b62e-11e4-85fb-4f7e7eebe65c.png)

@@ -437,3 +437,7 @@ GP are worse than everything, but this is because we don't know the right parame
 **UPDATE** Nugget `0.1` does obviously better. If nugget parameter means variance, it should be in a range of `0.01`. Results are going to be around soon.
 
 ![default](https://cloud.githubusercontent.com/assets/810383/6219777/45aeb1da-b62e-11e4-85fb-4f7e7eebe65c.png)
+
+**UPDATE** Very surprisingly enough, Nugget `0.01` doesn't differ much from `0.1`:
+
+![default](https://cloud.githubusercontent.com/assets/810383/6258090/0807f05a-b7c6-11e4-80ff-6180627c8ab2.png)

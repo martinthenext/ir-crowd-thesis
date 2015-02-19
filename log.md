@@ -441,3 +441,14 @@ GP are worse than everything, but this is because we don't know the right parame
 **UPDATE** Very surprisingly enough, Nugget `0.01` doesn't differ much from `0.1`:
 
 ![default](https://cloud.githubusercontent.com/assets/810383/6258090/0807f05a-b7c6-11e4-80ff-6180627c8ab2.png)
+
+## Proposed explanation for strange convergence
+
+Question: Why on some graphs the accuracy of estimates made with lower amount of votes per document is higher than the accuracy of the estimate made with all the available votes? 
+
+Answer: The procedure of drawing votes when generating a particular accuracy sequence is the following:
+
+1. Out of all documents a random one is chosen
+2. For this document a new vote is queried. In case there is no votes left for the document the entire sequence is disregarded
+
+As this procedure is more likely to diregard documents with smaller amount of votes, the documents with high amount of votes are more accounted for when calculated average accuracy at every particular iteration. Document with higher vote count are more likely to have good majority vote estimates. Hence, average accuracies measured for accuracy sequences can be higher than the one simply accounting all the data as low vote count documents are also accounted for.

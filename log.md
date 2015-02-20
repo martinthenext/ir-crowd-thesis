@@ -456,3 +456,9 @@ As this procedure is more likely to diregard documents with smaller amount of vo
 **UPDATE** Went back to the strage plot of topic `20932` and tried getting the [equal number of votes for every document](https://github.com/martinthenext/ir-crowd-thesis/blob/strangeplots/experiments.py#L45), still we have the same effect:
 
 ![learning-curve-for-majority-voting-topic-20932-1000-runs- 81](https://cloud.githubusercontent.com/assets/810383/6284377/a0229ad2-b8ef-11e4-97d6-605b4d92fdce.png)
+
+If we restrict number of votes per document even below mininum - to 10, this happens:
+
+![learning-curve-for-majority-voting-topic-20932-10000-runs- 24](https://cloud.githubusercontent.com/assets/810383/6284764/406aa4ea-b8f4-11e4-9ee9-1c8f5e10162b.png)
+
+Still goes above the all-information estimate.

@@ -453,6 +453,6 @@ Answer: The procedure of drawing votes when generating a particular accuracy seq
 
 As this procedure is more likely to diregard documents with smaller amount of votes, the documents with high amount of votes are more accounted for when calculated average accuracy at every particular iteration. Document with higher vote count are more likely to have good majority vote estimates. Hence, average accuracies measured for accuracy sequences can be higher than the one simply accounting all the data as low vote count documents are also accounted for.
 
-**UPDATE** Went back to the strage plot of topic `20932` and tried getting the equal number of votes for every document, still we have the same effect:
+**UPDATE** Went back to the strage plot of topic `20932` and tried getting the [equal number of votes for every document](https://github.com/martinthenext/ir-crowd-thesis/blob/strangeplots/experiments.py#L45), still we have the same effect:
 
 ![learning-curve-for-majority-voting-topic-20932-1000-runs- 81](https://cloud.githubusercontent.com/assets/810383/6284377/a0229ad2-b8ef-11e4-97d6-605b4d92fdce.png)

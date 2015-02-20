@@ -42,10 +42,20 @@ def copy_and_shuffle_sublists(list_of_lists):
   return result
 
 
+def copy_and_shuffle_sublists_equal_size(list_of_lists):
+  """
+  >>> copy_and_shuffle_sublists_equal_size([[1,2,3,4],[2,3,5,7,9,11],[33,44,55]])
+  [[3, 2, 4], [7, 3, 2], [44, 33, 55]]
+  """
+  min_length = min(len(l) for l in list_of_lists)
+  shuffled = copy_and_shuffle_sublists(list_of_lists)
+  return [l[:min_length] for l in shuffled]
+
+
 def get_accuracy_sequence(n_votes_to_sample, vote_lists, truths, n_strict=True):
   """ Randomly sample votes and re-calculate estimates
   """
-  unknown_votes = copy_and_shuffle_sublists(vote_lists)
+  unknown_votes = copy_and_shuffle_sublists_equal_size(vote_lists)
   known_votes = [ [] for _ in unknown_votes ]
 
   estimates = [None for _ in vote_lists]
@@ -96,4 +106,4 @@ def plot_learning_curve_for_topic(topic_id, n_runs, votes_per_doc=(1,10)):
   plot_learning_curve('Learning curve for majority voting, topic %s, %s runs' % (topic_id, n_runs), 
     x, y, 'Votes per document', 'Accuracy', baseline=max_accuracy)
 
-plot_learning_curve_for_topic('20690', 10000, votes_per_doc=(1, 10))
+plot_learning_curve_for_topic('20932', 1000, votes_per_doc=(1, 7))

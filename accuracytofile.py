@@ -14,8 +14,8 @@ if __name__ == "__main__":
 
   # Parameters
   topic_id = '20780'
-  estimator, args = est_gp, [ 1 ]
-#  estimator, args = est_majority_vote, []
+  estimator, args = est_gp, [ 0.3 ]
+  # estimator, args = est_merge_enough_votes, [ 3 ]
   votes_per_doc = (1, 5)
 
 

@@ -442,6 +442,10 @@ GP are worse than everything, but this is because we don't know the right parame
 
 ![default](https://cloud.githubusercontent.com/assets/810383/6258090/0807f05a-b7c6-11e4-80ff-6180627c8ab2.png)
 
+**UPDATE** New graph for nugget `0.3`, which appears not do that much difference
+
+![default](https://cloud.githubusercontent.com/assets/810383/6383980/bb264e44-bd56-11e4-9558-737b63cddfd9.png)
+
 ## Proposed explanation for strange convergence
 
 Question: Why on some graphs the accuracy of estimates made with lower amount of votes per document is higher than the accuracy of the estimate made with all the available votes? 
@@ -462,3 +466,4 @@ If we restrict number of votes per document even below mininum - to 10, this hap
 ![learning-curve-for-majority-voting-topic-20932-10000-runs- 24](https://cloud.githubusercontent.com/assets/810383/6284764/406aa4ea-b8f4-11e4-9ee9-1c8f5e10162b.png)
 
 Still goes above the all-information estimate.
+

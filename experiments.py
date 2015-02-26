@@ -107,6 +107,60 @@ def get_accuracy_sequence(estimator, n_votes_to_sample, texts,
     return accuracy_sequence
 
 
+def get_indexes_of_sublists_smaller_than(length, list_of_lists):
+  """
+  >>> get_indexes_of_sublists_smaller_than(4, [[1,1], [2,2,2,2], [3,3,3]])
+  [0, 2]
+  """
+  return [index for index, element in enumerate(list_of_lists) if len(element) < length]
+
+
+def get_accuracy_sequence_active(estimator, n_votes_to_sample, texts, 
+  vote_lists, truths, text_similarity, active_pars, idx=None, return_final=False, *args):
+  # TODO active_pars = [3] means that we need to "fill" documents untill they have 3 votes
+  if idx:
+    sys.stderr.write("%s\n" % idx)
+
+  unknown_votes = copy_and_shuffle_sublists(vote_lists)
+  known_votes = [ [] for _ in unknown_votes ]
+
+  estimates = [None for _ in vote_lists]
+
+  accuracy_sequence = [None] * n_votes_to_sample
+
+  (votes_required, ) = active_pars 
+
+  for index in xrange(n_votes_to_sample):
+    # TODO Active learning. See what amount of document have less than N votes
+    less_that_required_idx = get_indexes_of_sublists_smaller_than(votes_required, known_votes)
+    if less_that_required_idx:
+      # There are still documents to fill, pick a random
+      updated_doc_idx = random.choice(less_that_required_idx)
+    else:
+      # All documents have required number of votes, pick random from all
+      updated_doc_idx = random.randrange(len(vote_lists))
+    if not unknown_votes[updated_doc_idx]:
+      # We ran out of votes for this document, diregard this sequence
+      return None
+    vote = unknown_votes[updated_doc_idx].pop()
+    known_votes[updated_doc_idx].append(vote)
+    
+    if not return_final:
+      # Recalculate all the estimates for the sake of consistency
+      estimates = estimator(texts, known_votes, text_similarity, *args)
+
+      # Calucate the accuracy_sequence
+      accuracy_sequence[index] = get_accuracy(estimates, truths)
+
+  if return_final:
+
+    estimates = estimator(texts, known_votes, text_similarity, *args)
+    final_accuracy = get_accuracy(estimates, truths)
+    return final_accuracy
+  
+  else:
+    return accuracy_sequence
+
 def index_sublist_items(list_of_lists):
   """
   >>> a = [[1, 2], [65, 66], [12, 13, 14]]
@@ -149,7 +203,7 @@ def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, estimators_d
         vote_lists, truths, text_similarity, idx, False, *args) for idx in xrange(n_runs) )
     else:
       sequences = Parallel(n_jobs=4)( delayed(get_accuracy_sequence_active)(estimator, stop_idx, texts, 
-        vote_lists, truths, text_similarity, idx, False, *args) for idx in xrange(n_runs) )      
+        vote_lists, truths, text_similarity, active_pars, idx, False, *args) for idx in xrange(n_runs) )      
 
     good_slices = [ s[start_idx:] for s in sequences if s is not None ]
     results = np.vstack(good_slices)
@@ -318,8 +372,10 @@ print "started job at %s" % datetime.datetime.now()
 plot_learning_curves_for_topic('20690', 1000, (1,5), { 
   'Majority vote' : (est_majority_vote, [], None),
   'Majority vote with NN, suff.sim. 0.5': (est_majority_vote_with_nn, [ 0.5 ], None),
-  'Merge enough votes, required 5': (est_merge_enough_votes, [ 5 ], None),
-  'Merge enough votes, required 1': (est_merge_enough_votes, [ 1 ], None),
-  'Merge enough votes, required 3': (est_merge_enough_votes, [ 3 ], None),
-}, comment="for different sufficient similarity levels")
+  'Active learning with MV, req. 3' : (est_majority_vote, [], [3]),
+  'Active learning with MV, req. 5' : (est_majority_vote, [], [5]),
+#  'Merge enough votes, required 5': (est_merge_enough_votes, [ 5 ], None),
+#  'Merge enough votes, required 1': (est_merge_enough_votes, [ 1 ], None),
+#  'Merge enough votes, required 3': (est_merge_enough_votes, [ 3 ], None),
+}, comment="comparing with active learner")
 print "finished job at %s" % datetime.datetime.now()

@@ -467,3 +467,12 @@ If we restrict number of votes per document even below mininum - to 10, this hap
 
 Still goes above the all-information estimate.
 
+## Active learning
+
+First attempt at active learning: requiring a certain amount of votes per document and "filling" documents to the required number of votes instead of chosing randomly. This strategy is being used in conjunction with a simple Majority Vote estimator. Below are results for two different topics:
+
+![topic-20690-1000-runs-comparing-with-active-learner- 61](https://cloud.githubusercontent.com/assets/810383/6396145/1cb2b0f4-bddd-11e4-96c8-c7afc2155ed3.png)
+
+![topic-20910-10000-runs-comparing-with-active-learner- 22](https://cloud.githubusercontent.com/assets/810383/6396028/761e3f92-bddc-11e4-8e1c-d695ffb18cdc.png)
+
+It would be interesting to see how that strategy goes with the sufficient similarity method.

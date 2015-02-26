@@ -143,9 +143,13 @@ def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, estimators_d
 
   for estimator_name, estimator_and_args in estimators_dict.iteritems():
     print 'Calculating for %s' % estimator_name
-    estimator, args = estimator_and_args
-    sequences = Parallel(n_jobs=4)( delayed(get_accuracy_sequence)(estimator, stop_idx, texts, 
+    estimator, args, active_pars = estimator_and_args
+    if active_pars is None:
+      sequences = Parallel(n_jobs=4)( delayed(get_accuracy_sequence)(estimator, stop_idx, texts, 
         vote_lists, truths, text_similarity, idx, False, *args) for idx in xrange(n_runs) )
+    else:
+      sequences = Parallel(n_jobs=4)( delayed(get_accuracy_sequence_active)(estimator, stop_idx, texts, 
+        vote_lists, truths, text_similarity, idx, False, *args) for idx in xrange(n_runs) )      
 
     good_slices = [ s[start_idx:] for s in sequences if s is not None ]
     results = np.vstack(good_slices)
@@ -311,11 +315,11 @@ def est_merge_enough_votes(texts, vote_lists, text_similarity, votes_required):
 
 print "plotting curves from 1 to 5 votes per doc"
 print "started job at %s" % datetime.datetime.now()
-plot_learning_curves_for_topic('20690', 10000, (1,5), { 
-  'Majority vote' : (est_majority_vote, []),
-  'Majority vote with NN, suff.sim. 0.5': (est_majority_vote_with_nn, [ 0.5 ]),
-  'Merge enough votes, required 5': (est_merge_enough_votes, [ 5 ]),
-  'Merge enough votes, required 1': (est_merge_enough_votes, [ 1 ]),
-  'Merge enough votes, required 3': (est_merge_enough_votes, [ 3 ]),
+plot_learning_curves_for_topic('20690', 1000, (1,5), { 
+  'Majority vote' : (est_majority_vote, [], None),
+  'Majority vote with NN, suff.sim. 0.5': (est_majority_vote_with_nn, [ 0.5 ], None),
+  'Merge enough votes, required 5': (est_merge_enough_votes, [ 5 ], None),
+  'Merge enough votes, required 1': (est_merge_enough_votes, [ 1 ], None),
+  'Merge enough votes, required 3': (est_merge_enough_votes, [ 3 ], None),
 }, comment="for different sufficient similarity levels")
 print "finished job at %s" % datetime.datetime.now()

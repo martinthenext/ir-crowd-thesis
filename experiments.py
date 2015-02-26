@@ -369,13 +369,13 @@ def est_merge_enough_votes(texts, vote_lists, text_similarity, votes_required):
 
 print "plotting curves from 1 to 5 votes per doc"
 print "started job at %s" % datetime.datetime.now()
-plot_learning_curves_for_topic('20690', 1000, (1,5), { 
+plot_learning_curves_for_topic('20910', 10000, (1,5), { 
   'Majority vote' : (est_majority_vote, [], None),
   'Majority vote with NN, suff.sim. 0.5': (est_majority_vote_with_nn, [ 0.5 ], None),
   'Active learning with MV, req. 3' : (est_majority_vote, [], [3]),
   'Active learning with MV, req. 5' : (est_majority_vote, [], [5]),
-#  'Merge enough votes, required 5': (est_merge_enough_votes, [ 5 ], None),
-#  'Merge enough votes, required 1': (est_merge_enough_votes, [ 1 ], None),
+  'Merge enough votes, required 5': (est_merge_enough_votes, [ 5 ], None),
+  'Merge enough votes, required 1': (est_merge_enough_votes, [ 1 ], None),
 #  'Merge enough votes, required 3': (est_merge_enough_votes, [ 3 ], None),
 }, comment="comparing with active learner")
 print "finished job at %s" % datetime.datetime.now()

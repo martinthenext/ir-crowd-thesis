@@ -476,3 +476,11 @@ First attempt at active learning: requiring a certain amount of votes per docume
 ![topic-20910-10000-runs-comparing-with-active-learner- 22](https://cloud.githubusercontent.com/assets/810383/6396028/761e3f92-bddc-11e4-8e1c-d695ffb18cdc.png)
 
 It would be interesting to see how that strategy goes with the sufficient similarity method.
+
+**UPDATE** Results of using the simplest type of Active Learning with multiple baseline types (code [here](https://github.com/martinthenext/ir-crowd-thesis/blob/active-graphs/experiments.py) ):
+
+![topic-20910-10000-runs-comparing-with-active-learner- 12](https://cloud.githubusercontent.com/assets/810383/6414640/226a4694-be99-11e4-8cec-85c33879a578.png)
+
+We can see that for *Majority voting*, *Majority voting with NN, suff.sim. 0.5* and *Merge enough votes, required 1* active learning performs better than passive learning. The best results belongs to *Merge enough votes* with 1 vote required, performed actively. What it does if a document doesn't have any votes at all, it assigns it's label to the label of a nearest neighbor which has a vote. Active learning works trying to get at least one vote for every document first.
+
+Gonna look at a different topic now.

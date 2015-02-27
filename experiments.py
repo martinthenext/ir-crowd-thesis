@@ -371,11 +371,12 @@ print "plotting curves from 1 to 5 votes per doc"
 print "started job at %s" % datetime.datetime.now()
 plot_learning_curves_for_topic('20910', 10000, (1,5), { 
   'Majority vote' : (est_majority_vote, [], None),
+  'Majority vote active, req. 3' : (est_majority_vote, [], [3]),
   'Majority vote with NN, suff.sim. 0.5': (est_majority_vote_with_nn, [ 0.5 ], None),
-  'Active learning with MV, req. 3' : (est_majority_vote, [], [3]),
-  'Active learning with MV, req. 5' : (est_majority_vote, [], [5]),
-  'Merge enough votes, required 5': (est_merge_enough_votes, [ 5 ], None),
+  'Majority vote with NN, suff.sim. 0.5 active, req. 3': (est_majority_vote_with_nn, [ 0.5 ], [3]),
   'Merge enough votes, required 1': (est_merge_enough_votes, [ 1 ], None),
-#  'Merge enough votes, required 3': (est_merge_enough_votes, [ 3 ], None),
+  'Merge enough votes, required 1 active, req 1': (est_merge_enough_votes, [ 1 ], [1]),
+  'Merge enough votes, required 3': (est_merge_enough_votes, [ 3 ], None),
+  'Merge enough votes, required 3 active, req 3': (est_merge_enough_votes, [ 3 ], [3]),
 }, comment="comparing with active learner")
 print "finished job at %s" % datetime.datetime.now()

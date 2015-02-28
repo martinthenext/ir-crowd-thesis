@@ -484,3 +484,7 @@ It would be interesting to see how that strategy goes with the sufficient simila
 We can see that for *Majority voting*, *Majority voting with NN, suff.sim. 0.5* and *Merge enough votes, required 1* active learning performs better than passive learning. The best results belongs to *Merge enough votes* with 1 vote required, performed actively. What it does if a document doesn't have any votes at all, it assigns it's label to the label of a nearest neighbor which has a vote. Active learning works trying to get at least one vote for every document first.
 
 Gonna look at a different topic now.
+
+**UPDATE** For another topic we still have the same winner.
+
+![topic-20812-10000-runs-comparing-with-active-learner- 20](https://cloud.githubusercontent.com/assets/810383/6426344/05f9f30c-bf56-11e4-9997-6500f40a747d.png)

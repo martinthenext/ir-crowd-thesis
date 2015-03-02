@@ -320,21 +320,16 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget):
 
     gp = gaussian_process.GaussianProcess(nugget=nugget)
     gp.fit(X_good_typed, y_good)
-    results_for_good_idx = gp.predict(X_good_typed)
 
-    #print random.randint(1, 10)
+    # Fitted only the known ones, predict everything
+    results = gp.predict(X)
 
     del y_good
     del X_good_typed
     del gp
     gc.collect()
 
-    result_p = [None] * len(texts)
-    for idx_in_new, idx_in_orig in enumerate(good_idx):
-      result_p[idx_in_orig] = results_for_good_idx[idx_in_new]
-  
-    #print 'Memory: %s mb' % (int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)/1024)
-    return result_p
+    return results
   else:
     return p_mv
 

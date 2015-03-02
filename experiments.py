@@ -310,21 +310,19 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget):
   if len(good_idx) > 1:
     y_good = np.array(p_mv)[good_idx].astype(np.dtype('d'))
     
-    X_good = X[good_idx, :]
-    X_good_array = X_good.toarray()
+    X_array = X.toarray()
+    X_good_array = X_array[good_idx, :]
     X_good_typed = X_good_array.astype(np.dtype('d'), copy=False)
-  
-    del X_good
-    del X_good_array
-    gc.collect()
 
     gp = gaussian_process.GaussianProcess(nugget=nugget)
     gp.fit(X_good_typed, y_good)
 
     # Fitted only the known ones, predict everything
-    results = gp.predict(X)
+    results = gp.predict(X_array)
 
     del y_good
+    del X_array
+    del X_good_array
     del X_good_typed
     del gp
     gc.collect()

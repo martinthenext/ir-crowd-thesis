@@ -488,3 +488,9 @@ Gonna look at a different topic now.
 **UPDATE** For another topic we still have the same winner.
 
 ![topic-20812-10000-runs-comparing-with-active-learner- 20](https://cloud.githubusercontent.com/assets/810383/6426344/05f9f30c-bf56-11e4-9997-6500f40a747d.png)
+
+**UPDATE** Gaussian Process classifier is now trained on available data only (documents which have votes) and used on *all* documents.
+
+![default](https://cloud.githubusercontent.com/assets/810383/6460444/9c23a920-c197-11e4-9d43-55efa92fc2a3.png)
+
+The proper way of doing it is using a link function, going to implement it next.

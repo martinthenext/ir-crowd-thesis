@@ -494,3 +494,7 @@ Gonna look at a different topic now.
 ![default](https://cloud.githubusercontent.com/assets/810383/6460444/9c23a920-c197-11e4-9d43-55efa92fc2a3.png)
 
 The proper way of doing it is using a link function, going to implement it next.
+
+## New ground truth
+
+In [TREC 2011 Crowdsourcing track](https://sites.google.com/site/treccrowd/2011) some ground-truth NIST labels are given to teams to evaluate their techniques. This development (training) data is available [here](https://sites.google.com/site/treccrowd/2011/stage2-dev.tar?attredirects=0). It only has 25 topics, and, what a surpise, all of different from ones we used up until now.

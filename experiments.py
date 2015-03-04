@@ -14,6 +14,7 @@ from sklearn import gaussian_process
 import gc
 from memory_profiler import profile
 import resource
+from scipy.special import logit, expit
 
 class PrintCounter(object):
   def __init__(self, count_to):
@@ -314,11 +315,17 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget):
     X_good_array = X_array[good_idx, :]
     X_good_typed = X_good_array.astype(np.dtype('d'), copy=False)
 
+    # Before using GP transform y's to R
+    y_transformed = logit(y_good)
+
     gp = gaussian_process.GaussianProcess(nugget=nugget)
     gp.fit(X_good_typed, y_good)
 
     # Fitted only the known ones, predict everything
-    results = gp.predict(X_array)
+    results_transformed = gp.predict(X_array)
+    results = expit(results_transformed)
+
+    # Transform predictions back from R
 
     del y_good
     del X_array

@@ -506,3 +506,9 @@ Returning to the question of tie in Majority Voting. TREC evaluation procedure r
 ![topic-20910-10000-runs-comparing-with-active-learner- 59](https://cloud.githubusercontent.com/assets/810383/6514148/7ce26a52-c380-11e4-8a9c-8cc269d62320.png)
 
 Now we need to completely switch all estimators to do a toin coss in case of a tie (as in, when relevance estimate is exactly `0.5`).
+
+**UPDATE** The [updated code](https://github.com/martinthenext/ir-crowd-thesis/commit/cb8e097bcf8fabbcf950aa64a0e824efbd6b0d9b) uses coin tosses for all situations where p=0.5. See the corresponding version of the above plot:
+
+![topic-20910-10000-runs-comparing-with-active-learner- 12](https://cloud.githubusercontent.com/assets/810383/6517205/0bebdd60-c399-11e4-8fb5-8d6fda09f6be.png)
+
+Now the lines change their behaviour at the explainable positions.

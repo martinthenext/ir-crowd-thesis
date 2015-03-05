@@ -60,6 +60,25 @@ def est_majority_vote(texts, vote_lists, text_similarity):
   return ( unit_to_bool_indecisive(conf) for conf in p_majority_vote(texts, vote_lists) )
 
 
+def get_mean_vote_random(vote_list):
+  if vote_list:
+    relevance = np.mean(vote_list)
+    if relevance == 0.5:
+      return random.choice([True, False])
+    else:
+      return (relevance > 0.5)
+  else:
+    return None
+
+
+def p_majority_vote_random(texts, vote_lists):
+  return imap(get_mean_vote_random, vote_lists)
+
+
+def est_majority_vote_random(texts, vote_lists, text_similarity):
+  return ( unit_to_bool_indecisive(conf) for conf in p_majority_vote_random(texts, vote_lists) ) 
+
+
 def copy_and_shuffle_sublists(list_of_lists):
   """ Get a copy with all lists shuffled
   Use this to draw 'random' votes with .pop()
@@ -371,12 +390,13 @@ print "plotting curves from 1 to 5 votes per doc"
 print "started job at %s" % datetime.datetime.now()
 plot_learning_curves_for_topic('20910', 10000, (1,5), { 
   'Majority vote' : (est_majority_vote, [], None),
+  'Random majority vote' : (est_majority_vote_random, [], None),
   'Majority vote active, req. 3' : (est_majority_vote, [], [3]),
-  'Majority vote with NN, suff.sim. 0.5': (est_majority_vote_with_nn, [ 0.5 ], None),
-  'Majority vote with NN, suff.sim. 0.5 active, req. 3': (est_majority_vote_with_nn, [ 0.5 ], [3]),
+#  'Majority vote with NN, suff.sim. 0.5': (est_majority_vote_with_nn, [ 0.5 ], None),
+#  'Majority vote with NN, suff.sim. 0.5 active, req. 3': (est_majority_vote_with_nn, [ 0.5 ], [3]),
   'Merge enough votes, required 1': (est_merge_enough_votes, [ 1 ], None),
   'Merge enough votes, required 1 active, req 1': (est_merge_enough_votes, [ 1 ], [1]),
-  'Merge enough votes, required 3': (est_merge_enough_votes, [ 3 ], None),
-  'Merge enough votes, required 3 active, req 3': (est_merge_enough_votes, [ 3 ], [3]),
+#  'Merge enough votes, required 3': (est_merge_enough_votes, [ 3 ], None),
+#  'Merge enough votes, required 3 active, req 3': (est_merge_enough_votes, [ 3 ], [3]),
 }, comment="comparing with active learner")
 print "finished job at %s" % datetime.datetime.now()

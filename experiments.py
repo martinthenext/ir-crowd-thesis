@@ -43,6 +43,7 @@ def get_accuracy(estimates, truths):
 
 unit_to_bool_indecisive = lambda x: None if x == 0.5 else (x > 0.5)
 
+unit_to_bool_random = lambda x: random.choice([True, False]) if x == 0.5 else (x > 0.5)
 
 get_mean_vote = lambda vote_list: np.mean(vote_list) if vote_list else None
 
@@ -57,26 +58,7 @@ def p_majority_vote(texts, vote_lists):
 def est_majority_vote(texts, vote_lists, text_similarity):
   """ This is how all estimator functions should look like
   """
-  return ( unit_to_bool_indecisive(conf) for conf in p_majority_vote(texts, vote_lists) )
-
-
-def get_mean_vote_random(vote_list):
-  if vote_list:
-    relevance = np.mean(vote_list)
-    if relevance == 0.5:
-      return random.choice([True, False])
-    else:
-      return (relevance > 0.5)
-  else:
-    return None
-
-
-def p_majority_vote_random(texts, vote_lists):
-  return imap(get_mean_vote_random, vote_lists)
-
-
-def est_majority_vote_random(texts, vote_lists, text_similarity):
-  return ( unit_to_bool_indecisive(conf) for conf in p_majority_vote_random(texts, vote_lists) ) 
+  return ( unit_to_bool_random(conf) for conf in p_majority_vote(texts, vote_lists) )
 
 
 def copy_and_shuffle_sublists(list_of_lists):
@@ -209,7 +191,7 @@ def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, estimators_d
   text_similarity = cosine_similarity(tfidf)
 
   min_votes_per_doc, max_votes_per_doc = votes_per_doc
-  start_idx, stop_idx = min_votes_per_doc * n_documents, max_votes_per_doc * n_documents
+  start_idx, stop_idx = int(min_votes_per_doc * n_documents), int(max_votes_per_doc * n_documents)
   x = np.arange(float(start_idx), float(stop_idx)) / n_documents
 
   estimator_y = {}
@@ -324,7 +306,7 @@ def p_majority_vote_or_nn(texts, vote_lists, text_similarity, sufficient_similar
 
 
 def est_majority_vote_or_nn(texts, vote_lists, text_similarity, sufficient_similarity):
-  return ( unit_to_bool_indecisive(p) for p
+  return ( unit_to_bool_random(p) for p
    in p_majority_vote_or_nn(texts, vote_lists, text_similarity, sufficient_similarity) )
 
 
@@ -349,7 +331,7 @@ def p_majority_vote_with_nn(texts, vote_lists, text_similarity, sufficient_simil
 
 
 def est_majority_vote_with_nn(texts, vote_lists, text_similarity, sufficient_similarity):
-  return ( unit_to_bool_indecisive(p) for p
+  return ( unit_to_bool_random(p) for p
    in p_majority_vote_with_nn(texts, vote_lists, text_similarity, sufficient_similarity) )
 
 
@@ -382,15 +364,14 @@ def p_merge_enough_votes(texts, vote_lists, text_similarity, votes_required):
 
 
 def est_merge_enough_votes(texts, vote_lists, text_similarity, votes_required):
-  return ( unit_to_bool_indecisive(p) for p
+  return ( unit_to_bool_random(p) for p
    in p_merge_enough_votes(texts, vote_lists, text_similarity, votes_required) )
 
 
 print "plotting curves from 1 to 5 votes per doc"
 print "started job at %s" % datetime.datetime.now()
-plot_learning_curves_for_topic('20910', 10000, (1,5), { 
+plot_learning_curves_for_topic('20910', 10000, (0.5,5), { 
   'Majority vote' : (est_majority_vote, [], None),
-  'Random majority vote' : (est_majority_vote_random, [], None),
   'Majority vote active, req. 3' : (est_majority_vote, [], [3]),
 #  'Majority vote with NN, suff.sim. 0.5': (est_majority_vote_with_nn, [ 0.5 ], None),
 #  'Majority vote with NN, suff.sim. 0.5 active, req. 3': (est_majority_vote_with_nn, [ 0.5 ], [3]),

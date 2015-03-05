@@ -498,3 +498,11 @@ The proper way of doing it is using a link function, going to implement it next.
 ## New ground truth
 
 In [TREC 2011 Crowdsourcing track](https://sites.google.com/site/treccrowd/2011) some ground-truth NIST labels are given to teams to evaluate their techniques. This development (training) data is available [here](https://sites.google.com/site/treccrowd/2011/stage2-dev.tar?attredirects=0). It only has 25 topics, and, what a surpise, all of different from ones we used up until now.
+
+## Random MV
+
+Returning to the question of tie in Majority Voting. TREC evaluation procedure requires a label assigned to every document, meaning that you cannot return `None`. Returning to the strategy of tossing a fair coin in tie situations, [we can compare](https://github.com/martinthenext/ir-crowd-thesis/blob/active-graphs/experiments.py) MV and random MV on the state-of-the-art baseline plot:
+
+![topic-20910-10000-runs-comparing-with-active-learner- 59](https://cloud.githubusercontent.com/assets/810383/6514148/7ce26a52-c380-11e4-8a9c-8cc269d62320.png)
+
+Now we need to completely switch all estimators to do a toin coss in case of a tie (as in, when relevance estimate is exactly `0.5`).

@@ -512,3 +512,7 @@ Now we need to completely switch all estimators to do a toin coss in case of a t
 ![topic-20910-10000-runs-comparing-with-active-learner- 12](https://cloud.githubusercontent.com/assets/810383/6517205/0bebdd60-c399-11e4-8fb5-8d6fda09f6be.png)
 
 Now the lines change their behaviour at the explainable positions.
+
+**UPDATE** [Updated code](https://github.com/martinthenext/ir-crowd-thesis/commit/c4bdf253655dd8335cb29986ac08766b84664ebb) gets accuracy sequences for all possible topics and then averages them.
+
+![across-topics-1000-runs-comparing-with-active-learner- 20](https://cloud.githubusercontent.com/assets/810383/6525237/703c8052-c403-11e4-9ae7-307215c5bc7c.png)

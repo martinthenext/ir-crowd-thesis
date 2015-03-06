@@ -218,6 +218,49 @@ def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, estimators_d
   plot_learning_curve(title, x, estimator_y, 'Votes per document', 'Accuracy')
 
 
+def plot_learning_curves_across_topics(n_runs, start_idx, stop_idx, estimators_dict, comment=None):
+  for topic_id, data in texts_vote_lists_truths_by_topic_id.items():
+    print 'Loading topic %s' % topic_id
+    texts, vote_lists, truths = data
+    n_documents = len(texts)
+
+    vectorizer = TfidfVectorizer()
+    tfidf = vectorizer.fit_transform(texts)
+    text_similarity = cosine_similarity(tfidf)
+
+    x = np.arange(start_idx, stop_idx)
+
+    y_by_estimator = dict( (estimator, []) for estimator in estimators_dict.keys() )
+
+    for estimator_name, estimator_and_args in estimators_dict.iteritems():
+      print 'Calculating for %s' % estimator_name
+      estimator, args, active_pars = estimator_and_args
+      if active_pars is None:
+        sequences = Parallel(n_jobs=4)( delayed(get_accuracy_sequence)(estimator, stop_idx, texts, 
+          vote_lists, truths, text_similarity, idx, False, *args) for idx in xrange(n_runs) )
+      else:
+        sequences = Parallel(n_jobs=4)( delayed(get_accuracy_sequence_active)(estimator, stop_idx, texts, 
+          vote_lists, truths, text_similarity, active_pars, idx, False, *args) for idx in xrange(n_runs) )      
+
+      good_slices = [ s[start_idx:] for s in sequences if s is not None ]
+      results = np.vstack(good_slices)
+
+      # We will then need to vstack and avg though all the topic accuracies for each estimator
+      y_by_estimator[estimator_name].append( np.mean(results, axis=0) )
+
+    result_by_estimator = {}
+
+    for estimator_name, mean_accuracy_sequences in y_by_estimator.iteritems():
+      to_avg = np.vstack(mean_accuracy_sequences)
+      result_by_estimator[estimator_name] = np.mean(to_avg, axis=0)
+
+  if comment:
+    title = 'Across topics, %s runs, %s' % (n_runs, comment)
+  else:
+    title = 'Across topics, %s runs' % topic_id
+  plot_learning_curve(title, x, result_by_estimator, 'Votes sampled', 'Accuracy')
+
+
 def t_test_accuracy(topic_id, n_runs, estimator_params_votes_per_doc_tuples):
   """ Test if accuracy for estimators with given parameters is
       significantly better than that of the first estimator in the tuple
@@ -370,13 +413,13 @@ def est_merge_enough_votes(texts, vote_lists, text_similarity, votes_required):
 
 print "plotting curves from 1 to 5 votes per doc"
 print "started job at %s" % datetime.datetime.now()
-plot_learning_curves_for_topic('20910', 10000, (0.5,5), { 
+plot_learning_curves_across_topics(1000, 100 * 1, 100 * 5, { 
   'Majority vote' : (est_majority_vote, [], None),
   'Majority vote active, req. 3' : (est_majority_vote, [], [3]),
 #  'Majority vote with NN, suff.sim. 0.5': (est_majority_vote_with_nn, [ 0.5 ], None),
 #  'Majority vote with NN, suff.sim. 0.5 active, req. 3': (est_majority_vote_with_nn, [ 0.5 ], [3]),
-  'Merge enough votes, required 1': (est_merge_enough_votes, [ 1 ], None),
-  'Merge enough votes, required 1 active, req 1': (est_merge_enough_votes, [ 1 ], [1]),
+ 'Merge enough votes, required 1': (est_merge_enough_votes, [ 1 ], None),
+ 'Merge enough votes, required 1 active, req 1': (est_merge_enough_votes, [ 1 ], [1]),
 #  'Merge enough votes, required 3': (est_merge_enough_votes, [ 3 ], None),
 #  'Merge enough votes, required 3 active, req 3': (est_merge_enough_votes, [ 3 ], [3]),
 }, comment="comparing with active learner")

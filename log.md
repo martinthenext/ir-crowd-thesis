@@ -516,3 +516,7 @@ Now the lines change their behaviour at the explainable positions.
 **UPDATE** [Updated code](https://github.com/martinthenext/ir-crowd-thesis/commit/c4bdf253655dd8335cb29986ac08766b84664ebb) gets accuracy sequences for all possible topics and then averages them.
 
 ![across-topics-1000-runs-comparing-with-active-learner- 20](https://cloud.githubusercontent.com/assets/810383/6525237/703c8052-c403-11e4-9ae7-307215c5bc7c.png)
+
+**UPDATE** For larger amount of simulations:
+
+![across-topics-10000-runs-comparing-with-active-learner- 71](https://cloud.githubusercontent.com/assets/810383/6541916/794d4920-c4e8-11e4-8e94-0bd0d39bf6ba.png)

@@ -43,7 +43,7 @@ def get_accuracy(estimates, truths):
 
 unit_to_bool_indecisive = lambda x: None if x == 0.5 else (x > 0.5)
 
-unit_to_bool_random = lambda x: random.choice([True, False]) if x == 0.5 else (x > 0.5)
+unit_to_bool_random = lambda x: random.choice([True, False]) if (x == 0.5 or x is None) else (x > 0.5)
 
 get_mean_vote = lambda vote_list: np.mean(vote_list) if vote_list else None
 
@@ -417,11 +417,11 @@ def est_merge_enough_votes(texts, vote_lists, text_similarity, votes_required):
 
 print "plotting curves from 1 to 5 votes per doc"
 print "started job at %s" % datetime.datetime.now()
-plot_learning_curves_across_topics(1000, 100 * 1, 100 * 3, { 
+plot_learning_curves_across_topics(10000, 100 * 1, 100 * 3, { 
   'Majority vote' : (est_majority_vote, [], None),
   'Majority vote active, req. 3' : (est_majority_vote, [], [3]),
-#  'Majority vote with NN, suff.sim. 0.5': (est_majority_vote_with_nn, [ 0.5 ], None),
-#  'Majority vote with NN, suff.sim. 0.5 active, req. 3': (est_majority_vote_with_nn, [ 0.5 ], [3]),
+  'Majority vote with NN, suff.sim. 0.5': (est_majority_vote_with_nn, [ 0.5 ], None),
+  'Majority vote with NN, suff.sim. 0.5 active, req. 3': (est_majority_vote_with_nn, [ 0.5 ], [3]),
   'Merge enough votes, required 1': (est_merge_enough_votes, [ 1 ], None),
   'Merge enough votes, required 1 active, req 1': (est_merge_enough_votes, [ 1 ], [1]),
 #  'Merge enough votes, required 3': (est_merge_enough_votes, [ 3 ], None),

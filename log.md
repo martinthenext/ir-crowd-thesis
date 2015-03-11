@@ -520,3 +520,9 @@ Now the lines change their behaviour at the explainable positions.
 **UPDATE** For larger amount of simulations:
 
 ![across-topics-10000-runs-comparing-with-active-learner- 71](https://cloud.githubusercontent.com/assets/810383/6541916/794d4920-c4e8-11e4-8e94-0bd0d39bf6ba.png)
+
+## With rounding bug fixed
+
+[Fixed](https://github.com/martinthenext/ir-crowd-thesis/commit/604f900c7aa364ff0bdc33a870d5ee20821d43ed) a bug in a procedure that takes a relevance estimate in [0, 1] and outputs the label. Now if the input is `None` it also outputs a fair coin toss. The updated plot:
+
+![across-topics-10000-runs-comparing-with-active-learner- 17](https://cloud.githubusercontent.com/assets/810383/6593601/3f841e04-c7da-11e4-9fa0-581f4a69c5a5.png)

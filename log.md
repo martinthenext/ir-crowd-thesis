@@ -526,3 +526,9 @@ Now the lines change their behaviour at the explainable positions.
 [Fixed](https://github.com/martinthenext/ir-crowd-thesis/commit/604f900c7aa364ff0bdc33a870d5ee20821d43ed) a bug in a procedure that takes a relevance estimate in [0, 1] and outputs the label. Now if the input is `None` it also outputs a fair coin toss. The updated plot:
 
 ![across-topics-10000-runs-comparing-with-active-learner- 17](https://cloud.githubusercontent.com/assets/810383/6593601/3f841e04-c7da-11e4-9fa0-581f4a69c5a5.png)
+
+## Comparison: Passive vs. Active learning with Majority Vote
+
+![across-topics-10000-runs-comparing-with-active-learner- 90](https://cloud.githubusercontent.com/assets/810383/6622793/2d63cf20-c8df-11e4-852b-dca428046389.png)
+
+

@@ -534,7 +534,7 @@ Now the lines change their behaviour at the explainable positions.
 ## Ground truth new stats
 
 Topic|#ground truth/#documents|mean ground truth relevance
-=====|========================|===========================
+-----|------------------------|---------------------------
 20932|15/115|0.80
 20488|10/110|0.60
 20910|15/115|0.67

@@ -52,3 +52,10 @@ def plot_lines(name, xdata, ydata, xname=None, yname=None, axis=None, baseline=N
   filename = get_filename(name)
   plt.savefig('plots/%s' % filename)
   plt.close()
+
+def plot_hist(name, data, n_bins):
+  plt.hist(data, n_bins)
+  plt.title(name)
+  filename = get_filename(name)
+  plt.savefig('plots/%s' % filename)
+  plt.close()

@@ -568,3 +568,10 @@ Topic|#ground truth/#documents|mean ground truth relevance
 
 Overall mean relevance - `0.68`. There is only one topic where more than 80% of ground truth judgments show relevance.
 
+## Inner vs outer similarity histograms
+
+![inner- 45](https://cloud.githubusercontent.com/assets/810383/6701367/16cf8e3e-cd1c-11e4-9d4f-f7791c8d1745.png)
+
+![outer- 47](https://cloud.githubusercontent.com/assets/810383/6701370/1fd05270-cd1c-11e4-9549-f8c04bf6c550.png)
+
+Somehow the inner similarity has a spike close to 1, although we delete all the distances with self. Out of all the topics there are only two which have a lot of inner distances bigger than `0.95`: `20694` and `20584`.

@@ -53,9 +53,23 @@ def plot_lines(name, xdata, ydata, xname=None, yname=None, axis=None, baseline=N
   plt.savefig('plots/%s' % filename)
   plt.close()
 
+
 def plot_hist(name, data, n_bins):
   plt.hist(data, n_bins)
   plt.title(name)
+  filename = get_filename(name)
+  plt.savefig('plots/%s' % filename)
+  plt.close()
+
+
+def plot_hist_combined(inner, outer):
+  n_bins = 50
+
+  plt.hist(inner, n_bins, alpha=0.3, label='Inner')
+  plt.hist(outer, n_bins, alpha=0.3, label='Outer')
+  plt.legend(loc='upper left')
+
+  name = "Inner vs. outer relevant class similarities"
   filename = get_filename(name)
   plt.savefig('plots/%s' % filename)
   plt.close()

@@ -25,37 +25,30 @@ def get_inner_and_outer_similarities(topic_id):
       irrelevant_texts.append(text)
 
   relevant_vectors = vectorizer.transform(relevant_texts)
-  irrelevant_vectors = vectorizer.transform(irrelevant_texts)
+  inner_similarity = cosine_similarity(relevant_vectors)
 
-  inner_similarity = cosine_similarity(relevant_vectors).flatten()
-  outer_similarity = cosine_similarity(relevant_vectors, irrelevant_vectors).flatten()
+  # Go through the similarities and print pairs of text who are between 0.95 and 1 in similarity
+  # In relevant texts
+  sys.stdout.write('%s\n' % topic_id)
+  n_documents = len(relevant_texts)
+  for i in xrange(n_documents):
+    for j in xrange(n_documents):
+      sim = inner_similarity[i, j]
+      print sim
+      print sim != 1
+      if (sim > 0.95):
+        if not np.isclose(sim, 1.0):
+          print 'SIMILARITY NOT 1'
+          print sim
+          sys.stdout.write('\n\nSIMILARITY - %0.32f\n' % sim)
+          sys.stdout.write('=========TEXT1==========\n')
+          sys.stdout.write(relevant_texts[i])
+          sys.stdout.write('=========TEXT2==========\n')
+          sys.stdout.write(relevant_texts[j])
+          sys.stdout.write('EQUAL\n')
+          sys.stdout.write(str(relevant_texts[j]==relevant_texts[i]))
 
-  inner_similarity_according_texts = np.array(list(product(relevant_texts, relevant_texts)))
-
-  # We are not interested in similarities of a document with itself
-  inner_similarity_non_reflexive = inner_similarity[inner_similarity < 1.0]
-  inner_similarity_according_texts = inner_similarity_according_texts[inner_similarity < 1.0]
-
-  # sys.stdout.write( patches of text from very similar (>0.95) texts
-  for t1, t2 in inner_similarity_according_texts[inner_similarity_non_reflexive > 0.95]:
-    sys.stdout.write( '====================\n' )
-    sys.stdout.write( '====================\n' )
-    sys.stdout.write( '========TEXT1=======\n' )
-    sys.stdout.write( '===LEN: %s ===\n' % len(t1) )
-    sys.stdout.write( t1 + '\n' )
-    sys.stdout.write( '========TEXT2=======\n' )
-    sys.stdout.write( '===LEN: %s ===\n' % len(t2) )
-    sys.stdout.write( t2 + '\n' )
-    sys.stdout.write( '====================\n' )
-    sys.stdout.write(str(t1==t2) + '\n')
- 
-  return inner_similarity_non_reflexive, outer_similarity
+  return 
 
 inner_outer_tuples_accross_topics = [get_inner_and_outer_similarities(topic) for topic 
   in texts_vote_lists_truths_by_topic_id.keys()]
-inner_sets_by_topic, outer_sets_by_topic = zip(*inner_outer_tuples_accross_topics)
-
-inner_all, outer_all = np.concatenate(inner_sets_by_topic), np.concatenate(outer_sets_by_topic)
-
-plot_hist("Inner", inner_all, 50)
-plot_hist("Outer", outer_all, 50)

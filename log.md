@@ -575,3 +575,104 @@ Overall mean relevance - `0.68`. There is only one topic where more than 80% of 
 ![outer- 47](https://cloud.githubusercontent.com/assets/810383/6701370/1fd05270-cd1c-11e4-9549-f8c04bf6c550.png)
 
 Somehow the inner similarity has a spike close to 1, although we delete all the distances with self. Out of all the topics there are only two which have a lot of inner distances bigger than `0.95`: `20694` and `20584`.
+
+**UPDATE** I've checked documents with high similarity and they appear just to have different ads. Example difference between two relevant documents having similarity of `0.97`:
+
+```
+Watch the latest videos on YouTube.com
+
+Dental Assisting Programs
+Dental Journals
+Dental Blogs
+Dental Health Literature
+Pre-Dental Programs NEW
+
+Alabama Dental Hygiene Schools
+Alaska Dental Hygiene Schools
+Arizona Dental Hygiene Schools
+Arkansas Dental Hygiene Schools
+California Dental Hygiene Schools
+Colorado Dental Hygiene Schools
+Connecticut Dental Hygiene Schools
+Delaware Dental Hygiene Schools
+District of Columbia DH Programs
+Florida Dental Hygiene Schools
+Georgia Dental Hygiene Schools
+Hawaii Dental Hygiene Schools
+Find more programs below
+
+[...]
+
+Email a friend about this page:   
+
+Assessor Links USA    All Things Political    Engineers Guide USA    State 
+Health Links    healthlinksusa.com    Juggling Cats    Doomsday Guide
+
+Health Resource Guide     County Recorders    County Treasurers   Health 
+Resource USA    Buy Yellow Roses    Innovators Guide
+
+To report a broken link or to suggest a new site for our online resource 
+guide, please Contact Us.
+Proquantum Corporation.
+Copyright @ 2002-2007
+Use of this website is expressly subject to the various terms and 
+conditions set forth in our
+User Agreement/Disclaimer  and Privacy Policy
+
+Visit online mba review.
+
+visits since 8/31/03
+
+```
+
+```
+
+Health Guide USA  
+America's Online Health Resource Guide
+
+Enter your search terms Submit search form
+Web    www.healthguideusa.org
+
+To Home Page
+ 
+
+
+North Dakota Dental Hygiene Programs - Dental Hygienist Schools
+
+Other resources: Dental Hygienist Job Outlook
+State Dental Hygienist Licensing Information
+State Dental Health Programs
+
+North Dakota State Dental Hygiene Program
+
+ 
+
+Find more dental related resources below:
+
+
+
+
+State Dental Boards
+[...]
+
+Email a friend about this page:   
+
+Assessor Links USA    All Things Political    Engineers Guide USA    State 
+Health Links    healthlinksusa.com    Juggling Cats    Doomsday Guide
+
+Health Resource Guide     County Recorders    County Treasurers   Health 
+Resource USA    Buy Yellow Roses    Innovators Guide
+
+To report a broken link or to suggest a new site for our online resource 
+guide, please Contact Us.
+Proquantum Corporation.
+Copyright @ 2002-2007
+Use of this website is expressly subject to the various terms and 
+conditions set forth in our
+User Agreement/Disclaimer  and Privacy Policy
+
+Visit online mba review.
+
+visits since 8/31/03
+
+```

@@ -676,3 +676,11 @@ Visit online mba review.
 visits since 8/31/03
 
 ```
+
+## More string exclusion criterion for inner similarities
+
+Now excluding all similarities which are closer than 10^-5 to 1. This deleted more similarities, which means that there is a bunch of de-facto similar documents within the ground truth. New inner similarity plot:
+
+### Inner similarities
+
+![similarities-between-relevant-documents- 13](https://cloud.githubusercontent.com/assets/810383/6743175/fcb03be4-ce96-11e4-82be-c21eec4ba928.png)

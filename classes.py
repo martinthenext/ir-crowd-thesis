@@ -27,9 +27,8 @@ def get_inner_and_outer_similarities(topic_id):
   outer_similarity = cosine_similarity(relevant_vectors, irrelevant_vectors).flatten()
 
   # We are not interested in similarities of a document with itself
-  inner_similarity_non_reflexive = inner_similarity[inner_similarity < 1.0]
-  if inner_similarity_non_reflexive[inner_similarity_non_reflexive>0.95].shape[0] > 50:
-    print topic_id
+  inner_similarity_non_reflexive = inner_similarity[np.absolute(inner_similarity - 1.0) > 1e-5]
+
   return inner_similarity_non_reflexive, outer_similarity
 
 inner_outer_tuples_accross_topics = [get_inner_and_outer_similarities(topic) for topic 
@@ -38,5 +37,5 @@ inner_sets_by_topic, outer_sets_by_topic = zip(*inner_outer_tuples_accross_topic
 
 inner_all, outer_all = np.concatenate(inner_sets_by_topic), np.concatenate(outer_sets_by_topic)
 
-plot_hist("Inner", inner_all, 50)
-plot_hist("Outer", outer_all, 50)
+plot_hist("Similarities between relevant documents", inner_all, 50)
+plot_hist("Similarities between relevant and irrelevant documents", outer_all, 50)

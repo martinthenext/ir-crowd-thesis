@@ -684,3 +684,8 @@ Now excluding all similarities which are closer than 10^-5 to 1. This deleted mo
 ### Inner similarities
 
 ![similarities-between-relevant-documents- 13](https://cloud.githubusercontent.com/assets/810383/6743175/fcb03be4-ce96-11e4-82be-c21eec4ba928.png)
+
+If we delete two problem topics:
+
+![similarities-between-relevant-documents-two-removed](https://cloud.githubusercontent.com/assets/810383/6745123/ec0abe6a-ceb2-11e4-8020-e95e9bc898da.png)
+

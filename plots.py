@@ -55,9 +55,10 @@ def plot_lines(name, xdata, ydata, xname=None, yname=None, axis=None, baseline=N
 
 
 def plot_hist(name, data, n_bins):
-  plt.hist(data, n_bins, alpha=0.6)
+  plt.hist(data, n_bins, alpha=0.6, range=[0.0, 1.00001])
   plt.xlabel("Pairwise similarity", fontsize=14)
   plt.ylabel("Number of documents", fontsize=14)
+  plt.xlim(0.0, 1.00001)
 #  plt.title(name, fontsize=16)
   filename = get_filename(name)
   plt.savefig('plots/%s' % filename)

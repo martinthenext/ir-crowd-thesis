@@ -23,11 +23,20 @@ def get_inner_and_outer_similarities(topic_id):
   relevant_vectors = vectorizer.transform(relevant_texts)
   irrelevant_vectors = vectorizer.transform(irrelevant_texts)
 
-  inner_similarity = cosine_similarity(relevant_vectors).flatten()
+  inner_similarity_matrix = cosine_similarity(relevant_vectors)
+
+  for i in xrange(inner_similarity_matrix.shape[0]):
+    for j in xrange(inner_similarity_matrix.shape[1]):
+      if i == j: 
+        inner_similarity_matrix[i, j] = -1
+
+  inner_similarity = inner_similarity_matrix.flatten()
   outer_similarity = cosine_similarity(relevant_vectors, irrelevant_vectors).flatten()
 
   # We are not interested in similarities of a document with itself
-  inner_similarity_non_reflexive = inner_similarity[np.absolute(inner_similarity - 1.0) > 1e-5]
+  # Deleting diagonal elements
+  inner_similarity_non_reflexive = inner_similarity[inner_similarity >= 0]
+
 
   return inner_similarity_non_reflexive, outer_similarity
 

@@ -118,7 +118,6 @@ def get_indexes_of_sublists_smaller_than(length, list_of_lists):
 
 def get_accuracy_sequence_active(estimator, n_votes_to_sample, texts, 
   vote_lists, truths, text_similarity, active_pars, idx=None, return_final=False, *args):
-  # TODO active_pars = [3] means that we need to "fill" documents untill they have 3 votes
   if idx:
     sys.stderr.write("%s\n" % idx)
 
@@ -129,17 +128,22 @@ def get_accuracy_sequence_active(estimator, n_votes_to_sample, texts,
 
   accuracy_sequence = [None] * n_votes_to_sample
 
-  (votes_required, ) = active_pars 
+  (votes_required, sufficient_similarity) = active_pars 
 
   for index in xrange(n_votes_to_sample):
-    # TODO Active learning. See what amount of document have less than N votes
-    less_that_required_idx = get_indexes_of_sublists_smaller_than(votes_required, known_votes)
-    if less_that_required_idx:
-      # There are still documents to fill, pick a random
-      updated_doc_idx = random.choice(less_that_required_idx)
+    if sufficient_similarity:
+      # Count all sufficiently similar documents' votes together
+      # TODO
+      pass
     else:
-      # All documents have required number of votes, pick random from all
-      updated_doc_idx = random.randrange(len(vote_lists))
+      # Just get votes_required votes per document
+      less_that_required_idx = get_indexes_of_sublists_smaller_than(votes_required, known_votes)
+      if less_that_required_idx:
+        # There are still documents to fill, pick a random
+        updated_doc_idx = random.choice(less_that_required_idx)
+      else:
+        # All documents have required number of votes, pick random from all
+        updated_doc_idx = random.randrange(len(vote_lists))
     if not unknown_votes[updated_doc_idx]:
       # We ran out of votes for this document, diregard this sequence
       return None
@@ -417,13 +421,13 @@ def est_merge_enough_votes(texts, vote_lists, text_similarity, votes_required):
 
 print "plotting curves from 1 to 5 votes per doc"
 print "started job at %s" % datetime.datetime.now()
-plot_learning_curves_across_topics(10000, 100 * 1, 100 * 3, { 
+plot_learning_curves_across_topics(1000, 100 * 1, 100 * 3, { 
   'Majority vote' : (est_majority_vote, [], None),
-  'Majority vote active, req. 3' : (est_majority_vote, [], [3]),
-  'Majority vote with NN, suff.sim. 0.5': (est_majority_vote_with_nn, [ 0.5 ], None),
-  'Majority vote with NN, suff.sim. 0.5 active, req. 3': (est_majority_vote_with_nn, [ 0.5 ], [3]),
-  'Merge enough votes, required 1': (est_merge_enough_votes, [ 1 ], None),
-  'Merge enough votes, required 1 active, req 1': (est_merge_enough_votes, [ 1 ], [1]),
+  'Majority vote active, req. 3' : (est_majority_vote, [], [3, None]),
+#  'Majority vote with NN, suff.sim. 0.5': (est_majority_vote_with_nn, [ 0.5 ], None),
+#  'Majority vote with NN, suff.sim. 0.5 active, req. 3': (est_majority_vote_with_nn, [ 0.5 ], [3]),
+#  'Merge enough votes, required 1': (est_merge_enough_votes, [ 1 ], None),
+#  'Merge enough votes, required 1 active, req 1': (est_merge_enough_votes, [ 1 ], [1]),
 #  'Merge enough votes, required 3': (est_merge_enough_votes, [ 3 ], None),
 #  'Merge enough votes, required 3 active, req 3': (est_merge_enough_votes, [ 3 ], [3]),
 }, comment="comparing with active learner")

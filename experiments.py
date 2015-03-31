@@ -72,8 +72,8 @@ def get_accuracy_sequence(estimator, n_votes_to_sample, texts,
   vote_lists, truths, text_similarity, idx=None, return_final=False, *args):
   """ Randomly sample votes and re-calculate estimates.
   """
-  if idx:
-    sys.stderr.write("%s\n" % idx)
+  #if idx:
+  #  sys.stderr.write("%s\n" % idx)
 
   unknown_votes = copy_and_shuffle_sublists(vote_lists)
   known_votes = [ [] for _ in unknown_votes ]
@@ -116,10 +116,38 @@ def get_indexes_of_sublists_smaller_than(length, list_of_lists):
   return [index for index, element in enumerate(list_of_lists) if len(element) < length]
 
 
+def boolean_slice(l, take_bool):
+  """
+  >>> boolean_slice(range(5), [False, False, False, False, True])
+  [4]
+  >>> boolean_slice(['a','b','c','d','e'], [False, True, False, False, True])
+  ['b', 'e']
+  """
+  return [el for el, take in zip(l, take_bool) if take]
+
+
+def get_indexes_with_neighborhood_votes_less_than(votes_required, vote_lists, 
+  text_similarity, sufficient_similarity):
+  """ For every document, if all documents which are closer than sufficient_similarity
+      have cumulatively less than votes_required votes, it's index is added to resulting list
+  """
+  result_idx = []
+  for idx in xrange(len(vote_lists)):
+    if len(vote_lists[idx]) < votes_required:
+      # Join votes of all documents closer than sufficient_similarity and see if it's enough
+      similarities = text_similarity[:, idx]
+      similarities[idx] = 0.0
+      # Boolean indexes of neighbors are: similarities > sufficient_similarity
+      lengths = [len(vote_list) for vote_list in boolean_slice(vote_lists, similarities > sufficient_similarity)]
+      if sum(lengths) < votes_required:
+        result_idx.append(idx)
+  return result_idx
+
+
 def get_accuracy_sequence_active(estimator, n_votes_to_sample, texts, 
   vote_lists, truths, text_similarity, active_pars, idx=None, return_final=False, *args):
-  if idx:
-    sys.stderr.write("%s\n" % idx)
+  #if idx:
+  #  sys.stderr.write("%s\n" % idx)
 
   unknown_votes = copy_and_shuffle_sublists(vote_lists)
   known_votes = [ [] for _ in unknown_votes ]
@@ -133,17 +161,19 @@ def get_accuracy_sequence_active(estimator, n_votes_to_sample, texts,
   for index in xrange(n_votes_to_sample):
     if sufficient_similarity:
       # Count all sufficiently similar documents' votes together
-      # TODO
-      pass
+      interesting_idx = get_indexes_with_neighborhood_votes_less_than(votes_required, 
+        vote_lists, text_similarity, sufficient_similarity)
     else:
       # Just get votes_required votes per document
-      less_that_required_idx = get_indexes_of_sublists_smaller_than(votes_required, known_votes)
-      if less_that_required_idx:
-        # There are still documents to fill, pick a random
-        updated_doc_idx = random.choice(less_that_required_idx)
-      else:
-        # All documents have required number of votes, pick random from all
-        updated_doc_idx = random.randrange(len(vote_lists))
+      interesting_idx = get_indexes_of_sublists_smaller_than(votes_required, known_votes)
+
+    if interesting_idx:
+      # There are still documents to fill, pick a random
+      updated_doc_idx = random.choice(interesting_idx)
+    else:
+      # All documents have required number of votes, pick random from all
+      updated_doc_idx = random.randrange(len(vote_lists))
+
     if not unknown_votes[updated_doc_idx]:
       # We ran out of votes for this document, diregard this sequence
       return None
@@ -216,9 +246,9 @@ def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, estimators_d
     estimator_y[estimator_name] = np.mean(results, axis=0)
 
   if comment:
-    title = 'Topic %s, %s runs, %s' % (topic_id, n_runs, comment)
+    title = 'Query %s, %s runs, %s' % (topic_id, n_runs, comment)
   else:
-    title = 'Topic %s, %s runs' % (topic_id, n_runs)
+    title = 'Query %s, %s runs' % (topic_id, n_runs)
   plot_learning_curve(title, x, estimator_y, 'Votes per document', 'Accuracy')
 
 
@@ -421,14 +451,18 @@ def est_merge_enough_votes(texts, vote_lists, text_similarity, votes_required):
 
 print "plotting curves from 1 to 5 votes per doc"
 print "started job at %s" % datetime.datetime.now()
-plot_learning_curves_across_topics(1000, 100 * 1, 100 * 3, { 
-  'Majority vote' : (est_majority_vote, [], None),
-  'Majority vote active, req. 3' : (est_majority_vote, [], [3, None]),
-#  'Majority vote with NN, suff.sim. 0.5': (est_majority_vote_with_nn, [ 0.5 ], None),
-#  'Majority vote with NN, suff.sim. 0.5 active, req. 3': (est_majority_vote_with_nn, [ 0.5 ], [3]),
-#  'Merge enough votes, required 1': (est_merge_enough_votes, [ 1 ], None),
-#  'Merge enough votes, required 1 active, req 1': (est_merge_enough_votes, [ 1 ], [1]),
-#  'Merge enough votes, required 3': (est_merge_enough_votes, [ 3 ], None),
-#  'Merge enough votes, required 3 active, req 3': (est_merge_enough_votes, [ 3 ], [3]),
-}, comment="comparing with active learner")
+plot_learning_curves_for_topic('20910', 1000, (1, 4), {
+  'MajorityVote' : (est_majority_vote, [], None),
+  'MajorityVoteWithNearestNeighbor(0.5)' : (est_majority_vote_with_nn, [ 0.5 ], None),
+  'MergeEnoughVotes' : (est_merge_enough_votes, [ 1 ], None),
+}, comment="")
 print "finished job at %s" % datetime.datetime.now()
+
+
+"""
+plot_learning_curves_across_topics(3000, 100 * 1, 100 * 3, { 
+  'MajorityVote' : (est_majority_vote, [], None),
+  'MajorityVoteWithNearestNeighbor(0.5)' : (est_majority_vote_with_nn, [ 0.5 ], None),
+  'MergeEnoughVotes' : (est_merge_enough_votes, [ 1 ], None),  
+}, comment="")
+"""

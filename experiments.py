@@ -41,8 +41,6 @@ def get_accuracy(estimates, truths):
     return np.mean(matching)
 
 
-unit_to_bool_indecisive = lambda x: None if x == 0.5 else (x > 0.5)
-
 unit_to_bool_random = lambda x: random.choice([True, False]) if (x == 0.5 or x is None) else (x > 0.5)
 
 get_mean_vote = lambda vote_list: np.mean(vote_list) if vote_list else None
@@ -242,6 +240,15 @@ def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, estimators_d
 
     good_slices = [ s[start_idx:] for s in sequences if s is not None ]
     results = np.vstack(good_slices)
+
+    # Here we can pickle accuracies in the beginning, middle and end
+    begin_accuracies = results[:, 0]
+    middle_accuracies = results[:, int(results.shape[1] / 2)]
+    end_accuracies = results[:, -1]
+
+    begin_accuracies.dump("pickles/%s-%s-begin-accuracies.pkl" % (topic_id, estimator_name) )
+    middle_accuracies.dump("pickles/%s-%s-middle-accuracies.pkl" % (topic_id, estimator_name))
+    end_accuracies.dump("pickles/%s-%s-end-accuracies.pkl" % (topic_id, estimator_name))
 
     estimator_y[estimator_name] = np.mean(results, axis=0)
 
@@ -449,13 +456,14 @@ def est_merge_enough_votes(texts, vote_lists, text_similarity, votes_required):
    in p_merge_enough_votes(texts, vote_lists, text_similarity, votes_required) )
 
 
-print "plotting curves from 1 to 5 votes per doc"
 print "started job at %s" % datetime.datetime.now()
-plot_learning_curves_for_topic('20910', 1000, (1, 4), {
-  'MajorityVote' : (est_majority_vote, [], None),
-  'MajorityVoteWithNearestNeighbor(0.5)' : (est_majority_vote_with_nn, [ 0.5 ], None),
-  'MergeEnoughVotes' : (est_merge_enough_votes, [ 1 ], None),
-}, comment="")
+for topic_id in texts_vote_lists_truths_by_topic_id.keys():
+  print 'topic %s' % topic_id
+  plot_learning_curves_for_topic(topic_id, 1000, (1, 4), {
+    'MajorityVote' : (est_majority_vote, [], None),
+    'MajorityVoteWithNearestNeighbor(0.5)' : (est_majority_vote_with_nn, [ 0.5 ], None),
+    'MergeEnoughVotes(1)' : (est_merge_enough_votes, [ 1 ], None),
+  }, comment="")
 print "finished job at %s" % datetime.datetime.now()
 
 

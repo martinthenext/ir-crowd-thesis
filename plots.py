@@ -33,6 +33,12 @@ def plot_learning_curve(name, xdata, ydata_dict, xname=None, yname=None, baselin
   plt.savefig('plots/%s' % filename)
   plt.close()
 
+  # Saving given data just in case
+  pickle_filename = filename[:-4]
+  xdata.dump("plots/%s-xdata.pkl" % pickle_filename)
+  for y_data_name, y_data in ydata_dict.iteritems():
+    y_data.dump("plots/%s-ydata-%s.pkl" % ( pickle_filename, y_data_name ) )
+
 
 def plot_lines(name, xdata, ydata, xname=None, yname=None, axis=None, baseline=None):
   plt.title(name, fontsize=16)

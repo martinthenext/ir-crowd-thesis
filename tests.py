@@ -1,10 +1,6 @@
 import numpy as np
 from data import texts_vote_lists_truths_by_topic_id
-
-import matplotlib as mpl
-mpl.use('Agg')
-import matplotlib.pyplot as plt
-
+from scipy import stats
 
 def print_table_row(table_row):
   print '|'.join([str(x) for x in table_row])
@@ -19,7 +15,7 @@ def print_accuracy_table(topics, methods, phase):
   baseline_method = 'MajorityVote'
   header = ['Topic', baseline_method, 'Runs']
   for method in methods:
-    header += [method, 'Runs', 'Better than MV']
+    header += [method, 'Runs', 'Better than MV, p-value']
 
   print_table_head(header)
   rows = []
@@ -28,25 +24,27 @@ def print_accuracy_table(topics, methods, phase):
     table_row = []
     table_row.append(topic_id)
     baseline_accuracies = np.load("pickles/%s-%s-%s-accuracies---.pkl" % (topic_id, baseline_method, phase))
-    plt.hist(baseline_accuracies, bins=50, alpha=0.3, label=baseline_method)
     table_row.append(np.mean(baseline_accuracies))
     table_row.append(len(baseline_accuracies))
 
     for method in methods:
       accuracies = np.load("pickles/%s-%s-%s-accuracies---.pkl" % (topic_id, method, phase))
-      plt.hist(accuracies, bins=50, alpha=0.3, label=method)
       table_row.append(np.mean(accuracies))
       table_row.append(len(accuracies))
 
+      
+
       if np.mean(accuracies) > np.mean(baseline_accuracies):
-        table_row.append("#")
+        _, pval = stats.ttest_ind(accuracies, baseline_accuracies, equal_var=False)
+        if pval < 0.05:
+          table_row.append("*")
+        else:
+          table_row.append("#")
       else:
-        table_row.append(" ")
+        table_row.append("X")
 
     rows.append(table_row)
-    plt.legend(loc=4)
-    plt.savefig('plots/hist%s.png' % topic_id)
-    plt.close()
+
 
   rows.sort(key=lambda row: int(row[0]))
   for row in rows:

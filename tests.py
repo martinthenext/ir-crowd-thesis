@@ -28,7 +28,7 @@ def print_accuracy_table(topics, methods, phase):
     table_row.append(len(baseline_accuracies))
 
     for method in methods:
-      accuracies = np.load("pickles/%s-%s-%s-accuracies---.pkl" % (topic_id, methods[0], phase))
+      accuracies = np.load("pickles/%s-%s-%s-accuracies---.pkl" % (topic_id, method, phase))
       table_row.append(np.mean(accuracies))
       table_row.append(len(accuracies))
 

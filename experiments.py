@@ -239,18 +239,21 @@ def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, estimators_d
         vote_lists, truths, text_similarity, active_pars, idx, False, *args) for idx in xrange(n_runs) )      
 
     good_slices = [ s[start_idx:] for s in sequences if s is not None ]
-    results = np.vstack(good_slices)
+    if good_slices:
+      results = np.vstack(good_slices)
 
-    # Here we can pickle accuracies in the beginning, middle and end
-    begin_accuracies = results[:, 0]
-    middle_accuracies = results[:, int(results.shape[1] / 2)]
-    end_accuracies = results[:, -1]
+      # Here we can pickle accuracies in the beginning, middle and end
+      begin_accuracies = results[:, 0]
+      middle_accuracies = results[:, int(results.shape[1] / 2)]
+      end_accuracies = results[:, -1]
 
-    begin_accuracies.dump("pickles/%s-%s-begin-accuracies.pkl" % (topic_id, estimator_name) )
-    middle_accuracies.dump("pickles/%s-%s-middle-accuracies.pkl" % (topic_id, estimator_name))
-    end_accuracies.dump("pickles/%s-%s-end-accuracies.pkl" % (topic_id, estimator_name))
+      begin_accuracies.dump("pickles/%s-%s-begin-accuracies---.pkl" % (topic_id, estimator_name) )
+      middle_accuracies.dump("pickles/%s-%s-middle-accuracies---.pkl" % (topic_id, estimator_name))
+      end_accuracies.dump("pickles/%s-%s-end-accuracies---.pkl" % (topic_id, estimator_name))
 
-    estimator_y[estimator_name] = np.mean(results, axis=0)
+      estimator_y[estimator_name] = np.mean(results, axis=0)
+    else:
+      print 'Query %s is not represented with estimator %s' % (topic_id, estimator_name)
 
   if comment:
     title = 'Query %s, %s runs, %s' % (topic_id, n_runs, comment)
@@ -286,6 +289,13 @@ def plot_learning_curves_across_topics(n_runs, start_idx, stop_idx, estimators_d
       good_slices = [ s[start_idx:] for s in sequences if s is not None ]
       if good_slices:
         results = np.vstack(good_slices)
+
+        begin_accuracies = results[:, 0]
+        end_accuracies = results[:, -1]
+        
+        begin_accuracies.dump("pickles/%s-%s-begin-accuracies--.pkl" % (topic_id, estimator_name) )
+        end_accuracies.dump("pickles/%s-%s-end-accuracies--.pkl" % (topic_id, estimator_name))
+
         # We will then need to vstack and avg though all the topic accuracies for each estimator
         y_by_estimator[estimator_name].append( np.mean(results, axis=0) )
       else:
@@ -456,10 +466,12 @@ def est_merge_enough_votes(texts, vote_lists, text_similarity, votes_required):
    in p_merge_enough_votes(texts, vote_lists, text_similarity, votes_required) )
 
 
+loser_topics = ['20424','20644','20696','20704','20714','20916','20922']
+
 print "started job at %s" % datetime.datetime.now()
-for topic_id in texts_vote_lists_truths_by_topic_id.keys():
+for topic_id in loser_topics:
   print 'topic %s' % topic_id
-  plot_learning_curves_for_topic(topic_id, 1000, (1, 4), {
+  plot_learning_curves_for_topic(topic_id, 10000, (1.0, 1.1), {
     'MajorityVote' : (est_majority_vote, [], None),
     'MajorityVoteWithNearestNeighbor(0.5)' : (est_majority_vote_with_nn, [ 0.5 ], None),
     'MergeEnoughVotes(1)' : (est_merge_enough_votes, [ 1 ], None),
@@ -471,6 +483,6 @@ print "finished job at %s" % datetime.datetime.now()
 plot_learning_curves_across_topics(3000, 100 * 1, 100 * 3, { 
   'MajorityVote' : (est_majority_vote, [], None),
   'MajorityVoteWithNearestNeighbor(0.5)' : (est_majority_vote_with_nn, [ 0.5 ], None),
-  'MergeEnoughVotes' : (est_merge_enough_votes, [ 1 ], None),  
+  'MergeEnoughVotes(1)' : (est_merge_enough_votes, [ 1 ], None),  
 }, comment="")
 """

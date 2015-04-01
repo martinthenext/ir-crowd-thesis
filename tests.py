@@ -24,12 +24,12 @@ def print_accuracy_table(topics, methods, phase):
     table_row = []
     table_row.append(topic_id)
     baseline_accuracies = np.load("pickles/%s-%s-%s-accuracies---.pkl" % (topic_id, baseline_method, phase))
-    table_row.append(np.mean(baseline_accuracies))
+    table_row.append("%0.3f" % np.mean(baseline_accuracies))
     table_row.append(len(baseline_accuracies))
 
     for method in methods:
       accuracies = np.load("pickles/%s-%s-%s-accuracies---.pkl" % (topic_id, method, phase))
-      table_row.append(np.mean(accuracies))
+      table_row.append("%0.3f" % np.mean(accuracies))
       table_row.append(len(accuracies))
 
       

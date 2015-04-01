@@ -3,12 +3,19 @@ from data import texts_vote_lists_truths_by_topic_id
 from scipy import stats
 
 def print_table_row(table_row):
-  print '|'.join([str(x) for x in table_row])
+  print '&'.join([str(x) for x in table_row]) + "\\\\ \\hline"
 
 
 def print_table_head(column_names):
-  print '|'.join(column_names)
-  print '|'.join(["----" for cn in column_names])
+  print "\\begin{table}"
+  print "\\begin{tabular}{" + "|".join(["l" for cn in column_names]) + "}"
+  print "\\hline"
+  print "&".join(column_names) + "\\\\ \\hline"
+
+
+def print_table_end():
+  print "\\end{tabular}"
+  print "\\end{table}"
 
 
 def print_accuracy_table(topics, methods, phase):
@@ -39,9 +46,9 @@ def print_accuracy_table(topics, methods, phase):
         if pval < 0.05:
           table_row.append("*")
         else:
-          table_row.append("#")
+          table_row.append(" ")
       else:
-        table_row.append("X")
+        table_row.append(" ")
 
     rows.append(table_row)
 
@@ -49,6 +56,8 @@ def print_accuracy_table(topics, methods, phase):
   rows.sort(key=lambda row: int(row[0]))
   for row in rows:
     print_table_row(row)
+
+  print_table_end()
 
 initial_loser_topics = ['20424','20644','20696','20704','20714','20916','20922']
 

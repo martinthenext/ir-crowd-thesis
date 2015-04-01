@@ -1,6 +1,10 @@
 import numpy as np
 from data import texts_vote_lists_truths_by_topic_id
 
+import matplotlib as mpl
+mpl.use('Agg')
+import matplotlib.pyplot as plt
+
 
 def print_table_row(table_row):
   print '|'.join([str(x) for x in table_row])
@@ -24,11 +28,13 @@ def print_accuracy_table(topics, methods, phase):
     table_row = []
     table_row.append(topic_id)
     baseline_accuracies = np.load("pickles/%s-%s-%s-accuracies---.pkl" % (topic_id, baseline_method, phase))
+    plt.hist(baseline_accuracies, bins=50, alpha=0.3, label=baseline_method)
     table_row.append(np.mean(baseline_accuracies))
     table_row.append(len(baseline_accuracies))
 
     for method in methods:
       accuracies = np.load("pickles/%s-%s-%s-accuracies---.pkl" % (topic_id, method, phase))
+      plt.hist(accuracies, bins=50, alpha=0.3, label=method)
       table_row.append(np.mean(accuracies))
       table_row.append(len(accuracies))
 
@@ -38,6 +44,9 @@ def print_accuracy_table(topics, methods, phase):
         table_row.append(" ")
 
     rows.append(table_row)
+    plt.legend(loc=4)
+    plt.savefig('plots/hist%s.png' % topic_id)
+    plt.close()
 
   rows.sort(key=lambda row: int(row[0]))
   for row in rows:
@@ -45,7 +54,7 @@ def print_accuracy_table(topics, methods, phase):
 
 initial_loser_topics = ['20424','20644','20696','20704','20714','20916','20922']
 
-loser_topics = ['20424','20644','20704','20714','20916','20922']
+loser_topics = ['20644','20922']
 topics_for_table = [t for t in texts_vote_lists_truths_by_topic_id.keys() if t not in loser_topics]
 
 print_accuracy_table(topics_for_table, ['MergeEnoughVotes(1)', 'MajorityVoteWithNearestNeighbor(0.5)'], 'begin')

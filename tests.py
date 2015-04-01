@@ -18,6 +18,7 @@ def print_accuracy_table(topics, methods, phase):
     header += [method, 'Runs', 'Better than MV']
 
   print_table_head(header)
+  rows = []
 
   for topic_id in topics_for_table:
     table_row = []
@@ -29,14 +30,18 @@ def print_accuracy_table(topics, methods, phase):
     for method in methods:
       accuracies = np.load("pickles/%s-%s-%s-accuracies---.pkl" % (topic_id, methods[0], phase))
       table_row.append(np.mean(accuracies))
+      table_row.append(len(accuracies))
+
       if np.mean(accuracies) > np.mean(baseline_accuracies):
         table_row.append("#")
       else:
         table_row.append(" ")
-      table_row.append(len(accuracies))
 
-    print_table_row(table_row)
+    rows.append(table_row)
 
+  rows.sort(key=lambda row: int(row[0]))
+  for row in rows:
+    print_table_row(row)
 
 initial_loser_topics = ['20424','20644','20696','20704','20714','20916','20922']
 

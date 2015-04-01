@@ -8,7 +8,8 @@ def print_table_row(table_row):
 
 def print_table_head(column_names):
   print "\\begin{table}"
-  print "\\begin{tabular}{" + "|".join(["l" for cn in column_names]) + "}"
+  print "\\small"
+  print "\\begin{tabular}{|" + "|".join(["l" for cn in column_names]) + "|}"
   print "\\hline"
   print "&".join(column_names) + "\\\\ \\hline"
 
@@ -20,9 +21,9 @@ def print_table_end():
 
 def print_accuracy_table(topics, methods, phase):
   baseline_method = 'MajorityVote'
-  header = ['Topic', baseline_method, 'Runs']
+  header = ['Query', baseline_method]
   for method in methods:
-    header += [method, 'Runs', 'Better than MV, p-value']
+    header.append(method)
 
   print_table_head(header)
   rows = []
@@ -32,23 +33,19 @@ def print_accuracy_table(topics, methods, phase):
     table_row.append(topic_id)
     baseline_accuracies = np.load("pickles/%s-%s-%s-accuracies---.pkl" % (topic_id, baseline_method, phase))
     table_row.append("%0.3f" % np.mean(baseline_accuracies))
-    table_row.append(len(baseline_accuracies))
 
     for method in methods:
       accuracies = np.load("pickles/%s-%s-%s-accuracies---.pkl" % (topic_id, method, phase))
-      table_row.append("%0.3f" % np.mean(accuracies))
-      table_row.append(len(accuracies))
-
-      
+      mean_accuracy_str = "%0.3f" % np.mean(accuracies)
 
       if np.mean(accuracies) > np.mean(baseline_accuracies):
         _, pval = stats.ttest_ind(accuracies, baseline_accuracies, equal_var=False)
         if pval < 0.05:
-          table_row.append("*")
+          table_row.append("%s *" % mean_accuracy_str)
         else:
-          table_row.append(" ")
+          table_row.append(mean_accuracy_str)
       else:
-        table_row.append(" ")
+        table_row.append(mean_accuracy_str)
 
     rows.append(table_row)
 

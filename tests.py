@@ -34,18 +34,31 @@ def print_accuracy_table(topics, methods, phase):
     baseline_accuracies = np.load("pickles/%s-%s-%s-accuracies---.pkl" % (topic_id, baseline_method, phase))
     table_row.append("%0.3f" % np.mean(baseline_accuracies))
 
+    pair = []
+
     for method in methods:
       accuracies = np.load("pickles/%s-%s-%s-accuracies---.pkl" % (topic_id, method, phase))
       mean_accuracy_str = "%0.3f" % np.mean(accuracies)
 
+      pair.append(accuracies)
+
       if np.mean(accuracies) > np.mean(baseline_accuracies):
+#        _, pval = stats.mannwhitneyu(accuracies, baseline_accuracies)
         _, pval = stats.ttest_ind(accuracies, baseline_accuracies, equal_var=False)
+      
         if pval < 0.05:
           table_row.append("%s *" % mean_accuracy_str)
         else:
           table_row.append(mean_accuracy_str)
       else:
         table_row.append(mean_accuracy_str)
+
+    # Look if the second method is better than the first one
+    accuracies1, accuracies2 = pair
+    if np.mean(accuracies2) > np.mean(accuracies1):
+      _, pval = stats.ttest_ind(accuracies1, accuracies2, equal_var=False)
+      if pval < 0.05:
+        table_row[-1] = "%s \\(\\sharp \\)" % table_row[-1]
 
     rows.append(table_row)
 
@@ -61,4 +74,4 @@ initial_loser_topics = ['20424','20644','20696','20704','20714','20916','20922']
 loser_topics = ['20644','20922']
 topics_for_table = [t for t in texts_vote_lists_truths_by_topic_id.keys() if t not in loser_topics]
 
-print_accuracy_table(topics_for_table, ['MergeEnoughVotes(1)', 'MajorityVoteWithNearestNeighbor(0.5)'], 'begin')
+print_accuracy_table(topics_for_table, ['MergeEnoughVotes(1)', 'MergeEnoughVotes(1),Active(1)'], 'begin')

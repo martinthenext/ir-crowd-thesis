@@ -5,9 +5,10 @@ import numpy as np
 import io
 from sklearn.externals import joblib
 
-JUDGEMENT_FILE = '/local/martin/data/all_judgements.txt'
-FULLTEXT_FOLDER = '/local/martin/data/url-header-html-txt'
-GROUND_TRUTH_FILE = '/local/martin/data/task1_unlabeled_g_truth_cons_public.csv'
+DATA_ROOT = '/cluster/home/mdavtyan/data/'
+JUDGEMENT_FILE = DATA_ROOT + 'all_judgements.txt'
+FULLTEXT_FOLDER = DATA_ROOT + 'url-header-html-txt'
+GROUND_TRUTH_FILE = DATA_ROOT + 'task1_unlabeled_g_truth_cons_public.csv'
 
 class JudgementRecord(object):
   def __init__(self, table_row):

@@ -247,9 +247,7 @@ def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, estimators_d
       middle_accuracies = results[:, int(results.shape[1] / 2)]
       end_accuracies = results[:, -1]
 
-      begin_accuracies.dump("pickles/%s-%s-begin-accuracies---.pkl" % (topic_id, estimator_name) )
-      middle_accuracies.dump("pickles/%s-%s-middle-accuracies---.pkl" % (topic_id, estimator_name))
-      end_accuracies.dump("pickles/%s-%s-end-accuracies---.pkl" % (topic_id, estimator_name))
+#      begin_accuracies.dump("pickles/%s-%s-begin-accuracies---.pkl" % (topic_id, estimator_name) )
 
       estimator_y[estimator_name] = np.mean(results, axis=0)
     else:

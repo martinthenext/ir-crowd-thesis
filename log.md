@@ -358,3 +358,398 @@ Another strategy would be to require a certain number of votes, and in case a do
 Results for some other topic, where previous results were pretty bad:
 
 ![topic-20910-10000-runs-for-different-sufficient-similarity-levels- 58](https://cloud.githubusercontent.com/assets/810383/5801071/318f8696-9fe7-11e4-8647-abb97a12483c.png)
+
+Sometimes mejority vote with NN outperforms 'merge enough votes' strategy. Also, optimal parameter for the latter is not always 3 as it seems.
+
+![topic-20780-10000-runs-for-different-sufficient-similarity-levels- 44](https://cloud.githubusercontent.com/assets/810383/5819072/4ac17276-a0bb-11e4-9033-021e16d75c5e.png)
+
+## Using GP package from Scikit-Learn
+
+For the task of "predicting" relevance probabilities from the given TF-IDF document vectors we try using Gaussian Processes regression `tf-idf vector` -> `relevance probability`. With a simple code like that:
+
+```python
+MY_FAVOURITE_NUMBER = 2900
+vectorizer = TfidfVectorizer()
+X = vectorizer.fit_transform(texts).toarray()
+y = np.array(list(p_majority_vote(texts, vote_lists)))
+gp = gaussian_process.GaussianProcess(nugget=MY_FAVOURITE_NUMBER)
+print gp.fit(X, y)
+```
+
+We get an exception:
+
+> Exception: Multiple input features cannot have the same target value.
+
+As we supply the `nugget` that should be possible, but it's not. Author [suggests](https://github.com/scikit-learn/scikit-learn/issues/642#issuecomment-67366214) this is an implementation problem.
+
+The exception could be quickly "fixed" by [monkey patching](http://en.wikipedia.org/wiki/Monkey_patch) the `sklearn` locally and allowing GP to run. The predicted values yielded by GP are slightly different (mean difference is 5e-18 but noticable), which is a desirable behaviour because we want an algorithm to converge to majority voting results when given plenty of data.
+
+This is `sklearn/gaussian_process/gaussian_process.py`:
+
+```python
+
+         # Calculate matrix of distances D between samples
+         D, ij = l1_cross_distances(X)
+#        if (np.min(np.sum(D, axis=1)) == 0.
+#                and self.corr != correlation.pure_nugget):
+#            raise Exception("Multiple input features cannot have the same"
+#                            " target value.")
+
+
+```
+
+
+## First GP results
+
+Here is an example comparison of mean vote estimates for relevance probability vs Gaussian Processes:
+
+```
+Mean vote:
+[0.0, 0.0, None, None, None, None, None, None, 1.0, None, None, 1.0, 0.0, None, None, 0.5, 0.0, 1.0, 0.0, None, 0.0, None, None, 0.0, 0.5, 0.0, None, None, 1.0, 0.0, None, 0.33333333333333331, 0.0, None, None, None, 1.0, 0.0, None, 0.0, None, None, None, 1.0, 1.0, None, None, None, None, None, None, 0.5, None, None, 0.0, 0.0, 0.0, None, 0.0, None, None, 0.0, None, None, None, 1.0, 0.0, None, 0.0, 0.33333333333333331, None, 0.0, 1.0, None, 1.0, None, None, 0.0, 0.0, None, 0.0, None, None, 0.0, 1.0, None, None, None, None, 1.0, None, None, 0.0, None, None, None, 1.0, None, None, None, 0.0, None, None, 1.0, 1.0, 1.0, None, None, None, None, None, None, 0.0, None, None]
+GP:
+[0.34528071444815872, 0.34485360723787234, None, None, None, None, None, None, 0.43618980658985174, None, None, 0.43618980658985174, 0.34528071444815872, None, None, 0.39073526051900526, 0.34528071444815872, 0.43618980658985174, 0.34528071444815872, None, 0.34528071444815872, None, None, 0.34528071444815872, 0.39073526051900526, 0.34528071444815872, None, None, 0.43618980658985174, 0.34528071444815872, None, 0.37558374588689636, 0.34528071444815872, None, None, None, 0.43618980658985174, 0.34528071444815872, None, 0.34528071444815872, None, None, None, 0.43618980658985174, 0.43618980658985174, None, None, None, None, None, None, 0.39076545834754334, None, None, 0.34528071444815872, 0.31631480117959171, 0.34528071444815872, None, 0.34528071444815872, None, None, 0.34528071444815872, None, None, None, 0.43618980658985174, 0.34528071444815872, None, 0.34528071444815872, 0.37558374588689636, None, 0.34528075940607789, 0.43618980658985174, None, 0.43619565728262016, None, None, 0.34528071444815872, 0.34528071444815872, None, 0.34528071444815872, None, None, 0.31631494391527976, 0.43618980658985174, None, None, None, None, 0.43618980658985174, None, None, 0.34528071444815872, None, None, None, 0.43618980658985174, None, None, None, 0.34528071444815872, None, None, 0.43618977905735268, 0.43618980658985174, 0.43618980658985174, None, None, None, None, None, None, 0.34528071444815872, None, None]
+
+```
+
+## Memory problems
+
+Ran into memory problems bacause gigantic dense tf-idf matrices don't get garbage-collected properly. Trying different strategies and going to do profiling. 
+
+Experiments show that memory is not enough to process one [sic] accuracy sequence.
+
+**UPDATE** This got implemented and is now running. Going to have a list of accuracy sequences in an `csv` file and then plot them in Excel.
+
+Now GPs seem to be running, we need to get them to an appropriate quality.
+Results that we're aiming at: way higher accuracy than majority voting at low amount of votes per document. Plan:
+
+1. Reimplement the accuracy measurement to include **all documents into the measurement**. Possibly toss a coin with the empirical probability of success measured from the dataset.
+
+2. Try getting parameters for the GP right. Parameters cannot be found by looking at the final accuracy, there should be some other way.
+
+## First GP results
+
+Now every accuracy sequence is generated separately and is written to a text file. GP with nugget parameter of `1` was compared to the previous successful baseline result of "Merge Enough Votes" with 3 votes required and Majority Voting. For every sequence 100 experiments were run and results from 1 to 5 votes per document are shown.
+
+![default](https://cloud.githubusercontent.com/assets/810383/6204550/e60d9dec-b54f-11e4-85b1-033118ab0391.png)
+
+GP are worse than everything, but this is because we don't know the right parameters yet. 
+
+**UPDATE** Nugget `0.1` does obviously better. If nugget parameter means variance, it should be in a range of `0.01`. Results are going to be around soon.
+
+![default](https://cloud.githubusercontent.com/assets/810383/6219777/45aeb1da-b62e-11e4-85fb-4f7e7eebe65c.png)
+
+**UPDATE** Very surprisingly enough, Nugget `0.01` doesn't differ much from `0.1`:
+
+![default](https://cloud.githubusercontent.com/assets/810383/6258090/0807f05a-b7c6-11e4-80ff-6180627c8ab2.png)
+
+**UPDATE** New graph for nugget `0.3`, which appears not do that much difference
+
+![default](https://cloud.githubusercontent.com/assets/810383/6383980/bb264e44-bd56-11e4-9558-737b63cddfd9.png)
+
+## Proposed explanation for strange convergence
+
+Question: Why on some graphs the accuracy of estimates made with lower amount of votes per document is higher than the accuracy of the estimate made with all the available votes? 
+
+Answer: The procedure of drawing votes when generating a particular accuracy sequence is the following:
+
+1. Out of all documents a random one is chosen
+2. For this document a new vote is queried. In case there is no votes left for the document the entire sequence is disregarded
+
+As this procedure is more likely to diregard documents with smaller amount of votes, the documents with high amount of votes are more accounted for when calculated average accuracy at every particular iteration. Document with higher vote count are more likely to have good majority vote estimates. Hence, average accuracies measured for accuracy sequences can be higher than the one simply accounting all the data as low vote count documents are also accounted for.
+
+**UPDATE** Went back to the strage plot of topic `20932` and tried getting the [equal number of votes for every document](https://github.com/martinthenext/ir-crowd-thesis/blob/strangeplots/experiments.py#L45), still we have the same effect:
+
+![learning-curve-for-majority-voting-topic-20932-1000-runs- 81](https://cloud.githubusercontent.com/assets/810383/6284377/a0229ad2-b8ef-11e4-97d6-605b4d92fdce.png)
+
+If we restrict number of votes per document even below mininum - to 10, this happens:
+
+![learning-curve-for-majority-voting-topic-20932-10000-runs- 24](https://cloud.githubusercontent.com/assets/810383/6284764/406aa4ea-b8f4-11e4-9ee9-1c8f5e10162b.png)
+
+Still goes above the all-information estimate.
+
+## Active learning
+
+First attempt at active learning: requiring a certain amount of votes per document and "filling" documents to the required number of votes instead of chosing randomly. This strategy is being used in conjunction with a simple Majority Vote estimator. Below are results for two different topics:
+
+![topic-20690-1000-runs-comparing-with-active-learner- 61](https://cloud.githubusercontent.com/assets/810383/6396145/1cb2b0f4-bddd-11e4-96c8-c7afc2155ed3.png)
+
+![topic-20910-10000-runs-comparing-with-active-learner- 22](https://cloud.githubusercontent.com/assets/810383/6396028/761e3f92-bddc-11e4-8e1c-d695ffb18cdc.png)
+
+It would be interesting to see how that strategy goes with the sufficient similarity method.
+
+**UPDATE** Results of using the simplest type of Active Learning with multiple baseline types (code [here](https://github.com/martinthenext/ir-crowd-thesis/blob/active-graphs/experiments.py) ):
+
+![topic-20910-10000-runs-comparing-with-active-learner- 12](https://cloud.githubusercontent.com/assets/810383/6414640/226a4694-be99-11e4-8cec-85c33879a578.png)
+
+We can see that for *Majority voting*, *Majority voting with NN, suff.sim. 0.5* and *Merge enough votes, required 1* active learning performs better than passive learning. The best results belongs to *Merge enough votes* with 1 vote required, performed actively. What it does if a document doesn't have any votes at all, it assigns it's label to the label of a nearest neighbor which has a vote. Active learning works trying to get at least one vote for every document first.
+
+Gonna look at a different topic now.
+
+**UPDATE** For another topic we still have the same winner.
+
+![topic-20812-10000-runs-comparing-with-active-learner- 20](https://cloud.githubusercontent.com/assets/810383/6426344/05f9f30c-bf56-11e4-9997-6500f40a747d.png)
+
+**UPDATE** Gaussian Process classifier is now trained on available data only (documents which have votes) and used on *all* documents.
+
+![default](https://cloud.githubusercontent.com/assets/810383/6460444/9c23a920-c197-11e4-9d43-55efa92fc2a3.png)
+
+The proper way of doing it is using a link function, going to implement it next.
+
+## New ground truth
+
+In [TREC 2011 Crowdsourcing track](https://sites.google.com/site/treccrowd/2011) some ground-truth NIST labels are given to teams to evaluate their techniques. This development (training) data is available [here](https://sites.google.com/site/treccrowd/2011/stage2-dev.tar?attredirects=0). It only has 25 topics, and, what a surpise, all of different from ones we used up until now.
+
+## Random MV
+
+Returning to the question of tie in Majority Voting. TREC evaluation procedure requires a label assigned to every document, meaning that you cannot return `None`. Returning to the strategy of tossing a fair coin in tie situations, [we can compare](https://github.com/martinthenext/ir-crowd-thesis/blob/active-graphs/experiments.py) MV and random MV on the state-of-the-art baseline plot:
+
+![topic-20910-10000-runs-comparing-with-active-learner- 59](https://cloud.githubusercontent.com/assets/810383/6514148/7ce26a52-c380-11e4-8a9c-8cc269d62320.png)
+
+Now we need to completely switch all estimators to do a toin coss in case of a tie (as in, when relevance estimate is exactly `0.5`).
+
+**UPDATE** The [updated code](https://github.com/martinthenext/ir-crowd-thesis/commit/cb8e097bcf8fabbcf950aa64a0e824efbd6b0d9b) uses coin tosses for all situations where p=0.5. See the corresponding version of the above plot:
+
+![topic-20910-10000-runs-comparing-with-active-learner- 12](https://cloud.githubusercontent.com/assets/810383/6517205/0bebdd60-c399-11e4-8fb5-8d6fda09f6be.png)
+
+Now the lines change their behaviour at the explainable positions.
+
+**UPDATE** [Updated code](https://github.com/martinthenext/ir-crowd-thesis/commit/c4bdf253655dd8335cb29986ac08766b84664ebb) gets accuracy sequences for all possible topics and then averages them.
+
+![across-topics-1000-runs-comparing-with-active-learner- 20](https://cloud.githubusercontent.com/assets/810383/6525237/703c8052-c403-11e4-9ae7-307215c5bc7c.png)
+
+**UPDATE** For larger amount of simulations:
+
+![across-topics-10000-runs-comparing-with-active-learner- 71](https://cloud.githubusercontent.com/assets/810383/6541916/794d4920-c4e8-11e4-8e94-0bd0d39bf6ba.png)
+
+## With rounding bug fixed
+
+[Fixed](https://github.com/martinthenext/ir-crowd-thesis/commit/604f900c7aa364ff0bdc33a870d5ee20821d43ed) a bug in a procedure that takes a relevance estimate in [0, 1] and outputs the label. Now if the input is `None` it also outputs a fair coin toss. The updated plot:
+
+![across-topics-10000-runs-comparing-with-active-learner- 17](https://cloud.githubusercontent.com/assets/810383/6593601/3f841e04-c7da-11e4-9fa0-581f4a69c5a5.png)
+
+## Comparison: Passive vs. Active learning with Majority Vote
+
+![across-topics-10000-runs-comparing-with-active-learner- 90](https://cloud.githubusercontent.com/assets/810383/6622793/2d63cf20-c8df-11e4-852b-dca428046389.png)
+
+## Ground truth new stats
+
+Topic|#ground truth/#documents|mean ground truth relevance
+-----|------------------------|---------------------------
+20932|15/115|0.80
+20488|10/110|0.60
+20910|15/115|0.67
+20958|10/100|0.70
+20714|10/110|0.50
+20636|10/100|0.70
+20956|10/110|0.80
+20424|10/100|0.60
+20916|10/110|0.80
+20542|15/115|0.67
+20778|10/110|0.50
+20690|25/125|0.72
+20696|10/110|0.80
+20694|20/100|0.60
+20832|10/100|0.80
+20962|10/110|0.70
+20812|15/115|0.67
+20814|10/100|0.70
+20704|10/90|0.50
+20922|10/100|0.60
+20780|15/115|0.53
+20766|10/110|0.50
+20644|15/105|0.53
+20764|10/100|0.70
+20642|15/115|0.87
+20686|15/115|0.73
+20976|10/90|0.60
+20972|15/90|0.60
+20584|35/105|0.74
+20996|10/110|0.90
+
+Overall mean relevance - `0.68`. There is only one topic where more than 80% of ground truth judgments show relevance.
+
+## Inner vs outer similarity histograms
+
+![inner- 45](https://cloud.githubusercontent.com/assets/810383/6701367/16cf8e3e-cd1c-11e4-9d4f-f7791c8d1745.png)
+
+![outer- 47](https://cloud.githubusercontent.com/assets/810383/6701370/1fd05270-cd1c-11e4-9549-f8c04bf6c550.png)
+
+Somehow the inner similarity has a spike close to 1, although we delete all the distances with self. Out of all the topics there are only two which have a lot of inner distances bigger than `0.95`: `20694` and `20584`.
+
+**UPDATE** I've checked documents with high similarity and they appear just to have different ads. Example difference between two relevant documents having similarity of `0.97`:
+
+```
+Watch the latest videos on YouTube.com
+
+Dental Assisting Programs
+Dental Journals
+Dental Blogs
+Dental Health Literature
+Pre-Dental Programs NEW
+
+Alabama Dental Hygiene Schools
+Alaska Dental Hygiene Schools
+Arizona Dental Hygiene Schools
+Arkansas Dental Hygiene Schools
+California Dental Hygiene Schools
+Colorado Dental Hygiene Schools
+Connecticut Dental Hygiene Schools
+Delaware Dental Hygiene Schools
+District of Columbia DH Programs
+Florida Dental Hygiene Schools
+Georgia Dental Hygiene Schools
+Hawaii Dental Hygiene Schools
+Find more programs below
+
+[...]
+
+Email a friend about this page:   
+
+Assessor Links USA    All Things Political    Engineers Guide USA    State 
+Health Links    healthlinksusa.com    Juggling Cats    Doomsday Guide
+
+Health Resource Guide     County Recorders    County Treasurers   Health 
+Resource USA    Buy Yellow Roses    Innovators Guide
+
+To report a broken link or to suggest a new site for our online resource 
+guide, please Contact Us.
+Proquantum Corporation.
+Copyright @ 2002-2007
+Use of this website is expressly subject to the various terms and 
+conditions set forth in our
+User Agreement/Disclaimer  and Privacy Policy
+
+Visit online mba review.
+
+visits since 8/31/03
+
+```
+
+```
+
+Health Guide USA  
+America's Online Health Resource Guide
+
+Enter your search terms Submit search form
+Web    www.healthguideusa.org
+
+To Home Page
+ 
+
+
+North Dakota Dental Hygiene Programs - Dental Hygienist Schools
+
+Other resources: Dental Hygienist Job Outlook
+State Dental Hygienist Licensing Information
+State Dental Health Programs
+
+North Dakota State Dental Hygiene Program
+
+ 
+
+Find more dental related resources below:
+
+
+
+
+State Dental Boards
+[...]
+
+Email a friend about this page:   
+
+Assessor Links USA    All Things Political    Engineers Guide USA    State 
+Health Links    healthlinksusa.com    Juggling Cats    Doomsday Guide
+
+Health Resource Guide     County Recorders    County Treasurers   Health 
+Resource USA    Buy Yellow Roses    Innovators Guide
+
+To report a broken link or to suggest a new site for our online resource 
+guide, please Contact Us.
+Proquantum Corporation.
+Copyright @ 2002-2007
+Use of this website is expressly subject to the various terms and 
+conditions set forth in our
+User Agreement/Disclaimer  and Privacy Policy
+
+Visit online mba review.
+
+visits since 8/31/03
+
+```
+
+## More string exclusion criterion for inner similarities
+
+Now excluding all similarities which are closer than 10^-5 to 1. This deleted more similarities, which means that there is a bunch of de-facto similar documents within the ground truth. New inner similarity plot:
+
+### Inner similarities
+
+![similarities-between-relevant-documents- 13](https://cloud.githubusercontent.com/assets/810383/6743175/fcb03be4-ce96-11e4-82be-c21eec4ba928.png)
+
+If we delete two problem topics:
+
+![similarities-between-relevant-documents-two-removed](https://cloud.githubusercontent.com/assets/810383/6745123/ec0abe6a-ceb2-11e4-8020-e95e9bc898da.png)
+
+
+## Accuracies at 1 vote per document
+
+We [take](https://github.com/martinthenext/ir-crowd-thesis/blob/cad6e5069c57a71cfbe11c6ae9fd185f59631ef4/tests.py) pickle accuracy files produced by `experiments.py` and measure mean accuracies at 1 vote per document:
+
+Topic|MajorityVote|Runs|MergeEnoughVotes(1)|Runs|Better than MV|MajorityVoteWithNearestNeighbor(0.5)|Runs|Better than MV
+----|----|----|----|----|----|----|----|----
+20488|0.678788892606|2989|0.769953208556|2992|#|0.761923847695|2994|#
+20542|0.682555555556|3000|0.733066666667|3000|#|0.694711111111|3000|#
+20584|0.693171428571|3000|0.783361904762|3000|#|0.753028571429|3000|#
+20636|0.683266666667|3000|0.754933333333|3000|#|0.740933333333|3000|#
+20642|0.700933333333|3000|0.774022222222|3000|#|0.742|3000|#
+20686|0.688888888889|3000|0.678666666667|3000| |0.634955555556|3000| 
+20690|0.684613333333|3000|0.7732|3000|#|0.734453333333|3000|#
+20694|0.731283333333|3000|0.798683333333|3000|#|0.765316666667|3000|#
+20696|0.561057108141|1646|0.645882352941|1615|#|0.624205378973|1636|#
+20764|0.657678029025|2963|0.692515171949|2966|#|0.624120433018|2956| 
+20766|0.786644407346|599|0.856470588235|595|#|0.813036565978|629|#
+20778|0.645866666667|3000|0.687433333333|3000|#|0.6957|3000|#
+20780|0.672733333333|3000|0.761822222222|3000|#|0.726333333333|3000|#
+20812|0.681888888889|3000|0.737511111111|3000|#|0.715244444444|3000|#
+20814|0.798933333333|375|0.865753424658|365|#|0.752706552707|351| 
+20832|0.660505529226|633|0.688410104012|673|#|0.667249602544|629|#
+20910|0.647733333333|3000|0.691777777778|3000|#|0.642555555556|3000| 
+20932|0.587244444444|3000|0.598355555556|3000|#|0.584333333333|3000| 
+20956|0.629166666667|3000|0.667166666667|3000|#|0.643466666667|3000|#
+20958|0.614160263447|1822|0.642936288089|1805|#|0.590588882774|1817| 
+20962|0.586851914605|2951|0.623281143635|2938|#|0.608375893769|2937|#
+20972|0.686488888889|3000|0.6878|3000|#|0.636577777778|3000| 
+20976|0.644856661046|2372|0.696030405405|2368|#|0.661131918435|2403|#
+20996|0.574833333333|3000|0.5589|3000| |0.5354|3000| 
+
+**UPDATE** `X` - mean of the method is not larger than the baseline, `#` - mean is larger but the difference is not significant, `*` - mean is larger and the difference is significant
+
+Topic|MajorityVote|Runs|MergeEnoughVotes(1)|Runs|Better than MV, p-value|MajorityVoteWithNearestNeighbor(0.5)|Runs|Better than MV, p-value
+----|----|----|----|----|----|----|----|----
+20424|0.610134990358|4667|0.63118507526|4717|*|0.625631067961|4635|*
+20488|0.678788892606|2989|0.769953208556|2992|*|0.761923847695|2994|*
+20542|0.682555555556|3000|0.733066666667|3000|*|0.694711111111|3000|*
+20584|0.693171428571|3000|0.783361904762|3000|*|0.753028571429|3000|*
+20636|0.683266666667|3000|0.754933333333|3000|*|0.740933333333|3000|*
+20642|0.700933333333|3000|0.774022222222|3000|*|0.742|3000|*
+20686|0.688888888889|3000|0.678666666667|3000|X|0.634955555556|3000|X
+20690|0.684613333333|3000|0.7732|3000|*|0.734453333333|3000|*
+20694|0.731283333333|3000|0.798683333333|3000|*|0.765316666667|3000|*
+20696|0.561057108141|1646|0.645882352941|1615|*|0.624205378973|1636|*
+20704|0.699523525908|8395|0.807063991452|8423|*|0.814700630877|8401|*
+20714|0.821297602257|709|0.865994236311|694|*|0.829292929293|693|#
+20764|0.657678029025|2963|0.692515171949|2966|*|0.624120433018|2956|X
+20766|0.786644407346|599|0.856470588235|595|*|0.813036565978|629|*
+20778|0.645866666667|3000|0.687433333333|3000|*|0.6957|3000|*
+20780|0.672733333333|3000|0.761822222222|3000|*|0.726333333333|3000|*
+20812|0.681888888889|3000|0.737511111111|3000|*|0.715244444444|3000|*
+20814|0.798933333333|375|0.865753424658|365|*|0.752706552707|351|X
+20832|0.660505529226|633|0.688410104012|673|*|0.667249602544|629|#
+20910|0.647733333333|3000|0.691777777778|3000|*|0.642555555556|3000|X
+20916|0.614517692681|8252|0.629090690979|8336|*|0.641534391534|8316|*
+20932|0.587244444444|3000|0.598355555556|3000|*|0.584333333333|3000|X
+20956|0.629166666667|3000|0.667166666667|3000|*|0.643466666667|3000|*
+20958|0.614160263447|1822|0.642936288089|1805|*|0.590588882774|1817|X
+20962|0.586851914605|2951|0.623281143635|2938|*|0.608375893769|2937|*
+20972|0.686488888889|3000|0.6878|3000|#|0.636577777778|3000|X
+20976|0.644856661046|2372|0.696030405405|2368|*|0.661131918435|2403|*
+20996|0.574833333333|3000|0.5589|3000|X|0.5354|3000|X

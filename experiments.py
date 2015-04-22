@@ -464,6 +464,47 @@ def est_merge_enough_votes(texts, vote_lists, text_similarity, votes_required):
    in p_merge_enough_votes(texts, vote_lists, text_similarity, votes_required) )
 
 
+def p_gp(texts, vote_lists, X, text_similarity, nugget):
+  p_mv = list(p_majority_vote(texts, vote_lists))
+  good_idx = [i for i, p in enumerate(p_mv) if p is not None]
+
+  # It only makes sense to run GPs if there is more than 1 observation
+  if len(good_idx) > 1:
+    y_good = np.array(p_mv)[good_idx].astype(np.dtype('d'))
+    
+    X_array = X.toarray()
+    X_good_array = X_array[good_idx, :]
+    X_good_typed = X_good_array.astype(np.dtype('d'), copy=False)
+
+    # Before using GP transform y's to R
+    y_transformed = logit(y_good)
+
+    gp = gaussian_process.GaussianProcess(nugget=nugget)
+    gp.fit(X_good_typed, y_good)
+
+    # Fitted only the known ones, predict everything
+    results_transformed = gp.predict(X_array)
+    results = expit(results_transformed)
+
+    # Transform predictions back from R
+
+    del y_good
+    del X_array
+    del X_good_array
+    del X_good_typed
+    del gp
+    gc.collect()
+
+    return results
+  else:
+    return p_mv
+
+
+def est_gp(texts, vote_lists, X, text_similarity, nugget):
+  return ( unit_to_bool_indecisive(p) for p 
+    in p_gp(texts, vote_lists, X, text_similarity, nugget))
+
+
 loser_topics = ['20644','20922']
 
 print "started job at %s" % datetime.datetime.now()

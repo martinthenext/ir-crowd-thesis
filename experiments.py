@@ -10,6 +10,9 @@ from sklearn.metrics.pairwise import cosine_similarity
 import datetime
 from scipy.stats import ttest_ind
 import sys
+from scipy.special import logit, expit
+from sklearn import gaussian_process
+import gc
 
 
 class PrintCounter(object):
@@ -53,7 +56,7 @@ def p_majority_vote(texts, vote_lists):
   return imap(get_mean_vote, vote_lists)
 
 
-def est_majority_vote(texts, vote_lists, text_similarity):
+def est_majority_vote(texts, vote_lists, X, text_similarity):
   """ This is how all estimator functions should look like
   """
   return ( unit_to_bool_random(conf) for conf in p_majority_vote(texts, vote_lists) )
@@ -67,12 +70,9 @@ def copy_and_shuffle_sublists(list_of_lists):
 
 
 def get_accuracy_sequence(estimator, n_votes_to_sample, texts, 
-  vote_lists, truths, text_similarity, idx=None, return_final=False, *args):
+  vote_lists, truths, X, text_similarity, idx=None, return_final=False, *args):
   """ Randomly sample votes and re-calculate estimates.
   """
-  #if idx:
-  #  sys.stderr.write("%s\n" % idx)
-
   unknown_votes = copy_and_shuffle_sublists(vote_lists)
   known_votes = [ [] for _ in unknown_votes ]
 
@@ -91,7 +91,7 @@ def get_accuracy_sequence(estimator, n_votes_to_sample, texts,
     
     if not return_final:
       # Recalculate all the estimates for the sake of consistency
-      estimates = estimator(texts, known_votes, text_similarity, *args)
+      estimates = estimator(texts, known_votes, X, text_similarity, *args)
 
       # Calucate the accuracy_sequence
       accuracy_sequence[index] = get_accuracy(estimates, truths)
@@ -144,8 +144,8 @@ def get_indexes_with_neighborhood_votes_less_than(votes_required, vote_lists,
 
 def get_accuracy_sequence_active(estimator, n_votes_to_sample, texts, 
   vote_lists, truths, text_similarity, active_pars, idx=None, return_final=False, *args):
-  #if idx:
-  #  sys.stderr.write("%s\n" % idx)
+  """ Active version of the function above
+  """
 
   unknown_votes = copy_and_shuffle_sublists(vote_lists)
   known_votes = [ [] for _ in unknown_votes ]
@@ -180,7 +180,7 @@ def get_accuracy_sequence_active(estimator, n_votes_to_sample, texts,
     
     if not return_final:
       # Recalculate all the estimates for the sake of consistency
-      estimates = estimator(texts, known_votes, text_similarity, *args)
+      estimates = estimator(texts, known_votes, X, text_similarity, *args)
 
       # Calucate the accuracy_sequence
       accuracy_sequence[index] = get_accuracy(estimates, truths)
@@ -205,22 +205,13 @@ def index_sublist_items(list_of_lists):
   return list(chain(*indexed_items))
 
 
-def get_accuracy_sequence_sample_votes(estimator, n_votes_to_sample,
-  texts, vote_lists, truths):
-  """ Sample random (document, vote) pairs instead of getting votes 
-      for random document
-  """
-  doc_vote_pairs = index_sublist_items(vote_lists)
-  pass
-
-
 def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, estimators_dict, comment=None):
   texts, vote_lists, truths = texts_vote_lists_truths_by_topic_id[topic_id]
   n_documents = len(texts)
 
   vectorizer = TfidfVectorizer()
-  tfidf = vectorizer.fit_transform(texts)
-  text_similarity = cosine_similarity(tfidf)
+  X = vectorizer.fit_transform(texts)
+  text_similarity = cosine_similarity(X)
 
   min_votes_per_doc, max_votes_per_doc = votes_per_doc
   start_idx, stop_idx = int(min_votes_per_doc * n_documents), int(max_votes_per_doc * n_documents)
@@ -232,8 +223,8 @@ def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, estimators_d
     print 'Calculating for %s' % estimator_name
     estimator, args, active_pars = estimator_and_args
     if active_pars is None:
-      sequences = Parallel(n_jobs=4)( delayed(get_accuracy_sequence)(estimator, stop_idx, texts, 
-        vote_lists, truths, text_similarity, idx, False, *args) for idx in xrange(n_runs) )
+      sequences = Parallel(n_jobs=16)( delayed(get_accuracy_sequence)(estimator, stop_idx, texts, 
+        vote_lists, truths, X, text_similarity, idx, False, *args) for idx in xrange(n_runs) )
     else:
       sequences = Parallel(n_jobs=4)( delayed(get_accuracy_sequence_active)(estimator, stop_idx, texts, 
         vote_lists, truths, text_similarity, active_pars, idx, False, *args) for idx in xrange(n_runs) )      
@@ -261,6 +252,9 @@ def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, estimators_d
 
 
 def plot_learning_curves_across_topics(n_runs, start_idx, stop_idx, estimators_dict, comment=None):
+  """
+  TODO Most probably buggy
+  """
   for topic_id, data in texts_vote_lists_truths_by_topic_id.iteritems():
     print 'Loading topic %s' % topic_id
     texts, vote_lists, truths = data
@@ -401,7 +395,7 @@ def p_majority_vote_or_nn(texts, vote_lists, text_similarity, sufficient_similar
   return result_p
 
 
-def est_majority_vote_or_nn(texts, vote_lists, text_similarity, sufficient_similarity):
+def est_majority_vote_or_nn(texts, vote_lists, X, text_similarity, sufficient_similarity):
   return ( unit_to_bool_random(p) for p
    in p_majority_vote_or_nn(texts, vote_lists, text_similarity, sufficient_similarity) )
 
@@ -426,7 +420,7 @@ def p_majority_vote_with_nn(texts, vote_lists, text_similarity, sufficient_simil
   return result_p
 
 
-def est_majority_vote_with_nn(texts, vote_lists, text_similarity, sufficient_similarity):
+def est_majority_vote_with_nn(texts, vote_lists, X, text_similarity, sufficient_similarity):
   return ( unit_to_bool_random(p) for p
    in p_majority_vote_with_nn(texts, vote_lists, text_similarity, sufficient_similarity) )
 
@@ -459,12 +453,14 @@ def p_merge_enough_votes(texts, vote_lists, text_similarity, votes_required):
   return result_p
 
 
-def est_merge_enough_votes(texts, vote_lists, text_similarity, votes_required):
+def est_merge_enough_votes(texts, vote_lists, X, text_similarity, votes_required):
   return ( unit_to_bool_random(p) for p
    in p_merge_enough_votes(texts, vote_lists, text_similarity, votes_required) )
 
 
 def p_gp(texts, vote_lists, X, text_similarity, nugget):
+  """ Smooth estimates with Gaussian Processes using linear correlation function
+  """
   p_mv = list(p_majority_vote(texts, vote_lists))
   good_idx = [i for i, p in enumerate(p_mv) if p is not None]
 
@@ -479,14 +475,14 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget):
     # Before using GP transform y's to R
     y_transformed = logit(y_good)
 
-    gp = gaussian_process.GaussianProcess(nugget=nugget)
+    gp = gaussian_process.GaussianProcess(corr='linear', nugget=nugget)
     gp.fit(X_good_typed, y_good)
 
     # Fitted only the known ones, predict everything
     results_transformed = gp.predict(X_array)
+    # Transform predictions back from R
     results = expit(results_transformed)
 
-    # Transform predictions back from R
 
     del y_good
     del X_array
@@ -501,7 +497,7 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget):
 
 
 def est_gp(texts, vote_lists, X, text_similarity, nugget):
-  return ( unit_to_bool_indecisive(p) for p 
+  return ( unit_to_bool_random(p) for p 
     in p_gp(texts, vote_lists, X, text_similarity, nugget))
 
 
@@ -511,11 +507,13 @@ print "started job at %s" % datetime.datetime.now()
 #for topic_id in [t for t in texts_vote_lists_truths_by_topic_id.keys() if t not in loser_topics]:
 for topic_id in ['20910']:
   print 'topic %s' % topic_id
-  plot_learning_curves_for_topic(topic_id, 10000, (1.0, 5.0), {
+  plot_learning_curves_for_topic(topic_id, 100, (1.0, 5.0), {
     'MajorityVote' : (est_majority_vote, [], None),
-    'MajorityVote,Active(3)' : (est_majority_vote, [], [ 3, None ]),
-    'MergeEnoughVotes(1),Active(1)' : (est_merge_enough_votes, [ 1 ], [ 1, None ]),
-    'MergeEnoughVotes(1)' : (est_merge_enough_votes, [ 1 ], None),
+#    'MajorityVote,Active(3)' : (est_majority_vote, [], [ 3, None ]),
+#    'MergeEnoughVotes(1),Active(1)' : (est_merge_enough_votes, [ 1 ], [ 1, None ]),
+#    'MergeEnoughVotes(1)' : (est_merge_enough_votes, [ 1 ], None),
+    'GP(1)' : (est_gp, [ 1 ], None),
+    'GP(0.001)' : (est_gp, [ 0.001 ], None),
   }, comment="")
 print "finished job at %s" % datetime.datetime.now()
 

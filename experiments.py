@@ -475,14 +475,16 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget):
     # Before using GP transform y's to R
     y_transformed = logit(y_good)
 
+    # GP
     gp = gaussian_process.GaussianProcess(corr='linear', nugget=nugget)
-    gp.fit(X_good_typed, y_good)
+    gp.fit(X_good_typed, y_transformed)
+    print X_good_typed
+    print y_transformed
 
     # Fitted only the known ones, predict everything
     results_transformed = gp.predict(X_array)
     # Transform predictions back from R
     results = expit(results_transformed)
-
 
     del y_good
     del X_array
@@ -502,18 +504,18 @@ def est_gp(texts, vote_lists, X, text_similarity, nugget):
 
 
 loser_topics = ['20644','20922']
+#for topic_id in [t for t in texts_vote_lists_truths_by_topic_id.keys() if t not in loser_topics]:
 
 print "started job at %s" % datetime.datetime.now()
-#for topic_id in [t for t in texts_vote_lists_truths_by_topic_id.keys() if t not in loser_topics]:
 for topic_id in ['20910']:
   print 'topic %s' % topic_id
-  plot_learning_curves_for_topic(topic_id, 100, (1.0, 5.0), {
-    'MajorityVote' : (est_majority_vote, [], None),
+  plot_learning_curves_for_topic(topic_id, 100, (1.0, 1.1), {
+#    'MajorityVote' : (est_majority_vote, [], None),
 #    'MajorityVote,Active(3)' : (est_majority_vote, [], [ 3, None ]),
 #    'MergeEnoughVotes(1),Active(1)' : (est_merge_enough_votes, [ 1 ], [ 1, None ]),
 #    'MergeEnoughVotes(1)' : (est_merge_enough_votes, [ 1 ], None),
     'GP(1)' : (est_gp, [ 1 ], None),
-    'GP(0.001)' : (est_gp, [ 0.001 ], None),
+#    'GP(0.001)' : (est_gp, [ 0.001 ], None),
   }, comment="")
 print "finished job at %s" % datetime.datetime.now()
 

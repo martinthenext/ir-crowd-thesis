@@ -223,7 +223,7 @@ def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, estimators_d
     print 'Calculating for %s' % estimator_name
     estimator, args, active_pars = estimator_and_args
     if active_pars is None:
-      sequences = Parallel(n_jobs=16)( delayed(get_accuracy_sequence)(estimator, stop_idx, texts, 
+      sequences = Parallel(n_jobs=8)( delayed(get_accuracy_sequence)(estimator, stop_idx, texts, 
         vote_lists, truths, X, text_similarity, idx, False, *args) for idx in xrange(n_runs) )
     else:
       sequences = Parallel(n_jobs=4)( delayed(get_accuracy_sequence_active)(estimator, stop_idx, texts, 
@@ -460,6 +460,7 @@ def est_merge_enough_votes(texts, vote_lists, X, text_similarity, votes_required
 
 def p_gp(texts, vote_lists, X, text_similarity, nugget):
   """ Smooth estimates with Gaussian Processes using linear correlation function
+      Extrapolate to get estimates for unknown values as well
   """
   p_mv = list(p_majority_vote(texts, vote_lists))
   good_idx = [i for i, p in enumerate(p_mv) if p is not None]
@@ -472,19 +473,22 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget):
     X_good_array = X_array[good_idx, :]
     X_good_typed = X_good_array.astype(np.dtype('d'), copy=False)
 
-    # Before using GP transform y's to R
-    y_transformed = logit(y_good)
-
     # GP
     gp = gaussian_process.GaussianProcess(corr='linear', nugget=nugget)
-    gp.fit(X_good_typed, y_transformed)
-    print X_good_typed
-    print y_transformed
+    gp.fit(X_good_typed, y_good)
 
     # Fitted only the known ones, predict everything
-    results_transformed = gp.predict(X_array)
-    # Transform predictions back from R
-    results = expit(results_transformed)
+    results = gp.predict(X_array)
+
+    # Logging
+    # 'GPs fitted on (X, y)'
+    print '==='
+    # print X_good_typed
+    print y_good
+    # 'GPs predicted y\''
+    print results
+    # 'predicted for corresponding y (known values)'
+    print results[good_idx]
 
     del y_good
     del X_array
@@ -510,12 +514,12 @@ print "started job at %s" % datetime.datetime.now()
 for topic_id in ['20910']:
   print 'topic %s' % topic_id
   plot_learning_curves_for_topic(topic_id, 100, (1.0, 1.1), {
-#    'MajorityVote' : (est_majority_vote, [], None),
+    'MajorityVote' : (est_majority_vote, [], None),
 #    'MajorityVote,Active(3)' : (est_majority_vote, [], [ 3, None ]),
 #    'MergeEnoughVotes(1),Active(1)' : (est_merge_enough_votes, [ 1 ], [ 1, None ]),
 #    'MergeEnoughVotes(1)' : (est_merge_enough_votes, [ 1 ], None),
-    'GP(1)' : (est_gp, [ 1 ], None),
-#    'GP(0.001)' : (est_gp, [ 0.001 ], None),
+#    'GP(1)' : (est_gp, [ 1 ], None),
+    'GP(0.001)' : (est_gp, [ 0.001 ], None),
   }, comment="")
 print "finished job at %s" % datetime.datetime.now()
 

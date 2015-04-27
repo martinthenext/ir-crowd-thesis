@@ -63,6 +63,6 @@ def print_accuracies_to_stderr(estimator_dict, max_votes_per_doc, topic_id, n_ru
 
 if __name__ == "__main__":
   print_accuracies_to_stderr({
-    'MV()' : (est_majority_vote, [ ] ),
+    'GP()' : (est_gp, [ None ] ),
   }, 1, '20910', 50)
 

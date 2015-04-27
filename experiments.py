@@ -458,7 +458,7 @@ def est_merge_enough_votes(texts, vote_lists, X, text_similarity, votes_required
    in p_merge_enough_votes(texts, vote_lists, text_similarity, votes_required) )
 
 
-def p_gp(texts, vote_lists, X, text_similarity, nugget):
+def p_gp(texts, vote_lists, X, text_similarity, nugget=None):
   """ Smooth estimates with Gaussian Processes using linear correlation function
       Extrapolate to get estimates for unknown values as well
   """
@@ -474,7 +474,11 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget):
     X_good_typed = X_good_array.astype(np.dtype('d'), copy=False)
 
     # GP
-    gp = gaussian_process.GaussianProcess(corr='linear', nugget=nugget)
+    if nugget:
+      gp = gaussian_process.GaussianProcess(corr='linear', nugget=nugget)
+    else:
+      gp = gaussian_process.GaussianProcess(corr='linear')
+
     gp.fit(X_good_typed, y_good)
 
     # Fitted only the known ones, predict everything

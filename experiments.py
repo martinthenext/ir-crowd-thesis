@@ -518,7 +518,7 @@ def p_gp_noise(texts, vote_lists, X, text_similarity, nugget=None):
     else:
       gp = gaussian_process.GaussianProcess(corr='linear')
 
-    noise = np.random.normal(0, 0.01, X_good_typed.size)
+    noise = np.random.uniform(0.001, 0.005, X_good_typed.size)
     gp.fit(X_good_typed + noise.reshape(X_good_typed.shape), y_good)
 
     # Fitted only the known ones, predict everything

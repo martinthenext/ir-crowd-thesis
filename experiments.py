@@ -496,9 +496,54 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget=None):
     return p_mv
 
 
+def p_gp_noise(texts, vote_lists, X, text_similarity, nugget=None):
+  """ Smooth estimates with Gaussian Processes using linear correlation function
+      Extrapolate to get estimates for unknown values as well
+      Add random noise to y's
+  """
+  p_mv = list(p_majority_vote(texts, vote_lists))
+  good_idx = [i for i, p in enumerate(p_mv) if p is not None]
+
+  # It only makes sense to run GPs if there is more than 1 observation
+  if len(good_idx) > 1:
+    y_good = np.array(p_mv)[good_idx].astype(np.dtype('d'))
+    
+    X_array = X.toarray()
+    X_good_array = X_array[good_idx, :]
+    X_good_typed = X_good_array.astype(np.dtype('d'), copy=False)
+
+    # GP
+    if nugget:
+      gp = gaussian_process.GaussianProcess(corr='linear', nugget=nugget)
+    else:
+      gp = gaussian_process.GaussianProcess(corr='linear')
+
+    noise = np.random.normal(0, 0.01, X_good_typed.size)
+    gp.fit(X_good_typed + noise.reshape(X_good_typed.shape), y_good)
+
+    # Fitted only the known ones, predict everything
+    results = gp.predict(X_array)
+
+    del y_good
+    del X_array
+    del X_good_array
+    del X_good_typed
+    del gp
+    gc.collect()
+
+    return results
+  else:
+    return p_mv
+
+
 def est_gp(texts, vote_lists, X, text_similarity, nugget):
   return ( unit_to_bool_random(p) for p 
     in p_gp(texts, vote_lists, X, text_similarity, nugget))
+
+
+def est_gp_noise(texts, vote_lists, X, text_similarity, nugget):
+  return ( unit_to_bool_random(p) for p 
+    in p_gp_noise(texts, vote_lists, X, text_similarity, nugget))
 
 
 if __name__ == "__main__":

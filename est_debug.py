@@ -19,7 +19,8 @@ def run_estimator_once(estimator, args, topic_id, max_votes_per_doc):
 
   sequence_length = int(max_votes_per_doc * n_documents)
 
-  get_last_accuracy_in_sequence(estimator, sequence_length, texts, vote_lists, truths, X, text_similarity, None, False, *args)
+  return get_last_accuracy_in_sequence(estimator, sequence_length, texts, vote_lists, truths, X, text_similarity, None, False, *args)
 
-run_estimator_once(est_gp, [ None ], '20910', 1)
+print "Ran estimator once, accruacy was:"
+print run_estimator_once(est_gp, [ None ], '20910', 1)
 

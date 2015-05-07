@@ -3,7 +3,8 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from itertools import ifilter, izip
-from plots import plot_hist
+from plots import plot_hist, plot_similarity_densities
+
 
 def get_inner_and_outer_similarities(topic_id):
   texts, vote_lists, truths = texts_vote_lists_truths_by_topic_id[topic_id]
@@ -40,11 +41,24 @@ def get_inner_and_outer_similarities(topic_id):
 
   return inner_similarity_non_reflexive, outer_similarity
 
-inner_outer_tuples_accross_topics = [get_inner_and_outer_similarities(topic) for topic 
-  in texts_vote_lists_truths_by_topic_id.keys()]
-inner_sets_by_topic, outer_sets_by_topic = zip(*inner_outer_tuples_accross_topics)
 
-inner_all, outer_all = np.concatenate(inner_sets_by_topic), np.concatenate(outer_sets_by_topic)
+def plot_hist_of_similarities_across_topics():
+  inner_outer_tuples_accross_topics = [get_inner_and_outer_similarities(topic) for topic 
+    in texts_vote_lists_truths_by_topic_id.keys()]
+  inner_sets_by_topic, outer_sets_by_topic = zip(*inner_outer_tuples_accross_topics)
 
-plot_hist("Similarities between relevant documents", inner_all, 50)
-plot_hist("Similarities between relevant and irrelevant documents", outer_all, 50)
+  inner_all, outer_all = np.concatenate(inner_sets_by_topic), np.concatenate(outer_sets_by_topic)
+
+  plot_hist("Similarities between relevant documents", inner_all, 50)
+  plot_hist("Similarities between relevant and irrelevant documents", outer_all, 50)
+
+
+def plot_hist_of_similarities_for_all_topics():
+  for topic in texts_vote_lists_truths_by_topic_id.keys():
+  #for topic in ['20910']:
+    inner, outer = get_inner_and_outer_similarities(topic)
+    plot_similarity_densities(inner, outer, topic)
+
+plot_hist_of_similarities_for_all_topics()
+
+

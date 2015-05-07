@@ -2,6 +2,8 @@ import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
 from random import randrange
+from scipy.stats import gaussian_kde
+import numpy as np
 
 PLOT_FOLDER = 'plots/'
 
@@ -63,3 +65,26 @@ def plot_hist(name, data, n_bins):
   filename = get_filename(name)
   plt.savefig('plots/%s' % filename)
   plt.close()
+
+
+def plot_similarity_densities(inner, outer, topic_id=None):
+  x = np.linspace(0.0, 1.0, 200)
+  density_inner = gaussian_kde(inner)
+  plt.plot(x, density_inner(x), label="Inner similarities")
+  density_outer = gaussian_kde(outer)
+  plt.plot(x, density_outer(x), label="Outer similarities")
+
+  plt.xlabel("Pairwise similarity", fontsize=14)
+  plt.ylabel("Smoothed document pair frequency", fontsize=14)
+  plt.xlim(0.0, 1.00001)
+  plt.legend()
+  
+  if topic_id is None:
+    name = "Inner and outer similarities across topics"
+  else:
+    name = "Inner and outer similarities for topic %s" % topic_id
+  
+  filename = get_filename(name)
+  plt.savefig('plots/%s' % filename)
+  plt.close()
+

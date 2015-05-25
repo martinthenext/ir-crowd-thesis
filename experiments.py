@@ -471,11 +471,14 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget=None):
 
   # Take first vote for every document
   Y = np.array([float(l[0]) for l in vote_lists])[np.newaxis].T
+  
+  X = X.todense()
+
   print X.shape
   print X.dtype
   print X.__class__.__name__
 
-  #GPy.models.SparseGPClassification(X, Y)
+  GPy.models.SparseGPClassification(X, Y)
 
 
   return [None] * len(vote_lists)

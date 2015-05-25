@@ -13,7 +13,7 @@ import sys
 from scipy.special import logit, expit
 from sklearn import gaussian_process
 import gc
-
+import GPy
 
 class PrintCounter(object):
   def __init__(self, count_to):
@@ -462,39 +462,23 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget=None):
   """ Smooth estimates with Gaussian Processes using linear correlation function
       Extrapolate to get estimates for unknown values as well
   """
-  p_mv = list(p_majority_vote(texts, vote_lists))
-  good_idx = [i for i, p in enumerate(p_mv) if p is not None]
+  print 
+  print
+  print
+  
+  # have_votes_idx = [i for i, l in enumerate(vote_lists) if len(l) > 0]
+  # Assume everyone has votes for starters
 
-  # It only makes sense to run GPs if there is more than 1 observation
-  if len(good_idx) > 1:
-    y_good = np.array(p_mv)[good_idx].astype(np.dtype('d'))
-    
-    X_array = X.toarray()
-    X_good_array = X_array[good_idx, :]
-    X_good_typed = X_good_array.astype(np.dtype('d'), copy=False)
+  # Take first vote for every document
+  Y = np.array([float(l[0]) for l in vote_lists])[np.newaxis].T
+  print X.shape
+  print X.dtype
+  print X.__class__.__name__
 
-    # GP
-    if nugget:
-      gp = gaussian_process.GaussianProcess(corr='linear', nugget=nugget)
-    else:
-      gp = gaussian_process.GaussianProcess(corr='linear')
+  #GPy.models.SparseGPClassification(X, Y)
 
-    gp.fit(X_good_typed, y_good)
 
-    # Fitted only the known ones, predict everything
-    results = gp.predict(X_array)
-
-    del y_good
-    del X_array
-    del X_good_array
-    del X_good_typed
-    del gp
-    gc.collect()
-
-    return results
-  else:
-    return p_mv
-
+  return [None] * len(vote_lists)
 
 def p_gp_noise(texts, vote_lists, X, text_similarity, nugget=None):
   """ Smooth estimates with Gaussian Processes using linear correlation function

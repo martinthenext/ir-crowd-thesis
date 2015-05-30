@@ -474,13 +474,11 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget=None):
   
   X = X.todense()
 
+  model = GPy.models.SparseGPClassification(X, Y)
+
   print X.shape
-  print X.dtype
-  print X.__class__.__name__
-
-  GPy.models.SparseGPClassification(X, Y)
-
-
+  print model
+  
   return [None] * len(vote_lists)
 
 def p_gp_noise(texts, vote_lists, X, text_similarity, nugget=None):

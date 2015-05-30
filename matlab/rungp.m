@@ -18,3 +18,6 @@ hyp = minimize(hyp, @gp, -40, @infEP, meanfunc, covfunc, likfunc, x, y);
 prob = exp(lp);
 
 disp( prob(1, :) )
+
+save('prob.mat', 'prob');
+

@@ -1,0 +1,21 @@
+> Rexporttable3 <- read.delim("C:/Users/dufft/Desktop/Rexporttable3.dat", header=FALSE)
+>   View(Rexporttable3)
+> colnames(Rexporttable3)<-c("Topic", "Method", "Accuracy")
+> Rexporttable3$Topic <- as.character(Rexporttable3$Topic)
+> model<-aov(Accuracy ~ Method + Topic, data=Rexporttable3)
+> TukeyHSD(model, "Method")
+  Tukey multiple comparisons of means
+    95% family-wise confidence level
+
+Fit: aov(formula = Accuracy ~ Method + Topic, data = Rexporttable3)
+
+$Method
+                                                        diff        lwr        upr
+MergeEnoughVotes(1)-MajorityVote                  0.04837488 0.04699388 0.04975588
+MergeEnoughVotes(1),Active(1)-MajorityVote        0.08585449 0.08449998 0.08720899
+MergeEnoughVotes(1),Active(1)-MergeEnoughVotes(1) 0.03747961 0.03612530 0.03883391
+                                                  p adj
+MergeEnoughVotes(1)-MajorityVote                      0
+MergeEnoughVotes(1),Active(1)-MajorityVote            0
+MergeEnoughVotes(1),Active(1)-MergeEnoughVotes(1)     0
+

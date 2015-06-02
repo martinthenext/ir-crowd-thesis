@@ -474,7 +474,7 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget):
       feature_vectors.append( X[doc_idx, :] )
 
   X_new = sparse.vstack(feature_vectors)
-  y = np.array(labels, dtype=np.float64)
+  y = np.array(labels, dtype=np.float64)[np.newaxis].T
 
   io.savemat('matlab/train.mat', mdict = {'x' : X_new, 'y' : y})
   io.savemat('matlab/test.mat', mdict = {'t' : X_new })

@@ -4,6 +4,10 @@ addpath(genpath('./'))
 load('train.mat');
 load('test.mat');
 
+disp( size(x) )
+disp( size(y) )
+disp( size(t) )
+
 % Train
 meanfunc = @meanConst; 
 hyp.mean = 0;

@@ -1,3 +1,6 @@
+% Include subdirectories to use GPML code
+addpath(genpath('./'))
+
 % Generate data
 n1 = 80; n2 = 40;
 S1 = eye(2); S2 = [1 0.95; 0.95 1];

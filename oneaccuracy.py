@@ -1,4 +1,4 @@
-from experiments import get_accuracy, est_gp, est_gp_noise, est_majority_vote, copy_and_shuffle_sublists
+from experiments import get_accuracy, est_gp, est_majority_vote, copy_and_shuffle_sublists
 from data import texts_vote_lists_truths_by_topic_id
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity

@@ -13,7 +13,7 @@ import sys
 from scipy.special import logit, expit
 from sklearn import gaussian_process
 import gc
-
+from scipy import sparse, io
 
 class PrintCounter(object):
   def __init__(self, count_to):
@@ -462,72 +462,43 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget):
   """ Smooth estimates with Gaussian Processes using linear correlation function
       Extrapolate to get estimates for unknown values as well
   """
-  p_mv = list(p_majority_vote(texts, vote_lists))
-  good_idx = [i for i, p in enumerate(p_mv) if p is not None]
+  # for every vote in a vote list we have to get a vector of features 
+  labels = []
+  feature_vectors = []
 
-  # It only makes sense to run GPs if there is more than 1 observation
-  if len(good_idx) > 1:
-    y_good = np.array(p_mv)[good_idx].astype(np.dtype('d'))
-    
-    X_array = X.toarray()
-    X_good_array = X_array[good_idx, :]
-    X_good_typed = X_good_array.astype(np.dtype('d'), copy=False)
+  bool_to_plus_minus_one = lambda b: 1.0 if b else -1.0
 
-    # GP
-    gp = gaussian_process.GaussianProcess(corr='linear', nugget=nugget)
-    gp.fit(X_good_typed, y_good)
+  for doc_idx, vote_list in enumerate(vote_lists):
+    for vote in vote_list:
+      labels.append( bool_to_plus_minus_one(vote) )
+      feature_vectors.append( X[doc_idx, :] )
 
-    # Fitted only the known ones, predict everything
-    results = gp.predict(X_array)
+  X_new = sparse.vstack(feature_vectors)
+  y = np.array(labels, dtype=np.float64)
 
-    # Logging
-    # 'GPs fitted on (X, y)'
-    print '==='
-    # print X_good_typed
-    print y_good
-    # 'GPs predicted y\''
-    print results
-    # 'predicted for corresponding y (known values)'
-    print results[good_idx]
+  io.savemat('matlab/train.mat', mdict = {'x' : X_new, 'y' : y})
+  io.savemat('matlab/test.mat', mdict = {'t' : X_new })
 
-    del y_good
-    del X_array
-    del X_good_array
-    del X_good_typed
-    del gp
-    gc.collect()
-
-    return results
-  else:
-    return p_mv
-
+  return [ None for x in vote_lists ]
 
 def est_gp(texts, vote_lists, X, text_similarity, nugget):
   return ( unit_to_bool_random(p) for p 
     in p_gp(texts, vote_lists, X, text_similarity, nugget))
 
 
-loser_topics = ['20644','20922']
-#for topic_id in [t for t in texts_vote_lists_truths_by_topic_id.keys() if t not in loser_topics]:
+if __name__ == "__main__":
+  loser_topics = ['20644','20922']
 
-print "started job at %s" % datetime.datetime.now()
-for topic_id in ['20910']:
-  print 'topic %s' % topic_id
-  plot_learning_curves_for_topic(topic_id, 100, (1.0, 1.1), {
-    'MajorityVote' : (est_majority_vote, [], None),
-#    'MajorityVote,Active(3)' : (est_majority_vote, [], [ 3, None ]),
-#    'MergeEnoughVotes(1),Active(1)' : (est_merge_enough_votes, [ 1 ], [ 1, None ]),
-#    'MergeEnoughVotes(1)' : (est_merge_enough_votes, [ 1 ], None),
-#    'GP(1)' : (est_gp, [ 1 ], None),
-    'GP(0.001)' : (est_gp, [ 0.001 ], None),
-  }, comment="")
-print "finished job at %s" % datetime.datetime.now()
+  print "started job at %s" % datetime.datetime.now()
+  for topic_id in ['20910']:
+    print 'topic %s' % topic_id
+    plot_learning_curves_for_topic(topic_id, 100, (1.0, 1.1), {
+      'MajorityVote' : (est_majority_vote, [], None),
+  #    'MajorityVote,Active(3)' : (est_majority_vote, [], [ 3, None ]),
+  #    'MergeEnoughVotes(1),Active(1)' : (est_merge_enough_votes, [ 1 ], [ 1, None ]),
+  #    'MergeEnoughVotes(1)' : (est_merge_enough_votes, [ 1 ], None),
+  #    'GP(1)' : (est_gp, [ 1 ], None),
+      'GP(0.001)' : (est_gp, [ 0.001 ], None),
+    }, comment="")
+  print "finished job at %s" % datetime.datetime.now()
 
-
-"""
-plot_learning_curves_across_topics(3000, 100 * 1, 100 * 3, { 
-  'MajorityVote' : (est_majority_vote, [], None),
-  'MajorityVoteWithNearestNeighbor(0.5)' : (est_majority_vote_with_nn, [ 0.5 ], None),
-  'MergeEnoughVotes(1)' : (est_merge_enough_votes, [ 1 ], None),  
-}, comment="")
-"""

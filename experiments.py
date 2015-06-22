@@ -15,6 +15,7 @@ from sklearn import gaussian_process
 import gc
 from scipy import sparse, io
 import subprocess
+import datetime
 
 class PrintCounter(object):
   def __init__(self, count_to):
@@ -480,13 +481,15 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget):
   io.savemat('matlab/train.mat', mdict = {'x' : X_new, 'y' : y})
   io.savemat('matlab/test.mat', mdict = {'t' : X_new })
 
-  print 'Running MATLAB'
+  print 'Running MATLAB, started %s' % str(datetime.datetime.now())
   code = subprocess.call(['matlab/run_on_euler.sh'])
   if code != 0:
     raise Exception('MATLAB code couldn\'t run') 
+  print 'Finished %s' % str(datetime.datetime.now())
 
+  print 'Getting the matrix'
   # Loads a `prob` vector
-  io.savemat('matlab/prob.mat')
+  io.loadmat('matlab/prob.mat')
 
   print prob.shape
 

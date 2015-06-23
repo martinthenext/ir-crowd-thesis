@@ -488,10 +488,19 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget):
   print 'Finished %s' % str(datetime.datetime.now())
 
   print 'Getting the matrix'
-  # Loads a `prob` vector
-  io.loadmat('matlab/prob.mat')
 
+  # Loads a `prob` vector
+  mat_objects = io.loadmat('matlab/prob.mat')
+  prob = mat_objects['prob']
+
+  print 'prob.shape'
   print prob.shape
+
+  print 'y[30:]'
+  print y[30:]
+
+  print 'prob[30:]'
+  print prob[30:]
 
   return [ None for x in vote_lists ]
 

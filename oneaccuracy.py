@@ -71,7 +71,7 @@ def print_final_accuracy_to_stderr(estimator, args, topic_id):
 
   try:
     estimates = estimator(texts, vote_lists, X, text_similarity, *args)
-    sys.stderr.write('%s\n' % get_accuracy(estimates, truths))
+    sys.stderr.write('ACCURACY:\n%s\n' % get_accuracy(estimates, truths))
   except Exception, e:
     traceback.print_exc()
 

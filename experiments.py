@@ -479,7 +479,7 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget):
   y = np.array(labels, dtype=np.float64)[np.newaxis].T
 
   io.savemat('matlab/train.mat', mdict = {'x' : X_new, 'y' : y})
-  io.savemat('matlab/test.mat', mdict = {'t' : X_new })
+  io.savemat('matlab/test.mat', mdict = {'t' : X })
 
   print 'Running MATLAB, started %s' % str(datetime.datetime.now())
   code = subprocess.call(['matlab/run_on_euler.sh'])
@@ -502,7 +502,14 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget):
   print 'prob[30:]'
   print prob[30:]
 
-  return [ None for x in vote_lists ]
+  print 'X.shape'
+  print X.shape
+
+  result = prob[0, :]
+  print 'result'
+  print result
+
+  return result
 
 def est_gp(texts, vote_lists, X, text_similarity, nugget):
   return ( unit_to_bool_random(p) for p 

@@ -61,7 +61,7 @@ def print_accuracies_to_stderr(estimator_dict, max_votes_per_doc, topic_id, n_ru
         sys.stderr.write("%s\t%s\t%s\n" % ( estimator_name, topic_id, str(accuracy) ))
 
 
-def print_final_accuracy_to_stderr(estimator, args, topic_id):
+def print_final_accuracy_to_stream(estimator, args, topic_id, stream):
   texts, vote_lists, truths = texts_vote_lists_truths_by_topic_id[topic_id]
   n_documents = len(texts)
 
@@ -71,11 +71,11 @@ def print_final_accuracy_to_stderr(estimator, args, topic_id):
 
   try:
     estimates = estimator(texts, vote_lists, X, text_similarity, *args)
-    sys.stderr.write('ACCURACY:\n%s\n' % get_accuracy(estimates, truths))
+    stream.write('ACCURACY:\n%s\n' % get_accuracy(estimates, truths))
   except Exception, e:
     traceback.print_exc()
 
 if __name__ == "__main__":
   # print_accuracies_to_stderr({'GPy' : (est_gp, [ None ] ) }, 1, '20910', 1)
-  print_final_accuracy_to_stderr(est_gp, [None], '20910')
+  print_final_accuracy_to_stderr(est_gp, [None], '20910', sys.stdout)
 

@@ -77,5 +77,5 @@ def print_final_accuracy_to_stream(estimator, args, topic_id, stream):
 
 if __name__ == "__main__":
   # print_accuracies_to_stderr({'GPy' : (est_gp, [ None ] ) }, 1, '20910', 1)
-  print_final_accuracy_to_stderr(est_gp, [None], '20910', sys.stdout)
+  print_final_accuracy_to_stream(est_gp, [None], '20910', sys.stdout)
 

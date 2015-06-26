@@ -505,7 +505,7 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget):
   print 'X.shape'
   print X.shape
 
-  result = prob[0, :]
+  result = prob[:, 0]
   print 'result'
   print result
 

@@ -16,6 +16,7 @@ import gc
 from scipy import sparse, io
 import subprocess
 import datetime
+import shutil
 
 class PrintCounter(object):
   def __init__(self, count_to):
@@ -478,11 +479,16 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget):
   X_new = sparse.vstack(feature_vectors)
   y = np.array(labels, dtype=np.float64)[np.newaxis].T
 
-  io.savemat('matlab/train.mat', mdict = {'x' : X_new, 'y' : y})
-  io.savemat('matlab/test.mat', mdict = {'t' : X })
+  # Preparing a temp folder for running MATLAB
+  folder_id = random.randint(0, 10000)
+  matlab_folder_name = 'matlab_' + str(folder_id)
+  shutil.copytree('matlab', matlab_folder_name)
+
+  io.savemat(matlab_folder_name + '/train.mat', mdict = {'x' : X_new, 'y' : y})
+  io.savemat(matlab_folder_name + '/test.mat', mdict = {'t' : X })
 
   print 'Running MATLAB, started %s' % str(datetime.datetime.now())
-  code = subprocess.call(['matlab/run_on_euler.sh'])
+  code = subprocess.call(['matlab/run_in_dir.sh', matlab_folder_name])
   if code != 0:
     raise Exception('MATLAB code couldn\'t run') 
   print 'Finished %s' % str(datetime.datetime.now())
@@ -490,7 +496,9 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget):
   print 'Getting the matrix'
 
   # Loads a `prob` vector
-  mat_objects = io.loadmat('matlab/prob.mat')
+  prob_location = matlab_folder_name + '/prob.mat'
+  print 'Loading prob vector from %s' % prob_location
+  mat_objects = io.loadmat(prob_location)
   prob = mat_objects['prob']
 
   print 'prob.shape'
@@ -505,9 +513,15 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget):
   print 'X.shape'
   print X.shape
 
+  print 'X_new.shape'
+  print X_new.shape
+
   result = prob[:, 0]
   print 'result'
   print result
+
+  # Remove the temp folder
+  shutil.rmtree(matlab_folder_name)
 
   return result
 

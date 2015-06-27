@@ -21,7 +21,8 @@ hyp = minimize(hyp, @gp, -40, @infEP, meanfunc, covfunc, likfunc, x, y);
 % This gives a probability of y = +1
 prob = exp(lp);
 
-disp( prob(1, :) )
+disp('Saving to prob.mat in current folder:')
+disp(pwd)
 
 save('prob.mat', 'prob');
 

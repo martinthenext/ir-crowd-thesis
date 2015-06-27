@@ -7,11 +7,12 @@ import sys
 import random
 import traceback
 
-
 def get_last_accuracy_in_sequence(estimator, n_votes_to_sample, texts, 
   vote_lists, truths, X, text_similarity, idx=None, return_final=False, *args):
   """ Randomly sample votes and re-calculate estimates.
   """
+  random.seed()
+
   unknown_votes = copy_and_shuffle_sublists(vote_lists)
   known_votes = [ [] for _ in unknown_votes ]
 
@@ -76,6 +77,9 @@ def print_final_accuracy_to_stream(estimator, args, topic_id, stream):
     traceback.print_exc()
 
 if __name__ == "__main__":
-  # print_accuracies_to_stderr({'GPy' : (est_gp, [ None ] ) }, 1, '20910', 1)
-  print_final_accuracy_to_stream(est_gp, [None], '20910', sys.stderr)
+  # Accuracy on 2 votes per document
+  print_accuracies_to_stderr({
+    'Matlab GP, 1 vote per doc' : (est_gp, [None])
+    }, 2, '20910', 1)
+
 

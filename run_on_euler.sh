@@ -1,9 +1,23 @@
 #!/bin/bash
 #
+# Run oneaccuracy.py for all topics
+#
 # This file contains a command that has been run after the 
 # corresponding code has been commited to the repo
 
+N_RUNS_PER_TOPIC=5
 
+topic_ids=(20932 20488 20910 20958 20714 20636 20956 20424 20916 20542 20778 20690 20696 20694 20832 20962 20812 20814 20704 20922 20780 20766 20644 20764 20642 20686 20976 20972 20584 20996)
 runid=$RANDOM
-bsub -o out_run_$runid -e err_runs_1_vote_per_doc -R "rusage[mem=2000]" "python -W ignore oneaccuracy.py 20910" 
+
+for run in `seq 1 $N_RUNS_PER_TOPIC`;
+do
+
+  for topic_id in "${topic_ids[@]}"
+  do
+  
+    bsub -o out_run_$runid -e err_runs_2_vote_per_doc -R "rusage[mem=2000]" "python -W ignore oneaccuracy.py $topic_id" 
+
+  done
+done
 

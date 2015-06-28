@@ -1,6 +1,9 @@
 plots/
 results/
 
+# Temporary MATLAB folders
+matlab_*
+
 # Vim SWAP
 *.swp
 

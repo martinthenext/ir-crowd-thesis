@@ -5,10 +5,12 @@ import numpy as np
 import io
 from sklearn.externals import joblib
 
+
 DATA_ROOT = '/cluster/home/mdavtyan/data/'
 JUDGEMENT_FILE = DATA_ROOT + 'all_judgements.txt'
 FULLTEXT_FOLDER = DATA_ROOT + 'url-header-html-txt'
 GROUND_TRUTH_FILE = DATA_ROOT + 'task1_unlabeled_g_truth_cons_public.csv'
+
 
 class JudgementRecord(object):
   def __init__(self, table_row):
@@ -80,3 +82,10 @@ for topic_id, judgements in judgements_by_topic_id.iteritems():
     for doc_id in judgements_by_doc_id.keys()]
 
   texts_vote_lists_truths_by_topic_id[topic_id] = (document_texts, vote_lists, truths)
+  
+
+if __name__ == "__main__":
+  # Print a list of topic ids
+  topic_id_list = '(' + ' '.join(texts_vote_lists_truths_by_topic_id.keys()) + ')'
+  print topic_id_list
+

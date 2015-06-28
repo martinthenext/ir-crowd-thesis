@@ -58,7 +58,9 @@ def print_accuracies_to_stderr(estimator_dict, max_votes_per_doc, topic_id):
     estimator, args = estimator_args
     accuracy = get_last_accuracy_in_sequence(estimator, sequence_length, texts,
         vote_lists, truths, X, text_similarity, None, False, *args)  
-    sys.stderr.write("%s\t%s\t%s\n" % ( estimator_name, topic_id, str(accuracy) ))
+    accuracy_to_str = lambda acc: ("%.4f" % acc) if acc is not None else 'NA' 
+    sys.stderr.write("%s\t%s\t%s\n" % ( estimator_name, topic_id,
+      accuracy_to_str(accuracy) ))
 
 
 def print_final_accuracy_to_stream(estimator, args, topic_id, stream):

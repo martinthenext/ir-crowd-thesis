@@ -44,7 +44,7 @@ def get_last_accuracy_in_sequence(estimator, n_votes_to_sample, texts,
     return None
     
 
-def print_accuracies_to_stderr(estimator_dict, max_votes_per_doc, topic_id, n_runs):
+def print_accuracies_to_stderr(estimator_dict, max_votes_per_doc, topic_id):
   texts, vote_lists, truths = texts_vote_lists_truths_by_topic_id[topic_id]
   n_documents = len(texts)
 
@@ -56,10 +56,9 @@ def print_accuracies_to_stderr(estimator_dict, max_votes_per_doc, topic_id, n_ru
 
   for estimator_name, estimator_args in estimator_dict.iteritems():
     estimator, args = estimator_args
-    for run in xrange(n_runs):  
-      accuracy = get_last_accuracy_in_sequence(estimator, sequence_length, texts, vote_lists, truths, X, text_similarity, None, False, *args)
-      if accuracy is not None:
-        sys.stderr.write("%s\t%s\t%s\n" % ( estimator_name, topic_id, str(accuracy) ))
+    accuracy = get_last_accuracy_in_sequence(estimator, sequence_length, texts,
+        vote_lists, truths, X, text_similarity, None, False, *args)  
+    sys.stderr.write("%s\t%s\t%s\n" % ( estimator_name, topic_id, str(accuracy) ))
 
 
 def print_final_accuracy_to_stream(estimator, args, topic_id, stream):
@@ -77,9 +76,12 @@ def print_final_accuracy_to_stream(estimator, args, topic_id, stream):
     traceback.print_exc()
 
 if __name__ == "__main__":
-  # Accuracy on 2 votes per document
+  try:
+    topic_id = sys.argv[1]
+  except KeyError:
+    raise Error("Please suppy topic_id to get accuracies for")
+  
   print_accuracies_to_stderr({
-    'Matlab GP, 1 vote per doc' : (est_gp, [None])
-    }, 2, '20910', 1)
-
+    'Matlab GP' : (est_gp, [None])
+  }, 1, topic_id)
 

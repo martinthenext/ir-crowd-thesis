@@ -31,7 +31,8 @@ Mean accuracies for topics
 
 ```{r results='asis'}
 library(knitr)
-kable(aggregate(Accuracy ~ Topic, accuracy, mean))
+means <- aggregate(Accuracy ~ Topic, accuracy, mean)
+kable(means, format="markdown")
 
 ```
 

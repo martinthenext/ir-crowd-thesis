@@ -1,0 +1,37 @@
+---
+title: "GP accuracy"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+Here accuracy of GP method is analyzed. 
+
+```{r}
+accuracy <- read.delim("accuracy_1_vote_per_doc", header=FALSE)
+names(accuracy) <- c("Method", "Topic", "Accuracy")
+accuracy$Topic <- as.factor(accuracy$Topic)
+```
+
+Number of observations per topic:
+
+
+```{r}
+one.topic <- levels(accuracy$Topic)[1]
+length(accuracy$Topic[accuracy$Topic == one.topic])
+```
+
+Remove `NA` values
+
+```{r}
+accuracy <- accuracy[!is.na(accuracy$Accuracy), ]
+```
+
+Mean accuracies for topics
+
+```{r}
+
+aggregate(Accuracy ~ Topic, accuracy, mean)
+
+```
+

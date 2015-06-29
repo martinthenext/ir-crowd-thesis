@@ -29,9 +29,9 @@ accuracy <- accuracy[!is.na(accuracy$Accuracy), ]
 
 Mean accuracies for topics
 
-```{r}
-
-aggregate(Accuracy ~ Topic, accuracy, mean)
+```{r results='asis'}
+library(knitr)
+kable(aggregate(Accuracy ~ Topic, accuracy, mean))
 
 ```
 

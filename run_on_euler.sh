@@ -16,7 +16,7 @@ do
   do
   
     runid=$RANDOM
-    bsub -o /dev/null -e accuracy/exp-gp-accuracy.tsv -R "rusage[mem=2000]" "python -W ignore oneaccuracy.py $topic_id" 
+    bsub -o /dev/null -e accuracy/exp-older-methods-1-vote-per-doc.tsv -R "rusage[mem=2000]" "python -W ignore oneaccuracy.py $topic_id" 
 
   done
 done

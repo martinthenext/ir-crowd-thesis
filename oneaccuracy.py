@@ -85,7 +85,7 @@ if __name__ == "__main__":
   
   print_accuracies_to_stderr({
 #    'Matlab GP' : (est_gp, [None])
-     'MajorityVote' : (est_majority_vote, [None]),
+     'MajorityVote' : (est_majority_vote, []),
      'MergeEnoughVotes(1)' : (est_merge_enough_votes, [ 1 ]),
      'MajorityVoteWithNN(0.5)' : (est_majority_vote_with_nn, [ 0.5 ]),
 }, 1, topic_id)

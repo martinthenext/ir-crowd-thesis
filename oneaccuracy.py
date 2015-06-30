@@ -1,4 +1,4 @@
-from experiments import get_accuracy, est_gp, est_majority_vote, copy_and_shuffle_sublists
+from experiments import get_accuracy, est_gp, est_majority_vote, copy_and_shuffle_sublists, est_merge_enough_votes, est_majority_vote_with_nn
 from data import texts_vote_lists_truths_by_topic_id
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -84,6 +84,9 @@ if __name__ == "__main__":
     raise Error("Please suppy topic_id to get accuracies for")
   
   print_accuracies_to_stderr({
-    'Matlab GP' : (est_gp, [None])
-  }, 1, topic_id)
+#    'Matlab GP' : (est_gp, [None])
+     'MajorityVote' : (est_majority_vote, [None]),
+     'MergeEnoughVotes(1)' : (est_merge_enough_votes, [ 1 ]),
+     'MajorityVoteWithNN(0.5)' : (est_majority_vote_with_nn, [ 0.5 ]),
+}, 1, topic_id)
 

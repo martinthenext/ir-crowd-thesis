@@ -1503,7 +1503,6 @@ Matlab GP	20704	0.9000
 Matlab GP	20910	0.6667
 Matlab GP	20542	0.7333
 Matlab GP	20714	NA
-000
 Matlab GP	20542	0.6000
 Matlab GP	20932	0.6667
 Matlab GP	20814	0.8000
@@ -1925,18 +1924,6 @@ Matlab GP	20778	0.7000
 Matlab GP	20542	0.6667
 Matlab GP	20636	0.7000
 Matlab GP	20956	0.8000
-Traceback (most recent call last):
-  File "oneaccuracy.py", line 38, in get_last_accuracy_in_sequence
-    estimates = estimator(texts, known_votes, X, text_similarity, *args)
-  File "/cluster/home/mdavtyan/ir-crowd-thesis/experiments.py", line 530, in est_gp
-    in p_gp(texts, vote_lists, X, text_similarity, nugget))
-  File "/cluster/home/mdavtyan/ir-crowd-thesis/experiments.py", line 485, in p_gp
-    shutil.copytree('matlab', matlab_folder_name)
-  File "/cluster/apps/python/2.7.6/x86_64/lib64/python2.7/shutil.py", line 177, in copytree
-    os.makedirs(dst)
-  File "/cluster/apps/python/2.7.6/x86_64/lib64/python2.7/os.py", line 157, in makedirs
-    mkdir(name, mode)
-OSError: [Errno 17] File exists: 'matlab_2539'
 Matlab GP	20996	NA
 Matlab GP	20972	0.4000
 Matlab GP	20764	0.3000
@@ -2219,18 +2206,6 @@ Matlab GP	20910	0.9333
 Matlab GP	20488	0.8000
 Matlab GP	20922	NA
 Matlab GP	20714	NA
-Traceback (most recent call last):
-  File "oneaccuracy.py", line 38, in get_last_accuracy_in_sequence
-    estimates = estimator(texts, known_votes, X, text_similarity, *args)
-  File "/cluster/home/mdavtyan/ir-crowd-thesis/experiments.py", line 530, in est_gp
-    in p_gp(texts, vote_lists, X, text_similarity, nugget))
-  File "/cluster/home/mdavtyan/ir-crowd-thesis/experiments.py", line 485, in p_gp
-    shutil.copytree('matlab', matlab_folder_name)
-  File "/cluster/apps/python/2.7.6/x86_64/lib64/python2.7/shutil.py", line 177, in copytree
-    os.makedirs(dst)
-  File "/cluster/apps/python/2.7.6/x86_64/lib64/python2.7/os.py", line 157, in makedirs
-    mkdir(name, mode)
-OSError: [Errno 17] File exists: 'matlab_6286'
 Matlab GP	20488	NA
 Matlab GP	20714	NA
 Matlab GP	20644	NA
@@ -2342,7 +2317,6 @@ Matlab GP	20962	0.7000
 Matlab GP	20956	0.8000
 Matlab GP	20996	0.6000
 Matlab GP	20696	NA
-000
 Matlab GP	20686	0.6667
 Matlab GP	20976	0.7000
 Matlab GP	20714	NA

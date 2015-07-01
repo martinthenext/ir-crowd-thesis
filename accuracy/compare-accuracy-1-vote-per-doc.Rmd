@@ -18,6 +18,7 @@ read.accuracy.df <- function(filename, na.rm=TRUE) {
   }
   
   accuracy$Topic <- as.factor(accuracy$Topic)
+  row.names(accuracy) <- NULL
   accuracy
 }
 
@@ -76,6 +77,7 @@ List best methods for topics:
 
 best.methods <- means[means$Best == '*', c("Topic", "Method")]
 
+row.names(best.methods) <- NULL
 kable(best.methods, format="markdown")
 
 ```

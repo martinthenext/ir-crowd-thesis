@@ -1,5 +1,7 @@
 # Accuracy comparison at 1 vote per document
 
+## Dataset
+
 Reading accuracy levels for different methods from a `tsv` file.
 
 
@@ -40,6 +42,72 @@ head(accuracy)
 ## 6            MajorityVote 20696      0.3
 ```
 
+Look at amount of data available for different topics:
+
+
+```r
+library(knitr)
+
+topic.rows.sorted <- as.data.frame(sort(table(accuracy$Topic)))
+colnames(topic.rows.sorted) <- "Points in dataset"
+kable(topic.rows.sorted, format="markdown")
+```
+
+
+
+|      | Points in dataset|
+|:-----|-----------------:|
+|20714 |               150|
+|20696 |               327|
+|20424 |               706|
+|20916 |              1059|
+|20704 |              1078|
+|20584 |              1157|
+|20780 |              1160|
+|20814 |              1183|
+|20488 |              1197|
+|20642 |              1197|
+|20694 |              1197|
+|20832 |              1197|
+|20958 |              1197|
+|20766 |              1198|
+|20976 |              1198|
+|20686 |              1199|
+|20690 |              1199|
+|20910 |              1199|
+|20932 |              1199|
+|20972 |              1199|
+|20996 |              1199|
+|20542 |              1200|
+|20636 |              1200|
+|20764 |              1200|
+|20778 |              1200|
+|20812 |              1200|
+|20956 |              1200|
+|20962 |              1200|
+
+Amount of data available for different methods:
+
+
+```r
+method.rows.sorted <- as.data.frame(sort(table(accuracy$Method)))
+colnames(method.rows.sorted) <- "Points in dataset"
+kable(method.rows.sorted, format="markdown")
+```
+
+
+
+|                        | Points in dataset|
+|:-----------------------|-----------------:|
+|Matlab GP               |              7678|
+|MajorityVoteWithNN(0.5) |              7684|
+|MajorityVote            |              7710|
+|MergeEnoughVotes(1)     |              7723|
+
+Method classes are balanced, safe for testing.
+
+## Computing accuracy
+
 Calculate mean accuracies:
 
 
@@ -51,8 +119,6 @@ Let us print a star in front of a best method for a topic
 
 
 ```r
-library(knitr)
-
 means <- cbind(means, Best="")
 means$Best <- as.character(means$Best)
 for (i in 1:nrow(means)) {
@@ -184,7 +250,9 @@ kable(means, format="markdown")
 |Matlab GP               |20996 | 0.3668896|     |
 |MergeEnoughVotes(1)     |20996 | 0.5530000|     |
 
-List best methods for topics:
+## Results
+
+### Best methods for topics
 
 
 ```r
@@ -227,7 +295,7 @@ kable(best.methods, format="markdown")
 |20976 |MergeEnoughVotes(1) |
 |20996 |MajorityVote        |
 
-Total results
+### Method totals
 
 
 ```r

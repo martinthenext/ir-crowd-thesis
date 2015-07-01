@@ -5,6 +5,8 @@ output:
     keep_md: yes
 ---
 
+## Dataset
+
 Reading accuracy levels for different methods from a `tsv` file.
 
 ```{r}
@@ -30,6 +32,31 @@ head(accuracy)
 
 ```
 
+Look at amount of data available for different topics:
+
+```{r results='asis'}
+library(knitr)
+
+topic.rows.sorted <- as.data.frame(sort(table(accuracy$Topic)))
+colnames(topic.rows.sorted) <- "Points in dataset"
+kable(topic.rows.sorted, format="markdown")
+
+```
+
+Amount of data available for different methods:
+
+```{r results='asis'}
+
+method.rows.sorted <- as.data.frame(sort(table(accuracy$Method)))
+colnames(method.rows.sorted) <- "Points in dataset"
+kable(method.rows.sorted, format="markdown")
+
+```
+
+Method classes are balanced, safe for testing.
+
+## Computing accuracy
+
 Calculate mean accuracies:
 
 ```{r}
@@ -41,7 +68,6 @@ means <- aggregate(Accuracy ~ Method + Topic, accuracy, mean)
 Let us print a star in front of a best method for a topic
 
 ```{r results='asis'}
-library(knitr)
 
 means <- cbind(means, Best="")
 means$Best <- as.character(means$Best)
@@ -58,7 +84,9 @@ kable(means, format="markdown")
 
 ```
 
-List best methods for topics:
+## Results
+
+### Best methods for topics
 
 ```{r results='asis'}
 
@@ -69,7 +97,7 @@ kable(best.methods, format="markdown")
 
 ```
 
-Total results
+### Method totals
 
 ```{r}
 

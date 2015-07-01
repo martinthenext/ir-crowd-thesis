@@ -5,7 +5,7 @@
 # This file contains a command that has been run after the 
 # corresponding code has been commited to the repo
 
-N_RUNS_PER_TOPIC=1
+N_RUNS_PER_TOPIC=30
 OUTPUT_NAME='exp-accuracy-1-vote-per-doc'
 
 # Every time you run stuff on Euler, there is gonna be a new file

@@ -5,7 +5,7 @@ output:
     keep_md: yes
 ---
 
-Reading accuracy table for GP method from a `tsv` file.
+Reading accuracy levels for different methods from a `tsv` file.
 
 ```{r}
 
@@ -22,31 +22,18 @@ read.accuracy.df <- function(filename, na.rm=TRUE) {
   accuracy
 }
 
-accuracy.gp <- read.accuracy.df("exp-gp-accuracy-1-vote-per-doc.tsv")
+accuracy <- read.accuracy.df("exp-accuracy-1-vote-per-doc.tsv")
 
-nrow(accuracy.gp)
+nrow(accuracy)
 
-head(accuracy.gp)
-
-```
-
-Reading same table for older methods:
-
-```{r}
-
-accuracy.older <- read.accuracy.df("exp-older-methods-1-vote-per-doc.tsv")
-
-nrow(accuracy.older)
-
-head(accuracy.older)
+head(accuracy)
 
 ```
 
-Join the data frames and calculate the means
+Calculate mean accuracies:
 
 ```{r}
 
-accuracy <- rbind(accuracy.gp, accuracy.older)
 means <- aggregate(Accuracy ~ Method + Topic, accuracy, mean)
 
 ```

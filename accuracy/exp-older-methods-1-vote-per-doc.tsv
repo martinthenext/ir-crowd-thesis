@@ -1051,7 +1051,6 @@ MajorityVote	20644	NA
 MergeEnoughVotes(1)	20922	NA
 MajorityVoteWithNN(0.5)	20922	NA
 MajorityVote	20922	NA
-0542	0.6667
 MergeEnoughVotes(1)	20996	0.6000
 MajorityVoteWithNN(0.5)	20996	0.4000
 MajorityVote	20996	0.8000
@@ -1265,7 +1264,6 @@ MajorityVote	20932	0.4667
 MergeEnoughVotes(1)	20814	1.0000
 MajorityVoteWithNN(0.5)	20814	1.0000
 MajorityVote	20814	NA
-000
 MergeEnoughVotes(1)	20780	0.4667
 MajorityVoteWithNN(0.5)	20780	0.8667
 MajorityVote	20780	0.4667
@@ -2607,7 +2605,6 @@ MajorityVote	20642	0.7333
 MergeEnoughVotes(1)	20424	0.6000
 MajorityVoteWithNN(0.5)	20424	0.6000
 MajorityVote	20424	NA
-333
 MergeEnoughVotes(1)	20542	0.8000
 MajorityVoteWithNN(0.5)	20542	0.7333
 MajorityVote	20542	0.7333

@@ -7,7 +7,8 @@
 
 N_RUNS_PER_TOPIC=30
 
-topic_ids=(20932 20488 20910 20958 20714 20636 20956 20424 20916 20542 20778 20690 20696 20694 20832 20962 20812 20814 20704 20922 20780 20766 20644 20764 20642 20686 20976 20972 20584 20996)
+# Excluding the loser topics: 20644 and 20922
+topic_ids=(20932 20488 20910 20958 20714 20636 20956 20424 20916 20542 20778 20690 20696 20694 20832 20962 20812 20814 20704 20780 20766 20764 20642 20686 20976 20972 20584 20996)
 
 for run in `seq 1 $N_RUNS_PER_TOPIC`;
 do
@@ -16,7 +17,7 @@ do
   do
   
     runid=$RANDOM
-    bsub -o /dev/null -e accuracy/exp-older-methods-1-vote-per-doc.tsv -R "rusage[mem=2000]" "python -W ignore oneaccuracy.py $topic_id" 
+    bsub -o /dev/null -e accuracy/exp-gp-accuracy-1-vote-per-doc.tsv -R "rusage[mem=2000]" "python -W ignore oneaccuracy.py $topic_id" 
 
   done
 done

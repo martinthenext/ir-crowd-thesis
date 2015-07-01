@@ -12,10 +12,12 @@ Reading accuracy table for GP method from a `tsv` file.
 read.accuracy.df <- function(filename, na.rm=TRUE) {
   accuracy <- read.delim(filename, header=FALSE)
   names(accuracy) <- c("Method", "Topic", "Accuracy")
-  accuracy$Topic <- as.factor(accuracy$Topic)
+
   if (na.rm) {
     accuracy <- accuracy[!is.na(accuracy$Accuracy), ]
   }
+  
+  accuracy$Topic <- as.factor(accuracy$Topic)
   accuracy
 }
 

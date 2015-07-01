@@ -88,5 +88,5 @@ if __name__ == "__main__":
      'MajorityVote' : (est_majority_vote, []),
      'MergeEnoughVotes(1)' : (est_merge_enough_votes, [ 1 ]),
      'MajorityVoteWithNN(0.5)' : (est_majority_vote_with_nn, [ 0.5 ]),
-}, 1, topic_id)
+    }, 1, topic_id)
 

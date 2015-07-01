@@ -23,7 +23,7 @@ nrow(accuracy)
 ```
 
 ```
-## [1] 4211
+## [1] 30795
 ```
 
 ```r
@@ -32,12 +32,12 @@ head(accuracy)
 
 ```
 ##                    Method Topic Accuracy
-## 1 MajorityVoteWithNN(0.5) 20696     0.50
-## 2            MajorityVote 20696     0.50
-## 3            MajorityVote 20714     0.70
-## 4     MergeEnoughVotes(1) 20694     0.90
-## 5 MajorityVoteWithNN(0.5) 20694     0.60
-## 6               Matlab GP 20694     0.85
+## 1 MajorityVoteWithNN(0.5) 20714      1.0
+## 2 MajorityVoteWithNN(0.5) 20714      0.9
+## 3     MergeEnoughVotes(1) 20714      0.8
+## 4            MajorityVote 20696      0.7
+## 5     MergeEnoughVotes(1) 20696      0.6
+## 6            MajorityVote 20696      0.3
 ```
 
 Calculate mean accuracies:
@@ -71,118 +71,118 @@ kable(means, format="markdown")
 
 |Method                  |Topic |  Accuracy|Best |
 |:-----------------------|:-----|---------:|:----|
-|MajorityVote            |20424 | 0.5774194|     |
-|MajorityVoteWithNN(0.5) |20424 | 0.5857143|     |
-|Matlab GP               |20424 | 0.7192308|*    |
-|MergeEnoughVotes(1)     |20424 | 0.6208333|     |
-|MajorityVote            |20488 | 0.6809524|     |
-|MajorityVoteWithNN(0.5) |20488 | 0.7738095|     |
-|Matlab GP               |20488 | 0.7809524|*    |
-|MergeEnoughVotes(1)     |20488 | 0.7642857|     |
-|MajorityVote            |20542 | 0.6716625|     |
-|MajorityVoteWithNN(0.5) |20542 | 0.7033375|     |
-|Matlab GP               |20542 | 0.7200050|*    |
-|MergeEnoughVotes(1)     |20542 | 0.7033275|     |
-|MajorityVote            |20584 | 0.6912854|     |
-|MajorityVoteWithNN(0.5) |20584 | 0.7505293|     |
-|Matlab GP               |20584 | 0.8459829|*    |
-|MergeEnoughVotes(1)     |20584 | 0.7874585|     |
-|MajorityVote            |20636 | 0.6800000|     |
-|MajorityVoteWithNN(0.5) |20636 | 0.7650000|     |
-|Matlab GP               |20636 | 0.7150000|     |
-|MergeEnoughVotes(1)     |20636 | 0.7675000|*    |
-|MajorityVote            |20642 | 0.7040634|     |
-|MajorityVoteWithNN(0.5) |20642 | 0.7463415|     |
-|Matlab GP               |20642 | 0.8634073|*    |
-|MergeEnoughVotes(1)     |20642 | 0.7772390|     |
-|MajorityVote            |20686 | 0.6877951|     |
-|MajorityVoteWithNN(0.5) |20686 | 0.6227659|     |
-|Matlab GP               |20686 | 0.7073195|*    |
-|MergeEnoughVotes(1)     |20686 | 0.6617951|     |
-|MajorityVote            |20690 | 0.6809756|     |
-|MajorityVoteWithNN(0.5) |20690 | 0.7073171|     |
-|Matlab GP               |20690 | 0.8243902|*    |
-|MergeEnoughVotes(1)     |20690 | 0.7590244|     |
-|MajorityVote            |20694 | 0.7231707|     |
-|MajorityVoteWithNN(0.5) |20694 | 0.7585366|     |
-|Matlab GP               |20694 | 0.8365854|*    |
-|MergeEnoughVotes(1)     |20694 | 0.7951220|     |
-|MajorityVote            |20696 | 0.5571429|     |
-|MajorityVoteWithNN(0.5) |20696 | 0.6461538|     |
-|Matlab GP               |20696 | 0.7222222|*    |
-|MergeEnoughVotes(1)     |20696 | 0.6500000|     |
-|MajorityVote            |20704 | 0.7166667|     |
-|MajorityVoteWithNN(0.5) |20704 | 0.7902439|     |
-|Matlab GP               |20704 | 0.9470588|*    |
-|MergeEnoughVotes(1)     |20704 | 0.8058824|     |
-|MajorityVote            |20714 | 0.7714286|     |
-|MajorityVoteWithNN(0.5) |20714 | 0.8400000|     |
-|Matlab GP               |20714 | 0.9000000|*    |
-|MergeEnoughVotes(1)     |20714 | 0.8200000|     |
-|MajorityVote            |20764 | 0.6025000|     |
-|MajorityVoteWithNN(0.5) |20764 | 0.6850000|     |
-|Matlab GP               |20764 | 0.4125000|     |
-|MergeEnoughVotes(1)     |20764 | 0.7125000|*    |
-|MajorityVote            |20766 | 0.7675000|     |
-|MajorityVoteWithNN(0.5) |20766 | 0.7902439|     |
-|Matlab GP               |20766 | 0.8243902|     |
-|MergeEnoughVotes(1)     |20766 | 0.8658537|*    |
-|MajorityVote            |20778 | 0.6300000|     |
-|MajorityVoteWithNN(0.5) |20778 | 0.7650000|*    |
-|Matlab GP               |20778 | 0.7050000|     |
-|MergeEnoughVotes(1)     |20778 | 0.6900000|     |
-|MajorityVote            |20780 | 0.6733375|     |
-|MajorityVoteWithNN(0.5) |20780 | 0.7250050|     |
-|Matlab GP               |20780 | 0.7833300|*    |
-|MergeEnoughVotes(1)     |20780 | 0.7816750|     |
-|MajorityVote            |20812 | 0.6933325|     |
-|MajorityVoteWithNN(0.5) |20812 | 0.6849975|     |
-|Matlab GP               |20812 | 0.7247923|*    |
-|MergeEnoughVotes(1)     |20812 | 0.6900000|     |
-|MajorityVote            |20814 | 0.7775000|     |
-|MajorityVoteWithNN(0.5) |20814 | 0.7475000|     |
-|Matlab GP               |20814 | 0.9000000|*    |
-|MergeEnoughVotes(1)     |20814 | 0.8589744|     |
-|MajorityVote            |20832 | 0.6975610|     |
-|MajorityVoteWithNN(0.5) |20832 | 0.6829268|     |
-|Matlab GP               |20832 | 0.7658537|*    |
-|MergeEnoughVotes(1)     |20832 | 0.7050000|     |
-|MajorityVote            |20910 | 0.6699244|     |
-|MajorityVoteWithNN(0.5) |20910 | 0.6487878|     |
-|Matlab GP               |20910 | 0.6634171|     |
-|MergeEnoughVotes(1)     |20910 | 0.6812976|*    |
-|MajorityVote            |20916 | 0.5868421|     |
-|MajorityVoteWithNN(0.5) |20916 | 0.6567568|     |
-|Matlab GP               |20916 | 0.7128205|*    |
-|MergeEnoughVotes(1)     |20916 | 0.6026316|     |
-|MajorityVote            |20932 | 0.5777786|     |
-|MajorityVoteWithNN(0.5) |20932 | 0.5984071|     |
-|Matlab GP               |20932 | 0.6796780|*    |
-|MergeEnoughVotes(1)     |20932 | 0.6000048|     |
-|MajorityVote            |20956 | 0.6285714|     |
-|MajorityVoteWithNN(0.5) |20956 | 0.6238095|     |
-|Matlab GP               |20956 | 0.8333333|*    |
-|MergeEnoughVotes(1)     |20956 | 0.6928571|     |
-|MajorityVote            |20958 | 0.5904762|     |
-|MajorityVoteWithNN(0.5) |20958 | 0.5809524|     |
-|Matlab GP               |20958 | 0.6428571|     |
-|MergeEnoughVotes(1)     |20958 | 0.6571429|*    |
-|MajorityVote            |20962 | 0.5731707|     |
-|MajorityVoteWithNN(0.5) |20962 | 0.6243902|     |
-|Matlab GP               |20962 | 0.6700000|*    |
-|MergeEnoughVotes(1)     |20962 | 0.6170732|     |
-|MajorityVote            |20972 | 0.6733325|     |
-|MajorityVoteWithNN(0.5) |20972 | 0.6416675|     |
-|Matlab GP               |20972 | 0.5233350|     |
-|MergeEnoughVotes(1)     |20972 | 0.7083400|*    |
-|MajorityVote            |20976 | 0.6125000|     |
-|MajorityVoteWithNN(0.5) |20976 | 0.6325000|     |
-|Matlab GP               |20976 | 0.6075000|     |
-|MergeEnoughVotes(1)     |20976 | 0.6950000|*    |
-|MajorityVote            |20996 | 0.5804878|*    |
-|MajorityVoteWithNN(0.5) |20996 | 0.5707317|     |
-|Matlab GP               |20996 | 0.3146341|     |
-|MergeEnoughVotes(1)     |20996 | 0.5317073|     |
+|MajorityVote            |20424 | 0.6127778|     |
+|MajorityVoteWithNN(0.5) |20424 | 0.6267857|     |
+|Matlab GP               |20424 | 0.7210227|*    |
+|MergeEnoughVotes(1)     |20424 | 0.6258242|     |
+|MajorityVote            |20488 | 0.6763333|     |
+|MajorityVoteWithNN(0.5) |20488 | 0.7563333|     |
+|Matlab GP               |20488 | 0.8225589|*    |
+|MergeEnoughVotes(1)     |20488 | 0.7620000|     |
+|MajorityVote            |20542 | 0.6880000|     |
+|MajorityVoteWithNN(0.5) |20542 | 0.6853320|     |
+|Matlab GP               |20542 | 0.7151107|     |
+|MergeEnoughVotes(1)     |20542 | 0.7308923|*    |
+|MajorityVote            |20584 | 0.6876828|     |
+|MajorityVoteWithNN(0.5) |20584 | 0.7578303|     |
+|Matlab GP               |20584 | 0.8586314|*    |
+|MergeEnoughVotes(1)     |20584 | 0.7887714|     |
+|MajorityVote            |20636 | 0.6826667|     |
+|MajorityVoteWithNN(0.5) |20636 | 0.7396667|     |
+|Matlab GP               |20636 | 0.7093333|     |
+|MergeEnoughVotes(1)     |20636 | 0.7653333|*    |
+|MajorityVote            |20642 | 0.7035543|     |
+|MajorityVoteWithNN(0.5) |20642 | 0.7271133|     |
+|Matlab GP               |20642 | 0.8673391|*    |
+|MergeEnoughVotes(1)     |20642 | 0.7675553|     |
+|MajorityVote            |20686 | 0.7075557|*    |
+|MajorityVoteWithNN(0.5) |20686 | 0.6291127|     |
+|Matlab GP               |20686 | 0.7054622|     |
+|MergeEnoughVotes(1)     |20686 | 0.6879993|     |
+|MajorityVote            |20690 | 0.6909333|     |
+|MajorityVoteWithNN(0.5) |20690 | 0.7302667|     |
+|Matlab GP               |20690 | 0.8287625|*    |
+|MergeEnoughVotes(1)     |20690 | 0.7720000|     |
+|MajorityVote            |20694 | 0.7260000|     |
+|MajorityVoteWithNN(0.5) |20694 | 0.7700000|     |
+|Matlab GP               |20694 | 0.8232323|*    |
+|MergeEnoughVotes(1)     |20694 | 0.8041667|     |
+|MajorityVote            |20696 | 0.5390805|     |
+|MajorityVoteWithNN(0.5) |20696 | 0.6197531|     |
+|Matlab GP               |20696 | 0.7213333|*    |
+|MergeEnoughVotes(1)     |20696 | 0.6571429|     |
+|MajorityVote            |20704 | 0.6959108|     |
+|MajorityVoteWithNN(0.5) |20704 | 0.8157895|     |
+|Matlab GP               |20704 | 0.9422222|*    |
+|MergeEnoughVotes(1)     |20704 | 0.8131868|     |
+|MajorityVote            |20714 | 0.8258065|     |
+|MajorityVoteWithNN(0.5) |20714 | 0.8500000|     |
+|Matlab GP               |20714 | 0.9106383|*    |
+|MergeEnoughVotes(1)     |20714 | 0.8526316|     |
+|MajorityVote            |20764 | 0.6593333|     |
+|MajorityVoteWithNN(0.5) |20764 | 0.6350000|     |
+|Matlab GP               |20764 | 0.4600000|     |
+|MergeEnoughVotes(1)     |20764 | 0.6810000|*    |
+|MajorityVote            |20766 | 0.7678930|     |
+|MajorityVoteWithNN(0.5) |20766 | 0.7913043|     |
+|Matlab GP               |20766 | 0.8246667|     |
+|MergeEnoughVotes(1)     |20766 | 0.8563333|*    |
+|MajorityVote            |20778 | 0.6343333|     |
+|MajorityVoteWithNN(0.5) |20778 | 0.6856667|     |
+|Matlab GP               |20778 | 0.6963333|*    |
+|MergeEnoughVotes(1)     |20778 | 0.6940000|     |
+|MajorityVote            |20780 | 0.6793093|     |
+|MajorityVoteWithNN(0.5) |20780 | 0.7328721|     |
+|Matlab GP               |20780 | 0.7917193|*    |
+|MergeEnoughVotes(1)     |20780 | 0.7586214|     |
+|MajorityVote            |20812 | 0.6866670|     |
+|MajorityVoteWithNN(0.5) |20812 | 0.7146683|     |
+|Matlab GP               |20812 | 0.7135560|     |
+|MergeEnoughVotes(1)     |20812 | 0.7295550|*    |
+|MajorityVote            |20814 | 0.7807432|     |
+|MajorityVoteWithNN(0.5) |20814 | 0.7552189|     |
+|Matlab GP               |20814 | 0.9149153|*    |
+|MergeEnoughVotes(1)     |20814 | 0.8776271|     |
+|MajorityVote            |20832 | 0.6581940|     |
+|MajorityVoteWithNN(0.5) |20832 | 0.6696667|     |
+|Matlab GP               |20832 | 0.6768456|*    |
+|MergeEnoughVotes(1)     |20832 | 0.6760000|     |
+|MajorityVote            |20910 | 0.6486680|     |
+|MajorityVoteWithNN(0.5) |20910 | 0.6435563|     |
+|Matlab GP               |20910 | 0.6802732|     |
+|MergeEnoughVotes(1)     |20910 | 0.6973343|*    |
+|MajorityVote            |20916 | 0.6327138|     |
+|MajorityVoteWithNN(0.5) |20916 | 0.6208494|     |
+|Matlab GP               |20916 | 0.7007692|*    |
+|MergeEnoughVotes(1)     |20916 | 0.6343173|     |
+|MajorityVote            |20932 | 0.5768897|     |
+|MajorityVoteWithNN(0.5) |20932 | 0.5742210|     |
+|Matlab GP               |20932 | 0.6804903|*    |
+|MergeEnoughVotes(1)     |20932 | 0.5891117|     |
+|MajorityVote            |20956 | 0.6280000|     |
+|MajorityVoteWithNN(0.5) |20956 | 0.6370000|     |
+|Matlab GP               |20956 | 0.8216667|*    |
+|MergeEnoughVotes(1)     |20956 | 0.6603333|     |
+|MajorityVote            |20958 | 0.6016667|     |
+|MajorityVoteWithNN(0.5) |20958 | 0.6020000|     |
+|Matlab GP               |20958 | 0.6639731|*    |
+|MergeEnoughVotes(1)     |20958 | 0.6400000|     |
+|MajorityVote            |20962 | 0.5760000|     |
+|MajorityVoteWithNN(0.5) |20962 | 0.6013333|     |
+|Matlab GP               |20962 | 0.6620000|*    |
+|MergeEnoughVotes(1)     |20962 | 0.6046667|     |
+|MajorityVote            |20972 | 0.6826657|     |
+|MajorityVoteWithNN(0.5) |20972 | 0.6426703|     |
+|Matlab GP               |20972 | 0.4744729|     |
+|MergeEnoughVotes(1)     |20972 | 0.7035560|*    |
+|MajorityVote            |20976 | 0.6596667|     |
+|MajorityVoteWithNN(0.5) |20976 | 0.6563333|     |
+|Matlab GP               |20976 | 0.6067114|     |
+|MergeEnoughVotes(1)     |20976 | 0.7046667|*    |
+|MajorityVote            |20996 | 0.5693333|*    |
+|MajorityVoteWithNN(0.5) |20996 | 0.5336667|     |
+|Matlab GP               |20996 | 0.3668896|     |
+|MergeEnoughVotes(1)     |20996 | 0.5530000|     |
 
 List best methods for topics:
 
@@ -196,36 +196,36 @@ kable(best.methods, format="markdown")
 
 
 
-|Topic |Method                  |
-|:-----|:-----------------------|
-|20424 |Matlab GP               |
-|20488 |Matlab GP               |
-|20542 |Matlab GP               |
-|20584 |Matlab GP               |
-|20636 |MergeEnoughVotes(1)     |
-|20642 |Matlab GP               |
-|20686 |Matlab GP               |
-|20690 |Matlab GP               |
-|20694 |Matlab GP               |
-|20696 |Matlab GP               |
-|20704 |Matlab GP               |
-|20714 |Matlab GP               |
-|20764 |MergeEnoughVotes(1)     |
-|20766 |MergeEnoughVotes(1)     |
-|20778 |MajorityVoteWithNN(0.5) |
-|20780 |Matlab GP               |
-|20812 |Matlab GP               |
-|20814 |Matlab GP               |
-|20832 |Matlab GP               |
-|20910 |MergeEnoughVotes(1)     |
-|20916 |Matlab GP               |
-|20932 |Matlab GP               |
-|20956 |Matlab GP               |
-|20958 |MergeEnoughVotes(1)     |
-|20962 |Matlab GP               |
-|20972 |MergeEnoughVotes(1)     |
-|20976 |MergeEnoughVotes(1)     |
-|20996 |MajorityVote            |
+|Topic |Method              |
+|:-----|:-------------------|
+|20424 |Matlab GP           |
+|20488 |Matlab GP           |
+|20542 |MergeEnoughVotes(1) |
+|20584 |Matlab GP           |
+|20636 |MergeEnoughVotes(1) |
+|20642 |Matlab GP           |
+|20686 |MajorityVote        |
+|20690 |Matlab GP           |
+|20694 |Matlab GP           |
+|20696 |Matlab GP           |
+|20704 |Matlab GP           |
+|20714 |Matlab GP           |
+|20764 |MergeEnoughVotes(1) |
+|20766 |MergeEnoughVotes(1) |
+|20778 |Matlab GP           |
+|20780 |Matlab GP           |
+|20812 |MergeEnoughVotes(1) |
+|20814 |Matlab GP           |
+|20832 |Matlab GP           |
+|20910 |MergeEnoughVotes(1) |
+|20916 |Matlab GP           |
+|20932 |Matlab GP           |
+|20956 |Matlab GP           |
+|20958 |Matlab GP           |
+|20962 |Matlab GP           |
+|20972 |MergeEnoughVotes(1) |
+|20976 |MergeEnoughVotes(1) |
+|20996 |MajorityVote        |
 
 Total results
 
@@ -239,8 +239,6 @@ counts
 
 ```
 ## 
-##               Matlab GP     MergeEnoughVotes(1)            MajorityVote 
-##                      19                       7                       1 
-## MajorityVoteWithNN(0.5) 
-##                       1
+##           Matlab GP MergeEnoughVotes(1)        MajorityVote 
+##                  18                   8                   2
 ```

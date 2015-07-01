@@ -1,0 +1,90 @@
+---
+title: "Accuracy comparison at 1 vote per document"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+Reading accuracy table for GP method from a `tsv` file.
+
+```{r}
+
+read.accuracy.df <- function(filename, na.rm=TRUE) {
+  accuracy <- read.delim(filename, header=FALSE)
+  names(accuracy) <- c("Method", "Topic", "Accuracy")
+  accuracy$Topic <- as.factor(accuracy$Topic)
+  if (na.rm) {
+    accuracy <- accuracy[!is.na(accuracy$Accuracy), ]
+  }
+  accuracy
+}
+
+accuracy.gp <- read.accuracy.df("exp-gp-accuracy-1-vote-per-doc.tsv")
+
+nrow(accuracy.gp)
+
+head(accuracy.gp)
+
+```
+
+Reading same table for older methods:
+
+```{r}
+
+accuracy.older <- read.accuracy.df("exp-older-methods-1-vote-per-doc.tsv")
+
+nrow(accuracy.older)
+
+head(accuracy.older)
+
+```
+
+Join the data frames and calculate the means
+
+```{r}
+
+accuracy <- rbind(accuracy.gp, accuracy.older)
+means <- aggregate(Accuracy ~ Method + Topic, accuracy, mean)
+
+```
+
+Let us print a star in front of a best method for a topic
+
+```{r results='asis'}
+library(knitr)
+
+means <- cbind(means, Best="")
+means$Best <- as.character(means$Best)
+for (i in 1:nrow(means)) {
+  current <- means[i, "Accuracy"]
+  accuracies.on.this.topic <- means[means$Topic == means[i, "Topic"], "Accuracy"]
+  max.accuracy <- max(accuracies.on.this.topic)
+  if (current == max.accuracy) {
+    means[i, "Best"] <- '*'
+  }
+}
+
+kable(means, format="markdown")
+
+```
+
+List best methods for topics:
+
+```{r results='asis'}
+
+best.methods <- means[means$Best == '*', c("Topic", "Method")]
+
+kable(best.methods, format="markdown")
+
+```
+
+Total results
+
+```{r}
+
+counts <- table(best.methods$Method)
+counts <- counts[counts!=0]
+counts <- counts[order(counts, decreasing=TRUE)]
+counts
+
+```

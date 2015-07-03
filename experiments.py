@@ -18,6 +18,10 @@ import subprocess
 import datetime
 import shutil
 
+
+N_CORES = 8
+
+
 class PrintCounter(object):
   def __init__(self, count_to):
     self.count_to = count_to
@@ -226,22 +230,24 @@ def plot_learning_curves_for_topic(topic_id, n_runs, votes_per_doc, estimators_d
     print 'Calculating for %s' % estimator_name
     estimator, args, active_pars = estimator_and_args
     if active_pars is None:
-      sequences = Parallel(n_jobs=8)( delayed(get_accuracy_sequence)(estimator, stop_idx, texts, 
+      sequences = Parallel(n_jobs=N_CORES)( delayed(get_accuracy_sequence)(estimator, stop_idx, texts, 
         vote_lists, truths, X, text_similarity, idx, False, *args) for idx in xrange(n_runs) )
     else:
-      sequences = Parallel(n_jobs=4)( delayed(get_accuracy_sequence_active)(estimator, stop_idx, texts, 
+      sequences = Parallel(n_jobs=N_CORES)( delayed(get_accuracy_sequence_active)(estimator, stop_idx, texts, 
         vote_lists, truths, text_similarity, active_pars, idx, False, *args) for idx in xrange(n_runs) )      
 
     good_slices = [ s[start_idx:] for s in sequences if s is not None ]
     if good_slices:
       results = np.vstack(good_slices)
 
-      # Here we can pickle accuracies in the beginning, middle and end
+      # Pickling is not necessary yet
+      '''
       begin_accuracies = results[:, 0]
       middle_accuracies = results[:, int(results.shape[1] / 2)]
       end_accuracies = results[:, -1]
 
-#      begin_accuracies.dump("pickles/%s-%s-begin-accuracies---.pkl" % (topic_id, estimator_name) )
+      begin_accuracies.dump("pickles/%s-%s-begin-accuracies---.pkl" % (topic_id, estimator_name) )
+      '''
 
       estimator_y[estimator_name] = np.mean(results, axis=0)
     else:
@@ -501,6 +507,9 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget):
   mat_objects = io.loadmat(prob_location)
   prob = mat_objects['prob']
 
+  result = prob[:, 0]
+  
+  """
   print 'prob.shape'
   print prob.shape
 
@@ -516,9 +525,9 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget):
   print 'X_new.shape'
   print X_new.shape
 
-  result = prob[:, 0]
   print 'result'
   print result
+  """
 
   # Remove the temp folder
   shutil.rmtree(matlab_folder_name)
@@ -542,7 +551,7 @@ if __name__ == "__main__":
   #    'MergeEnoughVotes(1),Active(1)' : (est_merge_enough_votes, [ 1 ], [ 1, None ]),
   #    'MergeEnoughVotes(1)' : (est_merge_enough_votes, [ 1 ], None),
   #    'GP(1)' : (est_gp, [ 1 ], None),
-      'GP(0.001)' : (est_gp, [ 0.001 ], None),
+  #    'GP' : (est_gp, [ None ], None),
     }, comment="")
   print "finished job at %s" % datetime.datetime.now()
 

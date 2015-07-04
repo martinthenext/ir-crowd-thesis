@@ -545,7 +545,7 @@ if __name__ == "__main__":
   print "started job at %s" % datetime.datetime.now()
   for topic_id in ['20910']:
     print 'topic %s' % topic_id
-    plot_learning_curves_for_topic(topic_id, 100, (1.0, 1.1), {
+    plot_learning_curves_for_topic(topic_id, 10000, (1.0, 3.0), {
       'MajorityVote' : (est_majority_vote, [], None),
   #    'MajorityVote,Active(3)' : (est_majority_vote, [], [ 3, None ]),
   #    'MergeEnoughVotes(1),Active(1)' : (est_merge_enough_votes, [ 1 ], [ 1, None ]),

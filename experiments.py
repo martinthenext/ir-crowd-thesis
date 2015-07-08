@@ -76,10 +76,13 @@ def copy_and_shuffle_sublists(list_of_lists):
   return [sorted(l, key=lambda x: random.random()) for l in list_of_lists]
 
 
+# TODO remove return_final, it duplicates what is in oneaccuracy.py
 def get_accuracy_sequence(estimator, n_votes_to_sample, texts, 
   vote_lists, truths, X, text_similarity, idx=None, return_final=False, *args):
   """ Randomly sample votes and re-calculate estimates.
   """
+  random.seed() # This is using system time
+
   unknown_votes = copy_and_shuffle_sublists(vote_lists)
   known_votes = [ [] for _ in unknown_votes ]
 

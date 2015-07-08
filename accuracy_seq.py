@@ -33,7 +33,7 @@ def print_accuracy_sequences_to_stderr(estimator_dict, votes_per_doc, topic_id, 
       if seq is not None:
         accuracy_sequence = seq[start_idx: ]
         string_repr = "\t".join( [ ("%.4f" % acc) for acc in accuracy_sequence ] )
-        sys.stderr.write(string_repr + '\n')
+        sys.stderr.write("%s\t%s\t%s\n" % (estimator_name, topic_id, string_repr) )
 
 
 if __name__ == "__main__":
@@ -43,7 +43,7 @@ if __name__ == "__main__":
     raise Error("Please supply the topic id")
 
   print_accuracy_sequences_to_stderr({
-       'Matlab GP' : (est_gp, []),
+#       'Matlab GP' : (est_gp, []),
        'MajorityVote' : (est_majority_vote, []),
 #       'MergeEnoughVotes(1)' : (est_merge_enough_votes, [ 1 ]),
 #       'MajorityVoteWithNN(0.5)' : (est_majority_vote_with_nn, [ 0.5 ]),

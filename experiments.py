@@ -76,7 +76,6 @@ def copy_and_shuffle_sublists(list_of_lists):
   return [sorted(l, key=lambda x: random.random()) for l in list_of_lists]
 
 
-# TODO remove return_final, it duplicates what is in oneaccuracy.py
 def get_accuracy_sequence(estimator, n_votes_to_sample, texts, 
   vote_lists, truths, X, text_similarity, idx=None, return_final=False, *args):
   """ Randomly sample votes and re-calculate estimates.
@@ -470,7 +469,7 @@ def est_merge_enough_votes(texts, vote_lists, X, text_similarity, votes_required
    in p_merge_enough_votes(texts, vote_lists, text_similarity, votes_required) )
 
 
-def p_gp(texts, vote_lists, X, text_similarity, nugget):
+def p_gp(texts, vote_lists, X, text_similarity):
   """ Smooth estimates with Gaussian Processes using linear correlation function
       Extrapolate to get estimates for unknown values as well
   """
@@ -537,9 +536,9 @@ def p_gp(texts, vote_lists, X, text_similarity, nugget):
 
   return result
 
-def est_gp(texts, vote_lists, X, text_similarity, nugget):
+def est_gp(texts, vote_lists, X, text_similarity):
   return ( unit_to_bool_random(p) for p 
-    in p_gp(texts, vote_lists, X, text_similarity, nugget))
+    in p_gp(texts, vote_lists, X, text_similarity) )
 
 
 if __name__ == "__main__":

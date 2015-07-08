@@ -28,11 +28,12 @@ def print_accuracy_sequences_to_stderr(estimator_dict, votes_per_doc, topic_id, 
   for estimator_name, estimator_args in estimator_dict.iteritems():
     estimator, args = estimator_args
     for _ in xrange(n_sequesnces_per_estimator):
-      seq = get_accuracy_sequence(estimator, sequence_length, texts, vote_lists, truths, X, text_similarity)
+      seq = get_accuracy_sequence(estimator, sequence_length, texts, vote_lists, truths, X, text_similarity,
+          None, False, *args)
       if seq is not None:
         accuracy_sequence = seq[start_idx: ]
         string_repr = "\t".join( [ ("%.4f" % acc) for acc in accuracy_sequence ] )
-        sys.stderr.write(string_repr)
+        sys.stderr.write(string_repr + '\n')
 
 
 if __name__ == "__main__":
@@ -42,7 +43,7 @@ if __name__ == "__main__":
     raise Error("Please supply the topic id")
 
   print_accuracy_sequences_to_stderr({
-#       'Matlab GP' : (est_gp, [None]),
+       'Matlab GP' : (est_gp, []),
        'MajorityVote' : (est_majority_vote, []),
 #       'MergeEnoughVotes(1)' : (est_merge_enough_votes, [ 1 ]),
 #       'MajorityVoteWithNN(0.5)' : (est_majority_vote_with_nn, [ 0.5 ]),

@@ -488,7 +488,9 @@ def p_gp(texts, vote_lists, X, text_similarity):
   y = np.array(labels, dtype=np.float64)[np.newaxis].T
 
   # Preparing a temp folder for running MATLAB
-  folder_id = random.randint(0, 10000)
+  random.seed()
+  folder_id = random.randint(0, sys.maxint)
+  
   matlab_folder_name = 'matlab_' + str(folder_id)
   shutil.copytree('matlab', matlab_folder_name)
 

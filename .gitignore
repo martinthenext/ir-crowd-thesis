@@ -4,6 +4,9 @@ results/
 # Temporary MATLAB folders
 matlab_*
 
+# Immediate experiment output files
+*.stderr-*
+
 # Vim SWAP
 *.swp
 

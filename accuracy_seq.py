@@ -31,13 +31,13 @@ def print_accuracy_sequences_to_stderr(estimator_dict, votes_per_doc, topic_id, 
       seq = get_accuracy_sequence(estimator, sequence_length, texts, vote_lists, truths, X, text_similarity,
           None, False, *args)
       if seq is not None:
-        
+        sequence_id = random.randint(0, sys.maxint)
         accuracy_sequence = seq[start_idx: ]
-        for accuracy in accuracy_sequence:
-          sys.stderr.write("%s\t%s\t%s\n" % (estimator_name, topic_id, "%.4f" % accuracy) )
+        for index, accuracy in enumerate(accuracy_sequence):
+          sys.stderr.write("A\t%s\t%s\t%s\t%s\t%s\n" % (index, sequence_id, estimator_name, topic_id, "%.4f" % accuracy) )
 
       else:
-        sys.stdout.write("%s\t%s\tSEQUENCE FAILED" % (estimator_name, topic_id) )
+        sys.stdout.write("F\t-\t-\t%s\t%s\tSEQUENCE FAILED" % (estimator_name, topic_id) )
 
 
 if __name__ == "__main__":
@@ -51,5 +51,5 @@ if __name__ == "__main__":
 #       'MV' : (est_majority_vote, []),
 #       'MergeEnoughVotes(1)' : (est_merge_enough_votes, [ 1 ]),
 #       'MajorityVoteWithNN(0.5)' : (est_majority_vote_with_nn, [ 0.5 ]),
-  }, (1, 3), topic_id, 10)
+  }, (1, 3), topic_id, n_sequences_per_estimator=1)
 

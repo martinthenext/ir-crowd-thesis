@@ -10,6 +10,7 @@ from data import texts_vote_lists_truths_by_topic_id
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import sys
+import random
 
 
 def print_accuracy_sequences_to_stderr(estimator_dict, votes_per_doc, topic_id, n_sequesnces_per_estimator):

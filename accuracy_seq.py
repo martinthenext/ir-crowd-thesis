@@ -46,10 +46,13 @@ if __name__ == "__main__":
   except IndexError:
     raise Error("Please supply the topic id")
 
+  N_SEQS_PER_EST = 1
+
   print_accuracy_sequences_to_stderr({
        'Matlab GP' : (est_gp, []),
 #       'MV' : (est_majority_vote, []),
 #       'MergeEnoughVotes(1)' : (est_merge_enough_votes, [ 1 ]),
 #       'MajorityVoteWithNN(0.5)' : (est_majority_vote_with_nn, [ 0.5 ]),
-  }, (1, 3), topic_id, n_sequences_per_estimator=1)
+  }, (1, 3), topic_id, N_SEQS_PER_EST)
+
 

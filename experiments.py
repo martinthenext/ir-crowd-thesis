@@ -20,17 +20,7 @@ import shutil
 
 
 N_CORES = 8
-
-
-class PrintCounter(object):
-  def __init__(self, count_to):
-    self.count_to = count_to
-    self.count = 0
-
-  def __call__(self):
-    self.count += 1
-    if self.count <= self.count_to:
-      print '%s / %s' % (self.count, self.count_to)
+MATLAB_TEMP_FOLDER = '/scratch/' # Local scratch folder that gets deleted automatically when the job is done
 
 
 def get_accuracy(estimates, truths):
@@ -491,7 +481,7 @@ def p_gp(texts, vote_lists, X, text_similarity):
   random.seed()
   folder_id = random.randint(0, sys.maxint)
   
-  matlab_folder_name = 'matlab_' + str(folder_id)
+  matlab_folder_name = MATLAB_TEMP_FOLDER + 'matlab_' + str(folder_id)
   shutil.copytree('matlab', matlab_folder_name)
 
   io.savemat(matlab_folder_name + '/train.mat', mdict = {'x' : X_new, 'y' : y})
@@ -534,7 +524,8 @@ def p_gp(texts, vote_lists, X, text_similarity):
   """
 
   # Remove the temp folder
-  shutil.rmtree(matlab_folder_name)
+  # Not necessary for local scratch
+  # shutil.rmtree(matlab_folder_name)
 
   return result
 

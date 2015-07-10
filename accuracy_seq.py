@@ -49,10 +49,10 @@ if __name__ == "__main__":
   N_SEQS_PER_EST = 1
 
   print_accuracy_sequences_to_stderr({
-       'Matlab GP' : (est_gp, []),
+       'GP' : (est_gp, []),
 #       'MV' : (est_majority_vote, []),
-#       'MergeEnoughVotes(1)' : (est_merge_enough_votes, [ 1 ]),
-#       'MajorityVoteWithNN(0.5)' : (est_majority_vote_with_nn, [ 0.5 ]),
+#       'MEV(1)' : (est_merge_enough_votes, [ 1 ]),
+#       'MVNN(0.5)' : (est_majority_vote_with_nn, [ 0.5 ]),
   }, (1, 3), topic_id, N_SEQS_PER_EST)
 
 

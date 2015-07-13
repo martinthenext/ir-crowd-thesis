@@ -19,8 +19,8 @@ import datetime
 import shutil
 
 
-N_CORES = 8
-MATLAB_TEMP_FOLDER = '/scratch/' # Local scratch folder that gets deleted automatically when the job is done
+N_CORES = 1
+MATLAB_TEMP_DIR = '/scratch/' # Local scratch folder that gets deleted automatically when the job is done
 
 
 def get_accuracy(estimates, truths):
@@ -481,7 +481,7 @@ def p_gp(texts, vote_lists, X, text_similarity):
   random.seed()
   folder_id = random.randint(0, sys.maxint)
   
-  matlab_folder_name = MATLAB_TEMP_FOLDER + 'matlab_' + str(folder_id)
+  matlab_folder_name = MATLAB_TEMP_DIR + 'matlab_' + str(folder_id)
   shutil.copytree('matlab', matlab_folder_name)
 
   io.savemat(matlab_folder_name + '/train.mat', mdict = {'x' : X_new, 'y' : y})

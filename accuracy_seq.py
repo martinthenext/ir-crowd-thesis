@@ -82,7 +82,7 @@ def print_accuracy_sequences_to_stderr(estimator_dict, votes_per_doc, topic_id, 
         accuracy_sequence_trimmed = accuracy_sequence[start_idx: ]
 
         for index, accuracy in enumerate(accuracy_sequence_trimmed):
-          sys.stdout.write("A\t%s\t%s\t%s\t%s\t%s\n" % (start_vote_count + index, run_id, estimator_name, topic_id, "%.4f" % accuracy) )
+          sys.stderr.write("A\t%s\t%s\t%s\t%s\t%s\n" % (start_vote_count + index, run_id, estimator_name, topic_id, "%.4f" % accuracy) )
 
 
 if __name__ == "__main__":

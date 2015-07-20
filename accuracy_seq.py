@@ -52,7 +52,7 @@ def get_accuracy_sequences(estimator_dict, sequence_length, texts, vote_lists, t
       # Calucate the accuracy_sequence
       accuracy =  get_accuracy(estimates, truths)
       accuracy_sequences[estimator_name].append(accuracy)
-    
+  
   return accuracy_sequences
 
 def print_accuracy_sequences_to_stderr(estimator_dict, votes_per_doc, topic_id, n_sequesnces_per_estimator):
@@ -73,18 +73,16 @@ def print_accuracy_sequences_to_stderr(estimator_dict, votes_per_doc, topic_id, 
 
   for _ in xrange(n_sequesnces_per_estimator):
     # Getting accuracy for all esimators
-    print 'sequences called'
     sequences = get_accuracy_sequences(estimator_dict, sequence_length, texts, vote_lists, truths, X, text_similarity)
     if sequences is not None:
-      'sequences are not None'
       # Write all sequences from this dict to stderr
       run_id = random.randint(0, sys.maxint)
 
-      for estimator_name, accuracy_sequence in sequences:
+      for estimator_name, accuracy_sequence in sequences.iteritems():
         accuracy_sequence_trimmed = accuracy_sequence[start_idx: ]
 
         for index, accuracy in enumerate(accuracy_sequence_trimmed):
-          sys.stderr.write("A\t%s\t%s\t%s\t%s\t%s\n" % (start_vote_count + index, run_id, estimator_name, topic_id, "%.4f" % accuracy) )
+          sys.stdout.write("A\t%s\t%s\t%s\t%s\t%s\n" % (start_vote_count + index, run_id, estimator_name, topic_id, "%.4f" % accuracy) )
 
 
 if __name__ == "__main__":
@@ -93,7 +91,7 @@ if __name__ == "__main__":
   except IndexError:
     raise Exception("Please supply the topic id")
 
-  N_SEQS_PER_EST = 10
+  N_SEQS_PER_EST = 30
 
   print_accuracy_sequences_to_stderr({
 #       'GP' : (est_gp, []),

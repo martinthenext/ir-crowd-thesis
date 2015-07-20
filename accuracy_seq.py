@@ -5,13 +5,55 @@ separated by tabs
 
 """
 
-from experiments import get_accuracy_sequence, est_gp, est_majority_vote, est_merge_enough_votes, est_majority_vote_with_nn
+from experiments import get_accuracy, est_gp, est_majority_vote, est_merge_enough_votes, est_majority_vote_with_nn, copy_and_shuffle_sublists
 from data import texts_vote_lists_truths_by_topic_id
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import sys
 import random
 
+
+def get_accuracy_sequences(estimator_dict, sequence_length, texts, vote_lists, truths, X, text_similarity):
+
+  random.seed() # This is using system time
+
+  unknown_votes = copy_and_shuffle_sublists(vote_lists)
+  document_idx_vote_seq = []
+
+  # Conduct an experiment where you randomly sample votes for documents
+  for vote_index in xrange(sequence_length):
+    # Draw one vote for a random document
+    updated_doc_idx = random.randrange(len(vote_lists))
+    
+    if not unknown_votes[updated_doc_idx]:
+      # We ran out of votes for this document, diregard this sequence
+      return None
+
+    vote = unknown_votes[updated_doc_idx].pop()
+    document_idx_vote_seq.append( (updated_doc_idx, vote ) )
+
+  # Here we know the sequence of draws was successful
+  # Let us measure estimator accuracies now
+  accuracy_sequences = {}
+
+  for estimator_name, estimator_args in estimator_dict.iteritems():
+    estimator, args = estimator_args
+    accuracy_sequences[estimator_name] = []
+
+    # Go through the generated sequence of draws and measure accuracy
+    known_votes = [ [] for _ in unknown_votes ]
+
+    for document_idx, vote in document_idx_vote_seq:
+      known_votes[updated_doc_idx].append(vote)
+      
+      # Recalculate all the estimates for the sake of consistency
+      estimates = estimator(texts, known_votes, X, text_similarity, *args)
+
+      # Calucate the accuracy_sequence
+      accuracy =  get_accuracy(estimates, truths)
+      accuracy_sequences[estimator_name].append(accuracy)
+    
+  return accuracy_sequences
 
 def print_accuracy_sequences_to_stderr(estimator_dict, votes_per_doc, topic_id, n_sequesnces_per_estimator):
   texts, vote_lists, truths = texts_vote_lists_truths_by_topic_id[topic_id]
@@ -29,26 +71,27 @@ def print_accuracy_sequences_to_stderr(estimator_dict, votes_per_doc, topic_id, 
 
   sequence_length = int(max_votes_per_doc * n_documents)
 
-  for estimator_name, estimator_args in estimator_dict.iteritems():
-    estimator, args = estimator_args
-    for _ in xrange(n_sequesnces_per_estimator):
-      seq = get_accuracy_sequence(estimator, sequence_length, texts, vote_lists, truths, X, text_similarity,
-          None, False, *args)
-      if seq is not None:
-        sequence_id = random.randint(0, sys.maxint)
-        accuracy_sequence = seq[start_idx: ]
-        for index, accuracy in enumerate(accuracy_sequence):
-          sys.stderr.write("A\t%s\t%s\t%s\t%s\t%s\n" % (start_vote_count + index, sequence_id, estimator_name, topic_id, "%.4f" % accuracy) )
+  for _ in xrange(n_sequesnces_per_estimator):
+    # Getting accuracy for all esimators
+    print 'sequences called'
+    sequences = get_accuracy_sequences(estimator_dict, sequence_length, texts, vote_lists, truths, X, text_similarity)
+    if sequences is not None:
+      'sequences are not None'
+      # Write all sequences from this dict to stderr
+      run_id = random.randint(0, sys.maxint)
 
-      else:
-        sys.stdout.write("F\t-\t-\t%s\t%s\tSEQUENCE FAILED" % (estimator_name, topic_id) )
+      for estimator_name, accuracy_sequence in sequences:
+        accuracy_sequence_trimmed = accuracy_sequence[start_idx: ]
+
+        for index, accuracy in enumerate(accuracy_sequence_trimmed):
+          sys.stderr.write("A\t%s\t%s\t%s\t%s\t%s\n" % (start_vote_count + index, run_id, estimator_name, topic_id, "%.4f" % accuracy) )
 
 
 if __name__ == "__main__":
   try:
     topic_id = sys.argv[1]
   except IndexError:
-    raise Error("Please supply the topic id")
+    raise Exception("Please supply the topic id")
 
   N_SEQS_PER_EST = 10
 

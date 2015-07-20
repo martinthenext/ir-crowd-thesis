@@ -88,21 +88,13 @@ def get_accuracy_sequence(estimator, n_votes_to_sample, texts,
     vote = unknown_votes[updated_doc_idx].pop()
     known_votes[updated_doc_idx].append(vote)
     
-    if not return_final:
-      # Recalculate all the estimates for the sake of consistency
-      estimates = estimator(texts, known_votes, X, text_similarity, *args)
+    # Recalculate all the estimates for the sake of consistency
+    estimates = estimator(texts, known_votes, X, text_similarity, *args)
 
-      # Calucate the accuracy_sequence
-      accuracy_sequence[index] = get_accuracy(estimates, truths)
+    # Calucate the accuracy_sequence
+    accuracy_sequence[index] = get_accuracy(estimates, truths)
 
-  if return_final:
-
-    estimates = estimator(texts, known_votes, text_similarity, *args)
-    final_accuracy = get_accuracy(estimates, truths)
-    return final_accuracy
-  
-  else:
-    return accuracy_sequence
+  return accuracy_sequence
 
 
 def get_indexes_of_sublists_smaller_than(length, list_of_lists):

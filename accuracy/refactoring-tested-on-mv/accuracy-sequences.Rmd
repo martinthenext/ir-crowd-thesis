@@ -1,0 +1,35 @@
+---
+title: "accuracy-sequences.Rmd"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r}
+
+boxplot.accuracies <- function(filename) {
+
+  before <- read.delim(filename, header=FALSE)
+  
+  before$V1 <- NULL
+  # before$V2 <- as.factor(before$V2)
+  before$V3 <- as.factor(before$V3)
+  before$V5 <- as.factor(before$V5)
+  colnames(before) <- c("VotesPerDoc", "RunId", "Method", "Topic", "Accuracy")
+  
+  head(before)
+  
+  mean.accuracy.df <- aggregate(Accuracy ~ VotesPerDoc, before, mean)
+  plot(Accuracy ~ VotesPerDoc, data=mean.accuracy.df)
+  
+  boxplot(Accuracy ~ VotesPerDoc, data=before)
+  
+  print (mean.accuracy.df$Accuracy)
+    
+}
+
+boxplot.accuracies("BEFORE-accuracy-1.0to1.2.tsv")
+boxplot.accuracies("AFTER-BUGFIX1-accuracy-1.0to1.2.tsv")
+
+
+```

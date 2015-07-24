@@ -74,6 +74,12 @@ def print_accuracy_sequences_to_stderr(estimator_dict, votes_per_doc, topic_id, 
   for _ in xrange(n_sequesnces_per_estimator):
     # Getting accuracy for all esimators
     sequences = get_accuracy_sequences(estimator_dict, sequence_length, texts, vote_lists, truths, X, text_similarity)
+      
+    # If failed, attempt at getting a sequence until it's not None
+    # The while block is gonna be skipped if we're good
+    while sequences is not None:
+      sequences = get_accuracy_sequences(estimator_dict, sequence_length, texts, vote_lists, truths, X, text_similarity)
+
     if sequences is not None:
       # Write all sequences from this dict to stderr
       run_id = random.randint(0, sys.maxint)
@@ -91,13 +97,13 @@ if __name__ == "__main__":
   except IndexError:
     raise Exception("Please supply the topic id")
 
-  N_SEQS_PER_EST = 30
+  N_SEQS_PER_EST = 1
 
   print_accuracy_sequences_to_stderr({
-#       'GP' : (est_gp, []),
+       'GP' : (est_gp, []),
        'MV' : (est_majority_vote, []),
-#       'MEV(1)' : (est_merge_enough_votes, [ 1 ]),
-#       'MVNN(0.5)' : (est_majority_vote_with_nn, [ 0.5 ]),
-  }, (1.0, 1.2), topic_id, N_SEQS_PER_EST)
+       'MEV(1)' : (est_merge_enough_votes, [ 1 ]),
+       'MVNN(0.5)' : (est_majority_vote_with_nn, [ 0.5 ]),
+  }, (1.0, 3.0), topic_id, N_SEQS_PER_EST)
 
 

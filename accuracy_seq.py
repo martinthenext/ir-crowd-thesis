@@ -77,7 +77,7 @@ def print_accuracy_sequences_to_stderr(estimator_dict, votes_per_doc, topic_id, 
       
     # If failed, attempt at getting a sequence until it's not None
     # The while block is gonna be skipped if we're good
-    while sequences is not None:
+    while sequences is None:
       sequences = get_accuracy_sequences(estimator_dict, sequence_length, texts, vote_lists, truths, X, text_similarity)
 
     if sequences is not None:

@@ -21,12 +21,12 @@ def get_accuracy_sequences(estimator_dict, sequence_length, texts, vote_lists, t
   document_idx_vote_seq = []
 
   # Conduct an experiment where you randomly sample votes for documents
-  for vote_index in xrange(sequence_length):
+  for _ in xrange(sequence_length):
     # Draw one vote for a random document
     updated_doc_idx = random.randrange(len(vote_lists))
     
     if not unknown_votes[updated_doc_idx]:
-      # We ran out of votes for this document, diregard this sequence
+      # We ran out of votes for this document, diregard this run
       return None
 
     vote = unknown_votes[updated_doc_idx].pop()
@@ -44,7 +44,7 @@ def get_accuracy_sequences(estimator_dict, sequence_length, texts, vote_lists, t
     known_votes = [ [] for _ in unknown_votes ]
 
     for document_idx, vote in document_idx_vote_seq:
-      known_votes[updated_doc_idx].append(vote)
+      known_votes[document_idx].append(vote)
       
       # Recalculate all the estimates for the sake of consistency
       estimates = estimator(texts, known_votes, X, text_similarity, *args)

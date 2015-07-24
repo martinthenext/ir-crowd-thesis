@@ -73,10 +73,8 @@ def print_accuracy_sequences_to_stderr(estimator_dict, votes_per_doc, topic_id, 
 
   for _ in xrange(n_sequesnces_per_estimator):
     # Getting accuracy for all esimators
-    sequences = get_accuracy_sequences(estimator_dict, sequence_length, texts, vote_lists, truths, X, text_similarity)
-      
     # If failed, attempt at getting a sequence until it's not None
-    # The while block is gonna be skipped if we're good
+    sequences = None
     while sequences is None:
       sequences = get_accuracy_sequences(estimator_dict, sequence_length, texts, vote_lists, truths, X, text_similarity)
 

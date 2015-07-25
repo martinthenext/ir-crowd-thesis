@@ -75,10 +75,12 @@ def print_accuracy_sequences_to_stderr(estimator_dict, votes_per_doc, topic_id, 
     # Getting accuracy for all esimators
     # If failed, attempt at getting a sequence until it's not None
     sequences = None
+    attempt_counter = 0
     while sequences is None:
+      attempt_counter += 1
+      print 'Attempt to generate sequence #%s\n' % attempt_counter
       sequences = get_accuracy_sequences(estimator_dict, sequence_length, texts, vote_lists, truths, X, text_similarity)
 
-    if sequences is not None:
       # Write all sequences from this dict to stderr
       run_id = random.randint(0, sys.maxint)
 

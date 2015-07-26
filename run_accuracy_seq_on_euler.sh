@@ -23,7 +23,7 @@ do
   for job in `seq 1 $N_JOBS_PER_TOPIC`;
   do
 
-  bsub -W 24:00 -o "run_output/stdout-${batch_id}" -e "accuracy/${OUTPUT_NAME}.stderr-${batch_id}.tsv" -R "rusage[mem=16000]" "python -W ignore accuracy_seq.py $topic_id" 
+  bsub -W 120:00 -o "run_output/stdout-${batch_id}" -e "accuracy/${OUTPUT_NAME}.stderr-${batch_id}.tsv" -R "rusage[mem=16000]" "python -W ignore accuracy_seq.py $topic_id" 
 
   done
 

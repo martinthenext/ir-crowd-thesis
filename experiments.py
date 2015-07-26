@@ -475,7 +475,7 @@ def p_gp(texts, vote_lists, X, text_similarity):
   print 'Running MATLAB, started %s' % str(datetime.datetime.now())
   code = subprocess.call(['matlab/run_in_dir.sh', matlab_folder_name])
   if code != 0:
-    raise Exception('MATLAB code couldn\'t run') 
+    raise OSError('MATLAB code couldn\'t run') 
   print 'Finished %s' % str(datetime.datetime.now())
 
   print 'Getting the matrix'

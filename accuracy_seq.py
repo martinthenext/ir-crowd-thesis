@@ -50,7 +50,12 @@ def get_accuracy_sequences(estimator_dict, sequence_length, texts, vote_lists, t
       estimates = estimator(texts, known_votes, X, text_similarity, *args)
 
       # Calucate the accuracy_sequence
-      accuracy =  get_accuracy(estimates, truths)
+      try:
+        accuracy =  get_accuracy(estimates, truths)
+      except OSError:
+        # Leave the function
+        return None
+
       accuracy_sequences[estimator_name].append(accuracy)
   
   return accuracy_sequences
@@ -80,6 +85,7 @@ def print_accuracy_sequences_to_stderr(estimator_dict, votes_per_doc, topic_id, 
       attempt_counter += 1
       print 'Attempt to generate sequence #%s\n' % attempt_counter
       sequences = get_accuracy_sequences(estimator_dict, sequence_length, texts, vote_lists, truths, X, text_similarity)
+      print sequences
 
     # Got a sequence
     # Write all sequences from this dict to stderr
@@ -89,7 +95,7 @@ def print_accuracy_sequences_to_stderr(estimator_dict, votes_per_doc, topic_id, 
       accuracy_sequence_trimmed = accuracy_sequence[start_idx: ]
 
       for index, accuracy in enumerate(accuracy_sequence_trimmed):
-        sys.stderr.write("A\t%s\t%s\t%s\t%s\t%s\n" % (start_vote_count + index, run_id, estimator_name, topic_id, "%.4f" % accuracy) )
+        sys.stderr.write("AC\t%s\t%s\t%s\t%s\t%s\n" % (start_vote_count + index, run_id, estimator_name, topic_id, "%.4f" % accuracy) )
 
 
 if __name__ == "__main__":

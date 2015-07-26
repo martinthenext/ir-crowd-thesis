@@ -7,5 +7,5 @@
 # Example 
 # ./filter-and-append.sh exp-gp-accuracy-1-vote-per-doc.tsv exp-gp-accuracy-1-vote-per-doc.tsv.new 
 
-grep -P '^.*\t.*\t.*$' $1 >> $2
+grep -P '^AC\t.*' $1 >> $2
 

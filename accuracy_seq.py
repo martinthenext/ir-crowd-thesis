@@ -53,6 +53,7 @@ def get_accuracy_sequences(estimator_dict, sequence_length, texts, vote_lists, t
       try:
         accuracy =  get_accuracy(estimates, truths)
       except OSError:
+        print '#OS ERROR'
         # Leave the function
         return None
 
@@ -80,7 +81,10 @@ def print_accuracy_sequences_to_stderr(estimator_dict, votes_per_doc, topic_id, 
     # Getting accuracy for all esimators
     # If failed, attempt at getting a sequence until it's not None
     sequences = None
+    counter = 0
     while sequences is None:
+      counter += 1
+      print '#ATTEMPT\t%s' % counter
       sequences = get_accuracy_sequences(estimator_dict, sequence_length, texts, vote_lists, truths, X, text_similarity)
 
     # Got a sequence
@@ -89,7 +93,7 @@ def print_accuracy_sequences_to_stderr(estimator_dict, votes_per_doc, topic_id, 
 
     for estimator_name, accuracy_sequence in sequences.iteritems():
       accuracy_sequence_trimmed = accuracy_sequence[start_idx: ]
-
+      
       for index, accuracy in enumerate(accuracy_sequence_trimmed):
         sys.stderr.write("AC\t%s\t%s\t%s\t%s\t%s\n" % (start_vote_count + index, run_id, estimator_name, topic_id, "%.4f" % accuracy) )
 

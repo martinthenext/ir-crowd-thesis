@@ -1,0 +1,19 @@
+---
+title: "1to3votesPerDoc"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r}
+
+filename <- "seq-1to3.first-run.tsv"
+col.names <- c("AC", "NVotes", "RunId", "Method", "Topic", "Accuracy")
+col.types <- c("character", "numeric", "factor", "character", "factor", "numeric")
+
+accuracy <- read.delim(filename, header=FALSE, col.names = col.names, colClasses = col.types)
+accuracy$AC <- NULL
+
+head(accuracy)
+
+```

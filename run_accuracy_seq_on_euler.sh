@@ -5,7 +5,7 @@
 # This file contains a command that has been run after the 
 # corresponding code has been commited to the repo
 
-OUTPUT_NAME='seq-1to3'
+OUTPUT_NAME='seq-around1'
 N_JOBS_PER_TOPIC=1
 
 # Every time you run stuff on Euler, there is gonna be a new file

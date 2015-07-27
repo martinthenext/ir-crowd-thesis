@@ -17,19 +17,17 @@ def get_accuracy_sequences(estimator_dict, sequence_length, texts, vote_lists, t
 
   random.seed() # This is using system time
 
-  unknown_votes = copy_and_shuffle_sublists(vote_lists)
   document_idx_vote_seq = []
 
   # Conduct an experiment where you randomly sample votes for documents
   for _ in xrange(sequence_length):
-    # Draw one vote for a random document
+    # Randomly pick a document
     updated_doc_idx = random.randrange(len(vote_lists))
     
-    if not unknown_votes[updated_doc_idx]:
-      # We ran out of votes for this document, diregard this run
-      return None
+    # Randomly pick a vote for this document
+    vote_idx = random.randrange(len(vote_lists[updated_doc_idx]))
 
-    vote = unknown_votes[updated_doc_idx].pop()
+    vote = vote_lists[updated_doc_idx][vote_idx]
     document_idx_vote_seq.append( (updated_doc_idx, vote ) )
 
   # Here we know the sequence of draws was successful
@@ -41,7 +39,7 @@ def get_accuracy_sequences(estimator_dict, sequence_length, texts, vote_lists, t
     accuracy_sequences[estimator_name] = []
 
     # Go through the generated sequence of draws and measure accuracy
-    known_votes = [ [] for _ in unknown_votes ]
+    known_votes = [ [] for _ in vote_lists ]
 
     for document_idx, vote in document_idx_vote_seq:
       known_votes[document_idx].append(vote)
@@ -107,7 +105,7 @@ if __name__ == "__main__":
   N_SEQS_PER_EST = 1
 
   print_accuracy_sequences_to_stderr({
-       'GP' : (est_gp, []),
+#       'GP' : (est_gp, []),
        'MV' : (est_majority_vote, []),
        'MEV(1)' : (est_merge_enough_votes, [ 1 ]),
        'MVNN(0.5)' : (est_majority_vote_with_nn, [ 0.5 ]),

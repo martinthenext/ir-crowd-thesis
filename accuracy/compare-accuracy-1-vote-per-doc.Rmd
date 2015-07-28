@@ -11,24 +11,16 @@ Reading accuracy levels for different methods from a `tsv` file.
 
 ```{r}
 
-read.accuracy.df <- function(filename, na.rm=TRUE) {
-  accuracy <- read.delim(filename, header=FALSE)
-  names(accuracy) <- c("Method", "Topic", "Accuracy")
+filename <- "after-random-votes/seq-around1-first.tsv"
 
-  if (na.rm) {
-    accuracy <- accuracy[!is.na(accuracy$Accuracy), ]
-  }
-  
-  accuracy$Topic <- as.factor(accuracy$Topic)
-  row.names(accuracy) <- NULL
-  accuracy
-}
+col.names <- c("AC", "NVotes", "RunId", "Method", "Topic", "Accuracy")
+col.types <- c("character", "numeric", "factor", "factor", "factor", "numeric")
 
-accuracy <- read.accuracy.df("exp-accuracy-1-vote-per-doc.tsv")
-
-nrow(accuracy)
+accuracy <- read.delim(filename, header=FALSE, col.names = col.names, colClasses = col.types)
+accuracy$AC <- NULL
 
 head(accuracy)
+nrow(accuracy)
 
 ```
 

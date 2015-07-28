@@ -4,9 +4,10 @@ import operator
 import numpy as np
 import io
 from sklearn.externals import joblib
+import os
 
 
-DATA_ROOT = '/cluster/home/mdavtyan/data/'
+DATA_ROOT = os.getenv("HOME") + '/data/'
 JUDGEMENT_FILE = DATA_ROOT + 'all_judgements.txt'
 FULLTEXT_FOLDER = DATA_ROOT + 'url-header-html-txt'
 GROUND_TRUTH_FILE = DATA_ROOT + 'task1_unlabeled_g_truth_cons_public.csv'

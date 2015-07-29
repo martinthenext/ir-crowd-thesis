@@ -38,14 +38,53 @@ Let us calculate overall mean accuracy for pair (number of votes, method)
 
 means <- aggregate(Accuracy ~ Method + NVotes, accuracy, mean)
 
-plot.for.method <- function(means, method.name) {
+plot.for.method <- function(means, method.name, color=NULL) {
   means.for.method <- means[means$Method == method.name, ]
-  plot(Accuracy ~ NVotes, data=means.for.method, ylim=c(0.6, 0.85), pch='.')
+  if (is.null(color)) {
+    plot(Accuracy ~ NVotes, 
+       data=means.for.method, 
+       ylim=c(0.5, 1.0),
+       type="l",
+       xlab="Number of votes",
+       ylab="Accuracy")    
+  } else {
+    lines(Accuracy ~ NVotes, data=means.for.method, col=color)
+  }
 }
 
-plot.for.method(means, 'MV')
-plot.for.method(means, 'MEV(1)')
-plot.for.method(means, 'MVNN(0.5)')
-plot.for.method(means, 'GP')
+```
+
+## Accuracy accross all topics
+
+```{r}
+
+plot.learning.curves <- function(means) {
+  plot.for.method(means, 'MV')
+  plot.for.method(means, 'MEV(1)', "red")
+  plot.for.method(means, 'MVNN(0.5)', "green")
+  plot.for.method(means, 'GP', "blue")
+  
+  legend(x="bottomright", c("MV", "MEV(1)", "MVNN(0.5)", "GP"), lty=c(1,1,1,1), col=c("black", "red", "green", "blue") )
+}
+
+plot.learning.curves(means)
+
+```
+
+
+Variance on the ends of the plot is higher, because for every topic the data is from 1 to 3 votes per document. Number of documents varies from 90 to 125, and there is more data for average number of votes.
+
+## For each topic separately
+
+```{r}
+
+for (topic in levels(accuracy$Topic) ) {
+  print(topic)
+  accuracy.for.topic <- accuracy[accuracy$Topic == topic, ]
+  accuracy.for.topic$RunId <- factor(accuracy.for.topic$RunId)
+  cat("Runs plotted: ", length(levels(accuracy.for.topic$RunId)), "\n")
+  means <- aggregate(Accuracy ~ Method + NVotes, accuracy.for.topic, mean)
+  plot.learning.curves(means)
+}
 
 ```

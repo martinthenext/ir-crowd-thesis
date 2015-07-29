@@ -79,7 +79,7 @@ Variance on the ends of the plot is higher, because for every topic the data is 
 ```{r}
 
 for (topic in levels(accuracy$Topic) ) {
-  print(topic)
+  cat("Topic: ", topic, "\n")
   accuracy.for.topic <- accuracy[accuracy$Topic == topic, ]
   accuracy.for.topic$RunId <- factor(accuracy.for.topic$RunId)
   cat("Runs plotted: ", length(levels(accuracy.for.topic$RunId)), "\n")

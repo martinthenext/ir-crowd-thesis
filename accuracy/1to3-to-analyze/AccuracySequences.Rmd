@@ -1,0 +1,51 @@
+---
+title: "Accuracy Sequences"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+Loading data.
+
+```{r}
+
+filename <- "seq-1to3-10reps.filtered.tsv"
+
+col.names <- c("AC", "NVotes", "RunId", "Method", "Topic", "Accuracy")
+col.types <- c("character", "numeric", "factor", "factor", "factor", "numeric")
+
+accuracy <- read.delim(filename, header=FALSE, col.names = col.names, colClasses = col.types)
+accuracy$AC <- NULL
+
+head(accuracy)
+nrow(accuracy)
+```
+
+Look at amount of data available for different topics:
+
+```{r results='asis'}
+library(knitr)
+
+topic.rows.sorted <- as.data.frame(sort(table(accuracy$Topic)))
+colnames(topic.rows.sorted) <- "Points in dataset"
+kable(topic.rows.sorted, format="markdown")
+
+```
+
+Let us calculate overall mean accuracy for pair (number of votes, method)
+
+```{r}
+
+means <- aggregate(Accuracy ~ Method + NVotes, accuracy, mean)
+
+plot.for.method <- function(means, method.name) {
+  means.for.method <- means[means$Method == method.name, ]
+  plot(Accuracy ~ NVotes, data=means.for.method, ylim=c(0.6, 0.85), pch='.')
+}
+
+plot.for.method(means, 'MV')
+plot.for.method(means, 'MEV(1)')
+plot.for.method(means, 'MVNN(0.5)')
+plot.for.method(means, 'GP')
+
+```

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 
 This script filters iterations from the stardard accuracy file

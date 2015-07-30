@@ -9,7 +9,7 @@ Loading data.
 
 ```{r}
 
-filename <- "seq-1to3-10reps.filtered.tsv"
+filename <- "seq-1to3.filtered.tsv"
 
 col.names <- c("AC", "NVotes", "RunId", "Method", "Topic", "Accuracy")
 col.types <- c("character", "numeric", "factor", "factor", "factor", "numeric")

@@ -32,31 +32,58 @@ kable(topic.rows.sorted, format="markdown")
 
 ```
 
+
+## Accuracy accross all topics
+
+First, it would be useful to know amount of documents in each topic. We load it from a `csv` file.
+
+```{r}
+
+filename <- "NDocumentsPerTopic.csv"
+
+ndocs <- read.delim(filename, header=TRUE, sep=",", 
+                    colClasses = c("factor", "integer")
+                    )
+```
+
+Now plotting learning curves across topic *alighning them at a constant vote per document rate*.
+
+To this end, let us add another column to the `accuracy` frame, indicating for every number of votes a corresponding (topic-specific) vote per document rate.
+
+```{r}
+
+accuracy$VotesPerDoc <- NA
+
+for (topic in levels(ndocs$Topic)) {
+  accuracy.for.topic <- accuracy[accuracy$Topic == topic, ]
+  n.docs.for.topic <- ndocs[ndocs$Topic == topic, ]$NDocuments
+  votes.per.doc <- accuracy.for.topic$NVotes / n.docs.for.topic
+  accuracy[accuracy$Topic == topic, "VotesPerDoc"] <- votes.per.doc
+}
+
+head(accuracy)
+
+```
+
 Let us calculate overall mean accuracy for pair (number of votes, method)
 
 ```{r}
 
-means <- aggregate(Accuracy ~ Method + NVotes, accuracy, mean)
+means <- aggregate(Accuracy ~ Method + VotesPerDoc, accuracy, mean)
 
 plot.for.method <- function(means, method.name, color=NULL) {
   means.for.method <- means[means$Method == method.name, ]
   if (is.null(color)) {
-    plot(Accuracy ~ NVotes, 
+    plot(Accuracy ~ VotesPerDoc, 
        data=means.for.method, 
        ylim=c(0.5, 1.0),
        type="l",
-       xlab="Number of votes",
+       xlab="Votes per document",
        ylab="Accuracy")    
   } else {
-    lines(Accuracy ~ NVotes, data=means.for.method, col=color)
+    lines(Accuracy ~ VotesPerDoc, data=means.for.method, col=color)
   }
 }
-
-```
-
-## Accuracy accross all topics
-
-```{r}
 
 plot.learning.curves <- function(means) {
   plot.for.method(means, 'MV')
@@ -83,7 +110,7 @@ for (topic in levels(accuracy$Topic) ) {
   accuracy.for.topic <- accuracy[accuracy$Topic == topic, ]
   accuracy.for.topic$RunId <- factor(accuracy.for.topic$RunId)
   cat("Runs plotted: ", length(levels(accuracy.for.topic$RunId)), "\n")
-  means <- aggregate(Accuracy ~ Method + NVotes, accuracy.for.topic, mean)
+  means <- aggregate(Accuracy ~ Method + VotesPerDoc, accuracy.for.topic, mean)
   plot.learning.curves(means)
 }
 

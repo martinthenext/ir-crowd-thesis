@@ -77,10 +77,10 @@ plot.for.method <- function(means, method.name, color=NULL) {
        ylim=c(0.5, 1.0),
        xlab="Votes per document",
        ylab="Accuracy",
-       pch='.'
+       pch=16, cex=0.3
        )
   } else {
-    points(Accuracy ~ VotesPerDoc, data=means.for.method, col=color, pch='.')
+    points(Accuracy ~ VotesPerDoc, data=means.for.method, col=color, pch=16, cex=0.3)
   }
 }
 
@@ -98,6 +98,8 @@ plot.learning.curves(means)
 
   
 ```
+
+Accuracies are averaged across all topics and color for different methods.
 
 Separately calculating methods means at 1, 2 and 3 votes per document.
 
@@ -119,7 +121,28 @@ means.vpd$AccuracyAt3VPD <- means.3vpd$Accuracy
 
 ```
 
-We see interesting lines of performance for topics with similar numbers of documents. Let us explore the `GP` performance separately for different topics.
+### Origin of lines
+
+**Hypothesis 1** There is 6 lines for every method (easy to distinguish on `GP`) - one line for a topic document count. All the accuracties for a particular method are averaged into these 6 bins.
+
+As long as we calculate the means for (method, votesPerDoc) pairs first, we then only agregate 28 numbers into 6 bins:
+
+```{r} 
+
+# means <- aggregate(Accuracy ~ Method + VotesPerDoc, accuracy, mean)
+# plot.learning.curves(means)
+
+```
+
+The variance is high enough for them to differ this way.
+
+Let us explore the `GP` performance separately for different topics.
+
+## Inspecting GP accuracy
+
+### GP Accuracy colored by topic
+
+We want to plot Accuracy against VotesPerDoc, indicating every separate topic with a color.
 
 ```{r}
 
@@ -128,8 +151,7 @@ gp.accuracy <- accuracy[accuracy$Method=='GP', ]
 col.codes <- 1:28
 col.idx <- 1
 
-# We want to plot Accuracy ~ VotesPerDoc, coloring points depending in Topic
-plot(c(1.0, 3.0), range(accuracy$Accuracy), col="white")
+plot(c(1.0, 3.0), range(gp.accuracy$Accuracy), col="white")
 for (topic in levels(accuracy$Topic) ) {
   gp.accuracy.for.topic <- gp.accuracy[gp.accuracy$Topic == topic, ]
   topic.means <- aggregate(Accuracy ~ VotesPerDoc, gp.accuracy.for.topic, mean)
@@ -139,6 +161,42 @@ for (topic in levels(accuracy$Topic) ) {
 
 ```
 
+Each colored line represents a separate topic.
+
+No obvious clustering here. Let us now color the same lines by the number of documents in a topic.
+
+### GP accuracy colored by document count in a topic
+
+```{r}
+
+possible.doc.counts <- levels(as.factor(ndocs$NDocuments))
+color.code <- c("black", "red", "green", "blue", "yellow", "orange")
+colors <- numeric(125)
+
+i <- 1
+for (doc.count in possible.doc.counts) {
+  colors[as.numeric(doc.count)] <- color.code[i]
+  i <- i + 1
+}
+
+get.color.code.for.topic <- function(topic) {
+  # Look up the doc count
+  doc.count <- ndocs[ndocs$Topic==topic, ]$NDocuments
+  colors[doc.count]
+}
+
+# We want to plot Accuracy ~ VotesPerDoc, coloring points depending in doc count
+plot(c(1.0, 3.0), range(accuracy$Accuracy), col="white")
+for (topic in levels(accuracy$Topic) ) {
+  gp.accuracy.for.topic <- gp.accuracy[gp.accuracy$Topic == topic, ]
+  topic.means <- aggregate(Accuracy ~ VotesPerDoc, gp.accuracy.for.topic, mean)
+  points(topic.means$VotesPerDoc, topic.means$Accuracy, pch=16, cex=0.3, col=get.color.code.for.topic(topic))
+  col.idx <- col.idx + 1
+}
+
+```
+
+Lines of the same color are the ones that come from topics with similar document counts. Doesn't look like for GPs a number of documents in a topic influences accuracy.
 
 <!--
 

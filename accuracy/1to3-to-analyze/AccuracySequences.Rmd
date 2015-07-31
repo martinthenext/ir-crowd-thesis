@@ -80,7 +80,7 @@ plot.for.method <- function(means, method.name, color=NULL) {
        pch=16, cex=0.3
        )
   } else {
-    points(Accuracy ~ VotesPerDoc, data=means.for.method, col=color, pch=16, cex=0.3)
+    points(Accuracy ~ VotesPerDoc, data=means.for.method, col=color, pch=16, cex=0.1)
   }
 }
 
@@ -135,6 +135,13 @@ As long as we calculate the means for (method, votesPerDoc) pairs first, we then
 ```
 
 The variance is high enough for them to differ this way.
+
+If we plot all accuracies with aggregating them, and color them by topic: as there are not many documents with ground truth for every topic, there is only around 10 accuracy levels and plotting accuracies of methods on top of each other is not instructive.
+
+### To get rid of the lines
+
+We can split Votes per document into `0.05` segments and average accuracy on them.
+
 
 Let us explore the `GP` performance separately for different topics.
 

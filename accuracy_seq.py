@@ -119,7 +119,7 @@ if __name__ == "__main__":
   except IndexError:
     raise Exception("Please supply the topic id")
 
-  N_SEQS_PER_EST = 1
+  N_SEQS_PER_EST = 20
 
   print_accuracy_sequences_to_stderr({
        'GP' : (est_gp, []),

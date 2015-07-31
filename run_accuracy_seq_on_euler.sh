@@ -5,8 +5,8 @@
 # This file contains a command that has been run after the 
 # corresponding code has been commited to the repo
 
-OUTPUT_NAME='seq-around1'
-N_JOBS_PER_TOPIC=1
+OUTPUT_NAME='seq-around1-fewer-vote-docs'
+N_JOBS_PER_TOPIC=2
 
 # Every time you run stuff on Euler, there is gonna be a new file
 # You need to clean it and append to results with filter-and-append.sh

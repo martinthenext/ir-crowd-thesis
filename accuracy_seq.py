@@ -23,7 +23,7 @@ def get_indexes_of_smallest_elements(l):
   [0, 1, 2, 3, 4, 5]
   """
   min_element = min(l)
-    return [i for i, el in enumerate(l) if el == min_element ]
+  return [i for i, el in enumerate(l) if el == min_element ]
 
 
 def get_accuracy_sequences(estimator_dict, sequence_length, texts, vote_lists, truths, X, text_similarity):
@@ -119,13 +119,13 @@ if __name__ == "__main__":
   except IndexError:
     raise Exception("Please supply the topic id")
 
-  N_SEQS_PER_EST = 10
+  N_SEQS_PER_EST = 1
 
   print_accuracy_sequences_to_stderr({
        'GP' : (est_gp, []),
        'MV' : (est_majority_vote, []),
        'MEV(1)' : (est_merge_enough_votes, [ 1 ]),
        'MVNN(0.5)' : (est_majority_vote_with_nn, [ 0.5 ]),
-  }, (1.0, 3.0), topic_id, N_SEQS_PER_EST)
+  }, (1.0, 1.05), topic_id, N_SEQS_PER_EST)
 
 

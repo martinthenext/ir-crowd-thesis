@@ -5,12 +5,25 @@ separated by tabs
 
 """
 
-from experiments import get_accuracy, est_gp, est_majority_vote, est_merge_enough_votes, est_majority_vote_with_nn, copy_and_shuffle_sublists
+from experiments import get_accuracy, est_gp, est_majority_vote, est_merge_enough_votes, est_majority_vote_with_nn
 from data import texts_vote_lists_truths_by_topic_id
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import sys
 import random
+
+
+def get_indexes_of_smallest_elements(l):
+  """
+  >>> get_indexes_of_smallest_elements([1,2,3,1,1,1])
+  [0, 3, 4, 5]
+  >>> get_indexes_of_smallest_elements([0,2,3,-1,-1,100])
+  [3, 4]
+  >>> get_indexes_of_smallest_elements([0,0,0,0,0,0])
+  [0, 1, 2, 3, 4, 5]
+  """
+  min_element = min(l)
+    return [i for i, el in enumerate(l) if el == min_element ]
 
 
 def get_accuracy_sequences(estimator_dict, sequence_length, texts, vote_lists, truths, X, text_similarity):
@@ -19,11 +32,15 @@ def get_accuracy_sequences(estimator_dict, sequence_length, texts, vote_lists, t
 
   document_idx_vote_seq = []
 
+  document_vote_counts = [ 0 for _ in vote_lists ]
+
   # Conduct an experiment where you randomly sample votes for documents
   for _ in xrange(sequence_length):
-    # Randomly pick a document
-    updated_doc_idx = random.randrange(len(vote_lists))
-    
+    # Pick a document randomly from the ones that has fewer votes
+    min_vote_doc_idxs = get_indexes_of_smallest_elements(document_vote_counts)
+    updated_doc_idx = random.choice(min_vote_doc_idxs)
+    document_vote_counts[updated_doc_idx] += 1
+
     # Randomly pick a vote for this document
     vote_idx = random.randrange(len(vote_lists[updated_doc_idx]))
 

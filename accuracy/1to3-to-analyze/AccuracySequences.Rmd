@@ -32,31 +32,57 @@ kable(topic.rows.sorted, format="markdown")
 
 ```
 
+
+## Accuracy accross all topics
+
+First, it would be useful to know amount of documents in each topic. We load it from a `csv` file.
+
+```{r}
+
+filename <- "NDocumentsPerTopic.csv"
+
+ndocs <- read.delim(filename, header=TRUE, sep=",", 
+                    colClasses = c("factor", "integer")
+                    )
+```
+
+Now plotting learning curves across topic *alighning them at a constant vote per document rate*.
+
+To this end, let us add another column to the `accuracy` frame, indicating for every number of votes a corresponding (topic-specific) vote per document rate.
+
+```{r}
+
+accuracy$VotesPerDoc <- NA
+
+for (topic in levels(ndocs$Topic)) {
+  accuracy.for.topic <- accuracy[accuracy$Topic == topic, ]
+  n.docs.for.topic <- ndocs[ndocs$Topic == topic, ]$NDocuments
+  votes.per.doc <- accuracy.for.topic$NVotes / n.docs.for.topic
+  accuracy[accuracy$Topic == topic, "VotesPerDoc"] <- votes.per.doc
+}
+
+head(accuracy)
+
+```
+
 Let us calculate overall mean accuracy for pair (number of votes, method)
 
 ```{r}
 
-means <- aggregate(Accuracy ~ Method + NVotes, accuracy, mean)
-
 plot.for.method <- function(means, method.name, color=NULL) {
   means.for.method <- means[means$Method == method.name, ]
   if (is.null(color)) {
-    plot(Accuracy ~ NVotes, 
+    plot(Accuracy ~ VotesPerDoc, 
        data=means.for.method, 
        ylim=c(0.5, 1.0),
-       type="l",
-       xlab="Number of votes",
-       ylab="Accuracy")    
+       xlab="Votes per document",
+       ylab="Accuracy",
+       pch=16, cex=0.3
+       )
   } else {
-    lines(Accuracy ~ NVotes, data=means.for.method, col=color)
+    points(Accuracy ~ VotesPerDoc, data=means.for.method, col=color, pch=16, cex=0.3)
   }
 }
-
-```
-
-## Accuracy accross all topics
-
-```{r}
 
 plot.learning.curves <- function(means) {
   plot.for.method(means, 'MV')
@@ -67,12 +93,140 @@ plot.learning.curves <- function(means) {
   legend(x="bottomright", c("MV", "MEV(1)", "MVNN(0.5)", "GP"), lty=c(1,1,1,1), col=c("black", "red", "green", "blue") )
 }
 
+means <- aggregate(Accuracy ~ Method + VotesPerDoc, accuracy, mean)
+plot.learning.curves(means)
+
+  
+```
+
+Accuracies are averaged across all topics and color for different methods.
+
+Separately calculating methods means at 1, 2 and 3 votes per document.
+
+```{r}
+
+votes.per.doc <- 1.0
+means.vpd <- aggregate(Accuracy ~ Method, accuracy[accuracy$VotesPerDoc==votes.per.doc, ], mean)
+colnames(means.vpd) <- c("Method", "AccuracyAt1VPD")
+
+votes.per.doc <- 2.0
+means.2vpd <- aggregate(Accuracy ~ Method, accuracy[accuracy$VotesPerDoc==votes.per.doc, ], mean)
+means.vpd$AccuracyAt2VPD <- means.2vpd$Accuracy
+
+votes.per.doc <- 3.0
+means.3vpd <- aggregate(Accuracy ~ Method, accuracy[accuracy$VotesPerDoc==votes.per.doc, ], mean)
+means.vpd$AccuracyAt3VPD <- means.3vpd$Accuracy
+
+(means.vpd)
+
+```
+
+### Origin of lines
+
+**Hypothesis 1** There is 6 lines for every method (easy to distinguish on `GP`) - one line for a topic document count. All the accuracties for a particular method are averaged into these 6 bins.
+
+As long as we calculate the means for (method, votesPerDoc) pairs first, we then only agregate 28 numbers into 6 bins:
+
+```{r} 
+
+# means <- aggregate(Accuracy ~ Method + VotesPerDoc, accuracy, mean)
+# plot.learning.curves(means)
+
+```
+
+The variance is high enough for them to differ this way.
+
+Let us explore the `GP` performance separately for different topics.
+
+## Inspecting GP accuracy
+
+### GP Accuracy colored by topic
+
+We want to plot Accuracy against VotesPerDoc, indicating every separate topic with a color.
+
+```{r}
+
+gp.accuracy <- accuracy[accuracy$Method=='GP', ]
+
+col.codes <- 1:28
+col.idx <- 1
+
+plot(c(1.0, 3.0), range(gp.accuracy$Accuracy), col="white")
+for (topic in levels(accuracy$Topic) ) {
+  gp.accuracy.for.topic <- gp.accuracy[gp.accuracy$Topic == topic, ]
+  topic.means <- aggregate(Accuracy ~ VotesPerDoc, gp.accuracy.for.topic, mean)
+  points(topic.means$VotesPerDoc, topic.means$Accuracy, pch=16, cex=0.3, col=col.idx)
+  col.idx <- col.idx + 1
+}
+
+```
+
+Each colored line represents a separate topic.
+
+No obvious clustering here. Let us now color the same lines by the number of documents in a topic.
+
+### GP accuracy colored by document count in a topic
+
+```{r}
+
+possible.doc.counts <- levels(as.factor(ndocs$NDocuments))
+color.code <- c("black", "red", "green", "blue", "yellow", "orange")
+colors <- numeric(125)
+
+i <- 1
+for (doc.count in possible.doc.counts) {
+  colors[as.numeric(doc.count)] <- color.code[i]
+  i <- i + 1
+}
+
+get.color.code.for.topic <- function(topic) {
+  # Look up the doc count
+  doc.count <- ndocs[ndocs$Topic==topic, ]$NDocuments
+  colors[doc.count]
+}
+
+# We want to plot Accuracy ~ VotesPerDoc, coloring points depending in doc count
+plot(c(1.0, 3.0), range(accuracy$Accuracy), col="white")
+for (topic in levels(accuracy$Topic) ) {
+  gp.accuracy.for.topic <- gp.accuracy[gp.accuracy$Topic == topic, ]
+  topic.means <- aggregate(Accuracy ~ VotesPerDoc, gp.accuracy.for.topic, mean)
+  points(topic.means$VotesPerDoc, topic.means$Accuracy, pch=16, cex=0.3, col=get.color.code.for.topic(topic))
+  col.idx <- col.idx + 1
+}
+
+```
+
+Lines of the same color are the ones that come from topics with similar document counts. Doesn't look like for GPs a number of documents in a topic influences accuracy.
+
+<!--
+
+## Looking at slices of data
+
+Plot the same thing for 1/3 of the data
+
+```{r}
+
+total.n.rows <- nrow(accuracy)
+third <- total.n.rows/3
+accuracy.third <- accuracy[1:third, ]
+means <- aggregate(Accuracy ~ Method + VotesPerDoc, accuracy.third, mean)
 plot.learning.curves(means)
 
 ```
 
+Plot the same thing for 2/3 of the data
 
-Variance on the ends of the plot is higher, because for every topic the data is from 1 to 3 votes per document. Number of documents varies from 90 to 125, and there is more data for average number of votes.
+```{r}
+
+total.n.rows <- nrow(accuracy)
+two.third <- 2*total.n.rows/3
+accuracy.two.third <- accuracy[1:two.third, ]
+means <- aggregate(Accuracy ~ Method + VotesPerDoc, accuracy.two.third, mean)
+plot.learning.curves(means)
+
+```
+
+-->
 
 ## For each topic separately
 
@@ -83,7 +237,7 @@ for (topic in levels(accuracy$Topic) ) {
   accuracy.for.topic <- accuracy[accuracy$Topic == topic, ]
   accuracy.for.topic$RunId <- factor(accuracy.for.topic$RunId)
   cat("Runs plotted: ", length(levels(accuracy.for.topic$RunId)), "\n")
-  means <- aggregate(Accuracy ~ Method + NVotes, accuracy.for.topic, mean)
+  means <- aggregate(Accuracy ~ Method + VotesPerDoc, accuracy.for.topic, mean)
   plot.learning.curves(means)
 }
 

@@ -5,7 +5,7 @@
 # This file contains a command that has been run after the 
 # corresponding code has been commited to the repo
 
-OUTPUT_NAME='seq-around1-fewer-vote-docs'
+OUTPUT_NAME='seq-1to3'
 N_JOBS_PER_TOPIC=2
 
 # Every time you run stuff on Euler, there is gonna be a new file
@@ -30,7 +30,7 @@ do
   for job in `seq 1 $N_JOBS_PER_TOPIC`;
   do
 
-  bsub -W 4:00 -o $OUTPUT_FILE -e "accuracy/${OUTPUT_NAME}.stderr-${batch_id}.tsv" -R "rusage[mem=16000]" "python -W ignore accuracy_seq.py $topic_id" 
+  bsub -W 24:00 -o $OUTPUT_FILE -e "accuracy/${OUTPUT_NAME}.stderr-${batch_id}.tsv" -R "rusage[mem=16000]" "python -W ignore accuracy_seq.py $topic_id" 
 
   done
 

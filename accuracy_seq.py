@@ -119,13 +119,13 @@ if __name__ == "__main__":
   except IndexError:
     raise Exception("Please supply the topic id")
 
-  N_SEQS_PER_EST = 20
+  N_SEQS_PER_EST = 15
 
   print_accuracy_sequences_to_stderr({
        'GP' : (est_gp, []),
        'MV' : (est_majority_vote, []),
        'MEV(1)' : (est_merge_enough_votes, [ 1 ]),
        'MVNN(0.5)' : (est_majority_vote_with_nn, [ 0.5 ]),
-  }, (1.0, 1.05), topic_id, N_SEQS_PER_EST)
+  }, (1.0, 3.0), topic_id, N_SEQS_PER_EST)
 
 
